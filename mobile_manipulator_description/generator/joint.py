@@ -116,11 +116,12 @@ def _pocket(sign):
     return _sweep_cache[key]
 
 
-def tongue(sign, x0=-46.0, bolts='up', slot='rear', reg=None, extra=None, bolt_rear=True, port=False):
+def tongue(sign, x0=-46.0, bolts='up', slot='rear', reg=None, extra=None, bolt_rear=True, port=False, ins_len=8):
     """One clamshell half of the parent side of a joint (servo pocket + bearing seat).
     bolts: 'up' = M3 from the bottom half into heat-set inserts in the top half; 'down' = the reverse.
     The servo socket is the SO-ARM100 one (see SO100): same fit, hole sizes and case screws as the SO-100,
-    so a servo moves between the two arms with its screws."""
+    so a servo moves between the two arms with its screws.
+    ins_len: clamshell insert length (kit M3 x 8 on the base and links, M3 x 6 on the pitch housing)."""
     R, WY = P['R'], P['WY']
     if sign > 0:
         z0, z1 = 0.0, P['topT']
@@ -159,16 +160,16 @@ def tongue(sign, x0=-46.0, bolts='up', slot='rear', reg=None, extra=None, bolt_r
                 cut.append(screw_cut((x, y, z0 + 3.0), (0, 0, 1), 'M3', -z0 - 3.0 + 0.2, cb=3.2))
                 if reg is not None: reg.add('SHCS', 'M3', (x, y, z0 + 3.0), (0, 0, 1), 30, 'clamshell')
             else:
-                cut.append(insert_cut((x, y, 0.0), (0, 0, 1), 'M3'))
-                if reg is not None: reg.add('insert', 'M3', (x, y, 0.0), (0, 0, 1), None, 'clamshell')
+                cut.append(insert_cut((x, y, 0.0), (0, 0, 1), 'M3', length=ins_len))
+                if reg is not None: reg.add('insert', 'M3', (x, y, 0.0), (0, 0, 1), ins_len, 'clamshell')
         else:
             if sign > 0:
                 # head recessed 6 mm (was 3): an M3 x 35 then fills the whole 5.7 mm insert (it reached only 3 mm)
                 cut.append(screw_cut((x, y, z1 - 6.0), (0, 0, -1), 'M3', z1 - 6.0 + 0.2, cb=6.2))
                 if reg is not None: reg.add('SHCS', 'M3', (x, y, z1 - 6.0), (0, 0, -1), 35, 'clamshell')
             else:
-                cut.append(insert_cut((x, y, 0.0), (0, 0, -1), 'M3'))
-                if reg is not None: reg.add('insert', 'M3', (x, y, 0.0), (0, 0, -1), None, 'clamshell')
+                cut.append(insert_cut((x, y, 0.0), (0, 0, -1), 'M3', length=ins_len))
+                if reg is not None: reg.add('insert', 'M3', (x, y, 0.0), (0, 0, -1), ins_len, 'clamshell')
     # SO-100 case screws: M2x6 self-tap, 2.0 mm wall, dia 2.0 hole, dia 4.0 head counterbore
     S = SO100
     if sign > 0:
@@ -223,8 +224,8 @@ def fork(sign, F=58.0, reg=None, horn_screws=True, wide=None, cable=True, guides
         s = union(parts)
         cut = [cyl(CABLE_HOLE, 27.9, pz[1] + 0.1, hole=True)] if cable else []
         for yy in (-22.0, 22.0):
-            cut.append(insert_cut((F + bt / 2, yy, 0.0), (0, 0, 1), 'M3'))
-            if reg is not None: reg.add('insert', 'M3', (F + bt / 2, yy, 0.0), (0, 0, 1), None, 'fork base')
+            cut.append(insert_cut((F + bt / 2, yy, 0.0), (0, 0, 1), 'M3', length=6))
+            if reg is not None: reg.add('insert', 'M3', (F + bt / 2, yy, 0.0), (0, 0, 1), 6, 'fork base')
         return s - union(cut)
     pz = P['prongB']
     # seats on the output horn (Z = -18.7) and is screwed to it: this half drives the next link
@@ -272,8 +273,8 @@ def tube(sign, xa, xb, reg=None, holes=(), H=22.0, W=25.0, t=3.0):
     for xm in xs:
         for s_ in (-1, 1):
             if sign > 0:
-                cut.append(insert_cut((xm, s_ * yb, 0.0), (0, 0, 1), 'M3'))
-                if reg is not None: reg.add('insert', 'M3', (xm, s_ * yb, 0.0), (0, 0, 1), None, 'tube')
+                cut.append(insert_cut((xm, s_ * yb, 0.0), (0, 0, 1), 'M3', length=6))
+                if reg is not None: reg.add('insert', 'M3', (xm, s_ * yb, 0.0), (0, 0, 1), 6, 'tube')
             else:
                 seat = -H + 3.0
                 cut.append(screw_cut((xm, s_ * yb, seat), (0, 0, 1), 'M3', -seat + 0.2, cb=3.2))

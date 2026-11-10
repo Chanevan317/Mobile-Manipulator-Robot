@@ -1,15 +1,15 @@
 file,part,qty_per_arm,qty_two_arms,size_mm,volume_cm3,note
 01_base_top.stl,base_top,1,2,121.0 x 72.0 x 35.0,154.5,shoulder servo clamshell + pillar; prints split-face down
-02_base_bottom.stl,base_bottom,1,2,121.0 x 72.0 x 40.0,148.1,shoulder servo clamshell + pillar; prints split-face down
-03_upper_arm_top.stl,upper_arm_top,1,2,204.0 x 76.0 x 49.6,182.2,"link 130 mm: hub/fork at the near joint, servo clamshell at the far joint; prints split-face down"
+02_base_bottom.stl,base_bottom,1,2,121.0 x 72.0 x 40.0,147.8,shoulder servo clamshell + pillar; prints split-face down
+03_upper_arm_top.stl,upper_arm_top,1,2,204.0 x 76.0 x 49.6,182.0,"link 130 mm: hub/fork at the near joint, servo clamshell at the far joint; prints split-face down"
 04_upper_arm_bottom.stl,upper_arm_bottom,1,2,204.0 x 76.0 x 33.6,154.2,"link 130 mm: hub/fork at the near joint, servo clamshell at the far joint; prints split-face down"
-05_forearm_top.stl,forearm_top,1,2,204.0 x 76.0 x 49.6,182.2,"link 130 mm: hub/fork at the near joint, servo clamshell at the far joint; prints split-face down"
+05_forearm_top.stl,forearm_top,1,2,204.0 x 76.0 x 49.6,182.0,"link 130 mm: hub/fork at the near joint, servo clamshell at the far joint; prints split-face down"
 06_forearm_bottom.stl,forearm_bottom,1,2,204.0 x 76.0 x 33.6,154.2,"link 130 mm: hub/fork at the near joint, servo clamshell at the far joint; prints split-face down"
 07_wrist_top.stl,wrist_top,1,2,104.0 x 76.0 x 49.6,64.5,wrist-pan fork; the pitch housing hangs under the bottom prong
 08_wrist_bottom.stl,wrist_bottom,1,2,112.0 x 76.0 x 33.6,59.6,wrist-pan fork; the pitch housing hangs under the bottom prong
 09_pitch_housing_horn.stl,pitch_housing_horn,1,2,72.0 x 77.0 x 35.0,105.1,"pitch-servo clamshell (STS3215, SO-100 socket); split plane is vertical"
-10_pitch_housing_idler.stl,pitch_housing_idler,1,2,72.0 x 77.0 x 27.0,82.2,"pitch-servo clamshell (STS3215, SO-100 socket); split plane is vertical"
-11_tilt_fork_horn.stl,tilt_fork_horn,1,2,140.0 x 156.0 x 49.6,100.5,tilt fork half: hub/prong on the pitch servo + half of the roll-servo clamp; split plane is vertical
+10_pitch_housing_idler.stl,pitch_housing_idler,1,2,72.0 x 77.0 x 27.0,82.1,"pitch-servo clamshell (STS3215, SO-100 socket); split plane is vertical"
+11_tilt_fork_horn.stl,tilt_fork_horn,1,2,140.0 x 156.0 x 49.6,100.4,tilt fork half: hub/prong on the pitch servo + half of the roll-servo clamp; split plane is vertical
 12_tilt_fork_idler.stl,tilt_fork_idler,1,2,140.0 x 156.0 x 33.6,94.9,tilt fork half: hub/prong on the pitch servo + half of the roll-servo clamp; split plane is vertical
 13_camera_cradle.stl,camera_cradle,1,2,19.0 x 36.0 x 40.8,7.5,holds the 32 x 32 OV camera board (4 x M2 on 28 x 28); tilts 0..60 deg on one M3 bolt
 14_roll_yoke_gripper_housing.stl,roll_yoke_gripper_housing,1,2,61.4 x 44.0 x 48.3,41.1,"bolts to the roll servo horn, holds the gripper servo; servo slides in from the front"
@@ -20,3 +20,4 @@ file,part,qty_per_arm,qty_two_arms,size_mm,volume_cm3,note
 19_finger_right.stl,finger_right,1,2,50.0 x 40.0 x 14.0,17.1,"wedge finger, 1.5 mm rubber pad pocket on the grip face"
 20_finger_left.stl,finger_left,1,2,50.0 x 40.0 x 14.0,17.1,"wedge finger, 1.5 mm rubber pad pocket on the grip face"
 21_calibration_plate.stl,calibration_plate,1,1,150.0 x 150.0 x 10.0,220.4,"optional: bench / calibration plate, C-clamp on a table edge; 4 x M5 x 12 from below into the base inserts"
+22_insert_test_block.stl,insert_test_block,1,1,61.0 x 34.0 x 12.0,23.1,print first: M3 holes 4.1-4.5 and M5 holes 6.2-6.6 (small end at the notch) to pick the insert hole size

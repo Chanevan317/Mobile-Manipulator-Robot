@@ -90,9 +90,13 @@ newmtl fasteners_SHCS_M3x8
 Kd 0.080 0.080 0.090
 newmtl fasteners_SHCS_M5x16
 Kd 0.080 0.080 0.090
-newmtl fasteners_insert_M3
+newmtl fasteners_insert_M3x4
 Kd 0.850 0.650 0.200
-newmtl fasteners_insert_M5
+newmtl fasteners_insert_M3x6
+Kd 0.850 0.650 0.200
+newmtl fasteners_insert_M3x8
+Kd 0.850 0.650 0.200
+newmtl fasteners_insert_M5x8
 Kd 0.850 0.650 0.200
 newmtl fasteners_nut_M3
 Kd 0.550 0.570 0.600

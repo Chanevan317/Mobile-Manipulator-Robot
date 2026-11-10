@@ -79,12 +79,12 @@ def base_parts():
                 cut.append(screw_cut((-74.0, y, z1 - 6.0), (0, 0, -1), 'M3', z1 - 6.0 + 0.2, cb=6.2))   # 6 mm recess: full insert
                 r.add('SHCS', 'M3', (-74.0, y, z1 - 6.0), (0, 0, -1), 35, 'clamshell')
             else:
-                cut.append(insert_cut((-74.0, y, 0.0), (0, 0, -1), 'M3'))
-                r.add('insert', 'M3', (-74.0, y, 0.0), (0, 0, -1), None, 'clamshell')
+                cut.append(insert_cut((-74.0, y, 0.0), (0, 0, -1), 'M3', length=8))
+                r.add('insert', 'M3', (-74.0, y, 0.0), (0, 0, -1), 8, 'clamshell')
         if sign < 0:                                                         # M5 heat-set inserts for the mount plate
             for (x, y) in ((-80.0, 13.5), (-80.0, -13.5), (-54.0, 13.5), (-54.0, -13.5)):
-                cut.append(insert_cut((x, y, -40.0), (0, 0, 1), 'M5'))
-                r.add('insert', 'M5', (x, y, -40.0), (0, 0, 1), None, 'mount plate')
+                cut.append(insert_cut((x, y, -40.0), (0, 0, 1), 'M5', length=8))
+                r.add('insert', 'M5', (x, y, -40.0), (0, 0, 1), 8, 'mount plate')
                 r.add('SHCS', 'M5', (x, y, -48.0), (0, 0, 1), 16, 'from under the 8 mm mount plate')
         s = s - union(cut)
         add(nm, s, np.eye(4), (0.93, 0.55, 0.20) if sign > 0 else (0.96, 0.66, 0.30), r,
@@ -131,15 +131,15 @@ def wrist_parts(frame):
     tw = frame @ T(40.0, 0.0, PZ)
     for sign, nm in ((1, 'pitch_housing_horn'), (-1, 'pitch_housing_idler')):
         r = Reg()
-        t = tongue(sign, x0=-41.0, bolts='up', slot='side', reg=r, bolt_rear=False)
+        t = tongue(sign, x0=-41.0, bolts='up', slot='side', reg=r, bolt_rear=False, ins_len=6)
         s = xf(t, PITCH_J)                                             # into T frame
         rr = reg_xf(r, PITCH_J)
         cut = []
         for (x, y) in pin:                                             # inserts in the top face (W frame -> T frame)
             xt, yt = x - 40.0, y
             if (yt < 0) == (sign > 0):                                 # horn side is -Y
-                cut.append(insert_cut((xt, yt, 41.0), (0, 0, -1), 'M3', depth=6.0))
-                rr.add('insert', 'M3', (xt, yt, 41.0), (0, 0, -1), None, 'to wrist bracket')
+                cut.append(insert_cut((xt, yt, 41.0), (0, 0, -1), 'M3', depth=6.0, length=4))
+                rr.add('insert', 'M3', (xt, yt, 41.0), (0, 0, -1), 4, 'to wrist bracket')
         s = s - union(cut)
         add(nm, s, tw, (0.80, 0.35, 0.35) if sign > 0 else (0.86, 0.45, 0.42), rr,
             note='pitch-servo clamshell (STS3215, SO-100 socket); split plane is vertical')
@@ -177,7 +177,7 @@ def tilt_parts(frame):
                 if it['kind'] == 'SHCS':
                     recut.append(screw_cut(it['p'], it['d'], 'M3', 36.0, cb=4.0))
                 else:
-                    recut.append(insert_cut(it['p'], it['d'], 'M3'))
+                    recut.append(insert_cut(it['p'], it['d'], 'M3', length=it['length']))
         s = s - union(recut)
         # cable channel from the sockets (now at the back, T x 64.6..68.1, z ~14) up through the top of the clamp
         cut = [box(63.5, SOCK_ROLL + 0.1, -8.8, 8.8, 11.5, 17.0), box(63.5, SOCK_ROLL + 0.1, -6.0, 6.0, 11.5, 42.5)]
@@ -194,8 +194,8 @@ def tilt_parts(frame):
                 cut.append(screw_cut((x, 18.6 - 3.0, z), (0, -1, 0), 'M3', 15.8, cb=3.2))
                 rr.add('SHCS', 'M3', (x, 18.6 - 3.0, z), (0, -1, 0), 20, 'roll clamp')
             else:
-                cut.append(insert_cut((x, 0.0, z), (0, -1, 0), 'M3'))
-                rr.add('insert', 'M3', (x, 0.0, z), (0, -1, 0), None, 'roll clamp')
+                cut.append(insert_cut((x, 0.0, z), (0, -1, 0), 'M3', length=4))
+                rr.add('insert', 'M3', (x, 0.0, z), (0, -1, 0), 4, 'roll clamp')
         # camera tilt bolt through the cheek (one M3 x 55 through both cheeks and the cradle tube, nyloc nut)
         cut.append(xf(cyl(1.7, -30, 30, hole=True), T(CAM_PIVOT[0], 0, CAM_PIVOT[2]) @ Rx(90)))
         if sign < 0:
@@ -294,8 +294,8 @@ def yoke_part(frame):
                      for sy in (-1, 1) for z in (-8.0, 30.0)])
     for y in (-FP_Y, FP_Y):
         for z in (-8.0, 30.0):
-            cut.append(insert_cut((66.0, y, z), (-1, 0, 0), 'M3'))
-            r.add('insert', 'M3', (66.0, y, z), (-1, 0, 0), None, 'gripper front plate')
+            cut.append(insert_cut((66.0, y, z), (-1, 0, 0), 'M3', length=4))
+            r.add('insert', 'M3', (66.0, y, z), (-1, 0, 0), 4, 'gripper front plate')
     s = s - union(cut)
     add('roll_yoke_gripper_housing', s, frame, (0.92, 0.78, 0.25), r,
         note='bolts to the roll servo horn, holds the gripper servo; servo slides in from the front')
@@ -432,6 +432,6 @@ def finger_part(frame_fn):
     w = w - box(108.0, 140.0, -0.01, 1.6, -9.0, 9.0)               # pocket for a 1.5 mm rubber grip pad
     cut = []
     for z in (-10.0, 10.0):
-        cut.append(insert_cut((92.0, 7.0, z), (1, 0, 0), 'M3'))
-        r.add('insert', 'M3', (92.0, 7.0, z), (1, 0, 0), None, 'finger')
+        cut.append(insert_cut((92.0, 7.0, z), (1, 0, 0), 'M3', length=6))
+        r.add('insert', 'M3', (92.0, 7.0, z), (1, 0, 0), 6, 'finger')
     return w - union(cut), r

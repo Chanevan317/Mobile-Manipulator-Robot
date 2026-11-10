@@ -7,8 +7,9 @@ FS=fasteners(); bad=0
 for i,f in enumerate(FS):
     if f['kind']=='insert': 
         # insert model: shrink to check it sits fully in material: volume of insert outside its part
-        host=dict(W)[f['part']]; sz=f['size']; ri=SPEC[sz]['ins']/2
-        shell=place(cyl(ri+1.0,0.5,SPEC[sz]['ins_d']-0.5)-cyl(ri+0.05,0,SPEC[sz]['ins_d']),f['p'],f['d'])
+        # shell = the insert's own outside diameter + 1 mm of plastic, over its length (kit inserts, hw.SPEC od)
+        host=dict(W)[f['part']]; sz=f['size']; ri=SPEC[sz]['ins']/2; L=f['length'] or SPEC[sz]['ins_d']-0.8
+        shell=place(cyl(SPEC[sz]['od']/2+1.0,0.5,L)-cyl(ri+0.05,0,L+1),f['p'],f['d'])
         frac=(shell^host).volume()/shell.volume()
         if frac<0.97: print('insert wall thin',i,f['part'],f['note'],round(frac,3)); bad+=1
         continue

@@ -4,10 +4,12 @@ import numpy as np
 from lib import M, box, cyl, ring, union, xf, T, Rx, Ry, Rz
 
 SPEC = {
-    # clearance hole, head dia, head height, counterbore dia, insert hole dia, insert hole depth
-    'M2': dict(clear=2.4, head=3.8, head_h=1.6, cb=4.4, ins=3.2, ins_d=4.5),
-    'M3': dict(clear=3.4, head=5.5, head_h=3.0, cb=6.2, ins=4.0, ins_d=6.5),
-    'M5': dict(clear=5.5, head=8.5, head_h=5.0, cb=9.2, ins=6.4, ins_d=10.5),
+    # clearance hole, head dia, head height, counterbore dia, insert hole dia, default insert hole depth, insert outside dia
+    # Inserts: the user's 350-pc kit (2026-11-10): M3 x 4 / 6 / 8 long, 5.0 OD; M5 x 4 / 6 / 8, 7.0 OD (name = M x L x OD).
+    # M3 hole 4.3 is an estimate for the 5.0 OD (was 4.0 for 4.6 OD Ruthex): measure the inserts / print a test coupon.
+    'M2': dict(clear=2.4, head=3.8, head_h=1.6, cb=4.4, ins=3.2, ins_d=4.5, od=3.6),
+    'M3': dict(clear=3.4, head=5.5, head_h=3.0, cb=6.2, ins=4.3, ins_d=6.5, od=5.0),
+    'M5': dict(clear=5.5, head=8.5, head_h=5.0, cb=9.2, ins=6.4, ins_d=10.5, od=7.0),
 }
 
 
@@ -51,9 +53,11 @@ def screw_cut(p, d, size, shank, cb=0.0, extra=0.5, clear=None, cb_dia=None):
     return place(union(parts), p, d)
 
 
-def insert_cut(p, d, size, depth=None):
+def insert_cut(p, d, size, depth=None, length=None):
+    """Heat-set insert hole. The hole is at least `length` + 0.5 deep (the insert sits flush) and at least `depth`
+    (default SPEC ins_d), which also leaves room for the screw tip below a short insert."""
     s = SPEC[size]
-    depth = depth or s['ins_d']
+    depth = max(depth or s['ins_d'], (length or 0) + 0.5)
     c = union([cyl(s['ins'] / 2, -0.5, depth, hole=True), cyl(s['ins'] / 2 + 0.4, -0.5, 0.4, hole=True)])
     return place(c, p, d)
 
@@ -74,9 +78,9 @@ def screw_model(size, length, kind='SHCS'):
     return union([head, cyl(dia / 2 * 0.92, 0, length, n=16)])
 
 
-def insert_model(size):
+def insert_model(size, length=None):
     s = SPEC[size]
-    return ring(float(size[1:]) / 2, s['ins'] / 2 + 0.1, 0, s['ins_d'] - 0.8)
+    return ring(float(size[1:]) / 2, s['od'] / 2, 0, length or s['ins_d'] - 0.8)
 
 
 def bearing_6808():

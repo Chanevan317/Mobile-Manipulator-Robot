@@ -52,6 +52,14 @@ V2, F2 = mesh_arrays(_cpp); write_stl(os.path.join(OUT, 'print_ready_stl', _num 
 print_rows.append(dict(file=_num + '.stl', part='calibration_plate', qty_per_arm=1, qty_two_arms=1,
                        size_mm=f'{_bb[3]-_bb[0]:.1f} x {_bb[4]-_bb[1]:.1f} x {_bb[5]-_bb[2]:.1f}', volume_cm3=round(_cp.volume() / 1000, 1),
                        note='optional: bench / calibration plate, C-clamp on a table edge; 4 x M5 x 12 from below into the base inserts'))
+# heat-set insert test block (not part of the robot): print first to pick the insert hole size
+from insert_test import block as _insert_block
+_ib = _insert_block(); _num = f'{len(arm.PARTS) + 2:02d}_insert_test_block'
+_bb = _ib.bounding_box(); _ib = _ib.translate((-(_bb[0] + _bb[3]) / 2, -(_bb[1] + _bb[4]) / 2, -_bb[2]))
+V2, F2 = mesh_arrays(_ib); write_stl(os.path.join(OUT, 'print_ready_stl', _num + '.stl'), V2, F2)
+print_rows.append(dict(file=_num + '.stl', part='insert_test_block', qty_per_arm=1, qty_two_arms=1,
+                       size_mm=f'{_bb[3]-_bb[0]:.1f} x {_bb[4]-_bb[1]:.1f} x {_bb[5]-_bb[2]:.1f}', volume_cm3=round(_ib.volume() / 1000, 1),
+                       note='print first: M3 holes 4.1-4.5 and M5 holes 6.2-6.6 (small end at the notch) to pick the insert hole size'))
 pur_items = []
 for b in B:
     V, Fc = mesh_arrays(b['solid'])

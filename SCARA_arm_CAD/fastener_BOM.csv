@@ -7,8 +7,10 @@ SHCS,M3,30,10,20,clamshell
 SHCS,M3,35,14,28,clamshell; fork base
 SHCS,M3,55,1,2,"camera tilt bolt (both cheeks + cradle tube, nyloc nut)"
 SHCS,M5,16,4,8,from under the 8 mm mount plate
-insert,M3,,40,80,clamshell; finger; fork base; gripper front plate; roll clamp; to wrist bracket
-insert,M5,,4,8,mount plate
+insert,M3,4,12,24,gripper front plate; roll clamp; to wrist bracket
+insert,M3,6,14,28,clamshell; finger; fork base
+insert,M3,8,14,28,clamshell
+insert,M5,8,4,8,mount plate
 nut,M3,,7,14,MGN9 rail (nut trap); camera tilt bolt (nyloc)
 selftap,M2,6,22,44,gripper servo case (SO-100); roll servo case (SO-100); servo case (SO-100)
 selftap,M2,8,4,8,"camera board (from the front, into the standoff)"

@@ -86,7 +86,7 @@ def fastener_solid(f):
     if k in ('SHCS', 'selftap'):
         s = screw_model(f['size'], f['length'], 'SHCS' if k == 'SHCS' else 'pan')
     elif k == 'insert':
-        s = insert_model(f['size'])
+        s = insert_model(f['size'], f['length'])
     elif k == 'nut':
         s = xf(M.cylinder(2.4, 5.5 / 2 / math.cos(math.pi / 6), 5.5 / 2 / math.cos(math.pi / 6), 6), Rz(30)) - cyl(1.5, -1, 3)
     return place(s, f['p'], f['d'])

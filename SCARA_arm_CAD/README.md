@@ -52,16 +52,16 @@ Measured from the CAD model:
 | # | File | Size on the bed (mm) | Volume (cm³) | What it is |
 |---|---|---|---|---|
 | 1 | `01_base_top.stl` | 121.0 x 72.0 x 35.0 | 154.5 | shoulder servo clamshell + pillar; prints split-face down |
-| 2 | `02_base_bottom.stl` | 121.0 x 72.0 x 40.0 | 148.1 | shoulder servo clamshell + pillar; prints split-face down |
-| 3 | `03_upper_arm_top.stl` | 204.0 x 76.0 x 49.6 | 182.2 | link 130 mm: hub/fork at the near joint, servo clamshell at the far joint; prints split-face down |
+| 2 | `02_base_bottom.stl` | 121.0 x 72.0 x 40.0 | 147.8 | shoulder servo clamshell + pillar; prints split-face down |
+| 3 | `03_upper_arm_top.stl` | 204.0 x 76.0 x 49.6 | 182.0 | link 130 mm: hub/fork at the near joint, servo clamshell at the far joint; prints split-face down |
 | 4 | `04_upper_arm_bottom.stl` | 204.0 x 76.0 x 33.6 | 154.2 | link 130 mm: hub/fork at the near joint, servo clamshell at the far joint; prints split-face down |
-| 5 | `05_forearm_top.stl` | 204.0 x 76.0 x 49.6 | 182.2 | link 130 mm: hub/fork at the near joint, servo clamshell at the far joint; prints split-face down |
+| 5 | `05_forearm_top.stl` | 204.0 x 76.0 x 49.6 | 182.0 | link 130 mm: hub/fork at the near joint, servo clamshell at the far joint; prints split-face down |
 | 6 | `06_forearm_bottom.stl` | 204.0 x 76.0 x 33.6 | 154.2 | link 130 mm: hub/fork at the near joint, servo clamshell at the far joint; prints split-face down |
 | 7 | `07_wrist_top.stl` | 104.0 x 76.0 x 49.6 | 64.5 | wrist-pan fork; the pitch housing hangs under the bottom prong |
 | 8 | `08_wrist_bottom.stl` | 112.0 x 76.0 x 33.6 | 59.6 | wrist-pan fork; the pitch housing hangs under the bottom prong |
 | 9 | `09_pitch_housing_horn.stl` | 72.0 x 77.0 x 35.0 | 105.1 | pitch-servo clamshell (STS3215, SO-100 socket); split plane is vertical |
-| 10 | `10_pitch_housing_idler.stl` | 72.0 x 77.0 x 27.0 | 82.2 | pitch-servo clamshell (STS3215, SO-100 socket); split plane is vertical |
-| 11 | `11_tilt_fork_horn.stl` | 140.0 x 156.0 x 49.6 | 100.5 | tilt fork half: hub/prong on the pitch servo + half of the roll-servo clamp; split plane is vertical |
+| 10 | `10_pitch_housing_idler.stl` | 72.0 x 77.0 x 27.0 | 82.1 | pitch-servo clamshell (STS3215, SO-100 socket); split plane is vertical |
+| 11 | `11_tilt_fork_horn.stl` | 140.0 x 156.0 x 49.6 | 100.4 | tilt fork half: hub/prong on the pitch servo + half of the roll-servo clamp; split plane is vertical |
 | 12 | `12_tilt_fork_idler.stl` | 140.0 x 156.0 x 33.6 | 94.9 | tilt fork half: hub/prong on the pitch servo + half of the roll-servo clamp; split plane is vertical |
 | 13 | `13_camera_cradle.stl` | 19.0 x 36.0 x 40.8 | 7.5 | holds the 32 x 32 OV camera board (4 x M2 on 28 x 28); tilts 0..60 deg on one M3 bolt |
 | 14 | `14_roll_yoke_gripper_housing.stl` | 61.4 x 44.0 x 48.3 | 41.1 | bolts to the roll servo horn, holds the gripper servo; servo slides in from the front |
@@ -71,7 +71,8 @@ Measured from the CAD model:
 | 18 | `18_finger_carrier_left.stl` | 62.0 x 93.5 x 17.5 | 14.8 | bolts to one MGN9H carriage; its rack meshes with the pinion |
 | 19 | `19_finger_right.stl` | 50.0 x 40.0 x 14.0 | 17.1 | wedge finger, 1.5 mm rubber pad pocket on the grip face |
 | 20 | `20_finger_left.stl` | 50.0 x 40.0 x 14.0 | 17.1 | wedge finger, 1.5 mm rubber pad pocket on the grip face |
-| 21 | `21_calibration_plate.stl` | 150.0 x 150.0 x 10.0 | 223.0 | optional: bench / calibration plate, C-clamp on a table edge; 4 x M5 x 12 from below into the base inserts |
+| 21 | `21_calibration_plate.stl` | 150.0 x 150.0 x 10.0 | 220.4 | optional: bench / calibration plate, C-clamp on a table edge; 4 x M5 x 12 from below into the base inserts |
+| 22 | `22_insert_test_block.stl` | 61.0 x 34.0 x 12.0 | 23.1 | **print this first**: M3 holes Ø4.1–4.5 and M5 holes Ø6.2–6.6 (smallest at the notch) to pick the insert hole size; see "Heat-set inserts" |
 
 ## Print settings (Bambu Lab A1, PLA Pro+)
 
@@ -149,14 +150,14 @@ The A1 calibrates bed leveling, vibration and flow dynamics by itself, but **not
   screws into the cradle's standoffs).
 - **Fasteners:** see `fastener_BOM.csv`.
   - M3 socket-head screws: ISO 4762, steel 8.8 or A2.
-  - M3 heat-set inserts: hole Ø4.0 × 6.5 deep. For example Ruthex M3×5.7 or CNC Kitchen M3 standard.
-  - M5 heat-set inserts: hole Ø6.4 × 10.5 deep. These hold the arm on the carriage plate.
+  - Heat-set inserts: from a 350-piece "hot melt nut" kit (sizes named thread × length × outside diameter).
+    Three M3 lengths (4, 6 and 8 mm, all 5 mm outside) and M5 × 8. See "Heat-set inserts" below for which goes where.
   - M2×6 self-tapping screws: the same ones the SO-100 uses for its servo cases.
   - M3 nuts: hold the rail; one M3 nyloc nut on the camera tilt bolt.
 
 | Item | Per arm | Two arms | Used for |
 |---|---|---|---|
-| Socket-head cap screw M3×8 | 14 | 28 | camera post; carrier to MGN9H; pitch housing |
+| Socket-head cap screw M3×8 | 12 | 24 | carrier to MGN9H; pitch housing |
 | Socket-head cap screw M3×10 | 32 | 64 | finger; front plate to housing; horn (output); pinion to gripper horn; roll horn |
 | Socket-head cap screw M3×12 | 6 | 12 | MGN9 rail |
 | Socket-head cap screw M3×20 | 4 | 8 | roll clamp |
@@ -164,11 +165,13 @@ The A1 calibrates bed leveling, vibration and flow dynamics by itself, but **not
 | Socket-head cap screw M3×35 | 14 | 28 | clamshell; fork base |
 | Socket-head cap screw M3×55 | 1 | 2 | camera tilt bolt (through both cheeks + the cradle tube, nyloc nut) |
 | Socket-head cap screw M5×16 | 4 | 8 | from under the 8 mm mount plate |
-| Heat-set insert M3 | 42 | 84 | camera bracket; clamshell; finger; fork base; gripper front plate; roll clamp; to wrist bracket |
-| Heat-set insert M5 | 4 | 8 | mount plate |
+| Heat-set insert M3×8 (5 mm outside) | 14 | 28 | clamshell (base, upper arm, forearm) |
+| Heat-set insert M3×6 (5 mm outside) | 14 | 28 | clamshell (pitch housing); finger; fork base |
+| Heat-set insert M3×4 (5 mm outside) | 12 | 24 | gripper front plate; roll clamp; to wrist bracket |
+| Heat-set insert M5×8 (7 mm outside) | 4 | 8 | mount plate |
 | Hex nut M3 | 7 | 14 | MGN9 rail (nut trap); camera tilt bolt (nyloc) |
 | Self-tapping screw M2×6 | 22 | 44 | gripper servo case (SO-100); roll servo case (SO-100); servo case (SO-100) |
-| Self-tapping screw M2×12 | 4 | 8 | camera board (through the standoff) |
+| Self-tapping screw M2×8 | 4 | 8 | camera board (from the front, into the standoff) |
 
 ## Where the screws go
 
@@ -184,7 +187,7 @@ because it has no bearings.)
    from the bottom. On the shoulder base they are M3×35, put in from the top, because the base sits on the mount plate:
    their heads sit 6 mm deep in the counterbores so the bolt fills the whole insert (the inserts are in the bottom
    half, pressed in from the split face).
-   **Each bolt screws into a brass heat-set insert in the other half** (the larger Ø4.0 hole). Without the insert the
+   **Each bolt screws into a brass heat-set insert in the other half** (the larger Ø4.3 hole). Without the insert the
    bolt has nothing to grip. Fit the inserts first (see "Heat-set inserts" below).
 2. **Horn screws (output face only).** The bottom half of the next part fixes to the output horn with 4 × M3×10 from
    below, on the 9.9 mm square. The top half is not screwed to the idler.
@@ -237,19 +240,33 @@ front half, and keep the elbow fairly open when the arm points sideways.
 
 ## Heat-set inserts
 
-The clamshell halves, fork bases, roll clamp, gripper and camera bracket use **M3 brass heat-set inserts**, and the
-base uses **4 × M5** for the carriage plate. Per arm: 42 × M3 and 4 × M5 (`fastener_BOM.csv`).
+The clamshell halves, fork bases, fingers, roll clamp, gripper front plate and wrist bracket use **M3 brass heat-set
+inserts**, and the base uses **4 × M5** for the carriage plate. Per arm: 40 × M3 and 4 × M5 (`fastener_BOM.csv`).
 
-| Insert | Hole in the part | Fits |
-|---|---|---|
-| M3 | Ø4.0 × 6.5 mm deep | M3 × 5.7 mm long, ~4.6 mm outside (Ruthex / CNC Kitchen "M3 standard" type) |
-| M5 | Ø6.4 × 10.5 mm deep | M5 × 9.5 mm long, ~7 mm outside |
+The inserts come from a 350-piece kit. It has only 30 of each of the 6 mm and 8 mm M3 sizes, so each arm uses a mix of
+all three lengths. Both arms use the same mix:
 
-If your inserts have a different outside diameter or length, tell me their size and I'll change the hole (`SPEC` in
-`generator/hw.py`) and re-export.
+| Insert (thread × length × outside) | Hole in the part | Where | Per arm | Two arms | In the kit |
+|---|---|---|---|---|---|
+| M3 × 8 × 5 | Ø4.3 × 8.5 mm deep | clamshell bolts: base (6), upper arm (4), forearm (4) | 14 | 28 | 30 |
+| M3 × 6 × 5 | Ø4.3 × 6.5 mm deep | pitch-housing clamshell (2), fork bases (8), fingers (4) | 14 | 28 | 30 |
+| M3 × 4 × 5 | Ø4.3 × 6.0–6.5 mm deep | wrist bracket (4), roll clamp (4), gripper front plate (4) | 12 | 24 | 40 |
+| M5 × 8 × 7 | Ø6.4 × 10.5 mm deep | mount plate (bottom of the base) | 4 | 8 | 20 |
 
-Every insert was checked in CAD: at least 1.5 mm of plastic all round it, nothing over the opening (the iron can
-reach it), and its screw fills the insert's thread without bottoming out in the hole.
+- The 8 mm inserts go where the plastic is deepest. Their screws still grip 6 mm of thread.
+- The 4 mm inserts go where the wall is thinnest: the roll clamp (1.0 mm of plastic around the insert) and the
+  gripper front plate (1.2 mm). A short insert pushes less plastic aside. Their holes are deeper than the insert on
+  purpose: the screw tip goes past the insert (4.4–5.2 mm deep) into the plain hole below.
+- Press every insert in until it is flush with the surface, whatever the hole depth.
+
+**Check the hole size before printing everything.** Ø4.3 is an estimate for inserts 5.0 mm outside. Measure one
+insert with calipers. Then print `print_ready_stl/22_insert_test_block.stl` (M3 holes Ø4.1, 4.2, 4.3, 4.4, 4.5 and M5 holes Ø6.2,
+6.4, 6.6, growing from the notched edge) and press inserts into them. Pick the hole where the insert goes in with light pressure and does not turn when you tighten
+a screw. If it is not Ø4.3, tell me the size: I'll change `SPEC` in `generator/hw.py` and export again.
+
+Every insert was checked in CAD: at least 1 mm of plastic all round it (1.7–2.5 mm at most places), nothing over the
+opening (the iron can reach it), no hole breaking into a pocket, and its screw goes into the insert without hitting
+the bottom of the hole.
 
 How to fit one:
 1. Soldering iron with a heat-set tip of the insert's size, at about **200–220 °C for PLA**.
