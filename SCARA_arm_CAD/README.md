@@ -260,7 +260,7 @@ How to fit one:
 
 ## Control board (Waveshare bus servo adapter)
 
-The board goes on the **SO-101 Waveshare mounting plate** (`../SO100/WaveShare_Mounting_Plate_SO101.stl`). Its 18 mm
+The board goes on the **SO-101 Waveshare mounting plate** (`SO100/WaveShare_Mounting_Plate_SO101.stl`). Its 18 mm
 square tapered peg **slides sideways into the dovetail socket on the back face of the base pillar** (bottom half, open
 on one side), right under the rear cable slot. The cables come out of the slot and plug straight into the board. You
 can take the board off without opening the base. The board screws to the plate as on the SO-101.

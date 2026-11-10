@@ -278,7 +278,7 @@ How the masses were worked out:
 ## Servo sockets (same as the SO-100)
 
 Every servo is an STS3215 held exactly the way the SO-ARM100 holds it, so a servo moves between the SO-100 and this arm
-with its own screws. Measured from the SO-100 leader print files (`../SO100/`):
+with its own screws. Measured from the SO-100 leader print files (`../SCARA_arm_CAD/SO100/`):
 
 - The pocket is line-to-line with the servo case: the horn face sits flush, the idler side has 0.1 mm play.
 - Case screws are **M2×6 self-tapping** (the SO-100 ones) through a 2.0 mm wall into the servo's case holes:
