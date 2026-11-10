@@ -1,0 +1,161 @@
+#,goes in part,type,size,length_mm,purpose,x_part,y_part,z_part,dir_x,dir_y,dir_z,x_arm,y_arm,z_arm
+1,base_top,SHCS,M3,35,clamshell,-41.50,-16.30,29.00,0.000,0.000,-1.000,-41.50,-16.30,29.00
+2,base_top,SHCS,M3,35,clamshell,-41.50,16.30,29.00,0.000,0.000,-1.000,-41.50,16.30,29.00
+3,base_top,SHCS,M3,35,clamshell,27.81,-14.79,29.00,0.000,0.000,-1.000,27.81,-14.79,29.00
+4,base_top,SHCS,M3,35,clamshell,27.81,14.79,29.00,0.000,0.000,-1.000,27.81,14.79,29.00
+5,base_top,selftap,M2,6,servo case (SO-100),-32.80,10.25,17.90,0.000,0.000,-1.000,-32.80,10.25,17.90
+6,base_top,selftap,M2,6,servo case (SO-100),-32.80,-10.25,17.90,0.000,0.000,-1.000,-32.80,-10.25,17.90
+7,base_top,SHCS,M3,35,clamshell,-74.00,-14.50,29.00,0.000,0.000,-1.000,-74.00,-14.50,29.00
+8,base_top,SHCS,M3,35,clamshell,-74.00,14.50,29.00,0.000,0.000,-1.000,-74.00,14.50,29.00
+9,base_bottom,insert,M3,,clamshell,-41.50,-16.30,0.00,0.000,0.000,-1.000,-41.50,-16.30,0.00
+10,base_bottom,insert,M3,,clamshell,-41.50,16.30,0.00,0.000,0.000,-1.000,-41.50,16.30,0.00
+11,base_bottom,insert,M3,,clamshell,27.81,-14.79,0.00,0.000,0.000,-1.000,27.81,-14.79,0.00
+12,base_bottom,insert,M3,,clamshell,27.81,14.79,0.00,0.000,0.000,-1.000,27.81,14.79,0.00
+13,base_bottom,selftap,M2,6,servo case (SO-100),-29.00,10.25,-18.00,0.000,0.000,1.000,-29.00,10.25,-18.00
+14,base_bottom,selftap,M2,6,servo case (SO-100),-29.00,-10.25,-18.00,0.000,0.000,1.000,-29.00,-10.25,-18.00
+15,base_bottom,insert,M3,,clamshell,-74.00,-14.50,0.00,0.000,0.000,-1.000,-74.00,-14.50,0.00
+16,base_bottom,insert,M3,,clamshell,-74.00,14.50,0.00,0.000,0.000,-1.000,-74.00,14.50,0.00
+17,base_bottom,insert,M5,,mount plate,-80.00,13.50,-40.00,0.000,0.000,1.000,-80.00,13.50,-40.00
+18,base_bottom,SHCS,M5,16,from under the 8 mm mount plate,-80.00,13.50,-48.00,0.000,0.000,1.000,-80.00,13.50,-48.00
+19,base_bottom,insert,M5,,mount plate,-80.00,-13.50,-40.00,0.000,0.000,1.000,-80.00,-13.50,-40.00
+20,base_bottom,SHCS,M5,16,from under the 8 mm mount plate,-80.00,-13.50,-48.00,0.000,0.000,1.000,-80.00,-13.50,-48.00
+21,base_bottom,insert,M5,,mount plate,-54.00,13.50,-40.00,0.000,0.000,1.000,-54.00,13.50,-40.00
+22,base_bottom,SHCS,M5,16,from under the 8 mm mount plate,-54.00,13.50,-48.00,0.000,0.000,1.000,-54.00,13.50,-48.00
+23,base_bottom,insert,M5,,mount plate,-54.00,-13.50,-40.00,0.000,0.000,1.000,-54.00,-13.50,-40.00
+24,base_bottom,SHCS,M5,16,from under the 8 mm mount plate,-54.00,-13.50,-48.00,0.000,0.000,1.000,-54.00,-13.50,-48.00
+25,upper_arm_top,insert,M3,,fork base,62.00,-22.00,0.00,0.000,0.000,1.000,62.00,-22.00,0.00
+26,upper_arm_top,insert,M3,,fork base,62.00,22.00,0.00,0.000,0.000,1.000,62.00,22.00,0.00
+27,upper_arm_top,insert,M3,,clamshell,88.50,-16.30,0.00,0.000,0.000,1.000,88.50,-16.30,0.00
+28,upper_arm_top,insert,M3,,clamshell,88.50,16.30,0.00,0.000,0.000,1.000,88.50,16.30,0.00
+29,upper_arm_top,insert,M3,,clamshell,157.81,-14.79,0.00,0.000,0.000,1.000,157.81,-14.79,0.00
+30,upper_arm_top,insert,M3,,clamshell,157.81,14.79,0.00,0.000,0.000,1.000,157.81,14.79,0.00
+31,upper_arm_top,selftap,M2,6,servo case (SO-100),97.20,10.25,17.90,0.000,0.000,-1.000,97.20,10.25,17.90
+32,upper_arm_top,selftap,M2,6,servo case (SO-100),97.20,-10.25,17.90,0.000,0.000,-1.000,97.20,-10.25,17.90
+33,upper_arm_bottom,SHCS,M3,10,horn (output),-4.95,-4.95,-25.90,0.000,0.000,1.000,-4.95,-4.95,-25.90
+34,upper_arm_bottom,SHCS,M3,10,horn (output),-4.95,4.95,-25.90,0.000,0.000,1.000,-4.95,4.95,-25.90
+35,upper_arm_bottom,SHCS,M3,10,horn (output),4.95,-4.95,-25.90,0.000,0.000,1.000,4.95,-4.95,-25.90
+36,upper_arm_bottom,SHCS,M3,10,horn (output),4.95,4.95,-25.90,0.000,0.000,1.000,4.95,4.95,-25.90
+37,upper_arm_bottom,SHCS,M3,35,fork base,62.00,-22.00,-30.10,0.000,0.000,1.000,62.00,-22.00,-30.10
+38,upper_arm_bottom,SHCS,M3,35,fork base,62.00,22.00,-30.10,0.000,0.000,1.000,62.00,22.00,-30.10
+39,upper_arm_bottom,SHCS,M3,30,clamshell,88.50,-16.30,-24.00,0.000,0.000,1.000,88.50,-16.30,-24.00
+40,upper_arm_bottom,SHCS,M3,30,clamshell,88.50,16.30,-24.00,0.000,0.000,1.000,88.50,16.30,-24.00
+41,upper_arm_bottom,SHCS,M3,30,clamshell,157.81,-14.79,-24.00,0.000,0.000,1.000,157.81,-14.79,-24.00
+42,upper_arm_bottom,SHCS,M3,30,clamshell,157.81,14.79,-24.00,0.000,0.000,1.000,157.81,14.79,-24.00
+43,upper_arm_bottom,selftap,M2,6,servo case (SO-100),101.00,10.25,-18.00,0.000,0.000,1.000,101.00,10.25,-18.00
+44,upper_arm_bottom,selftap,M2,6,servo case (SO-100),101.00,-10.25,-18.00,0.000,0.000,1.000,101.00,-10.25,-18.00
+45,forearm_top,insert,M3,,fork base,62.00,-22.00,0.00,0.000,0.000,1.000,192.00,-22.00,0.00
+46,forearm_top,insert,M3,,fork base,62.00,22.00,0.00,0.000,0.000,1.000,192.00,22.00,0.00
+47,forearm_top,insert,M3,,clamshell,88.50,-16.30,0.00,0.000,0.000,1.000,218.50,-16.30,0.00
+48,forearm_top,insert,M3,,clamshell,88.50,16.30,0.00,0.000,0.000,1.000,218.50,16.30,0.00
+49,forearm_top,insert,M3,,clamshell,157.81,-14.79,0.00,0.000,0.000,1.000,287.81,-14.79,0.00
+50,forearm_top,insert,M3,,clamshell,157.81,14.79,0.00,0.000,0.000,1.000,287.81,14.79,0.00
+51,forearm_top,selftap,M2,6,servo case (SO-100),97.20,10.25,17.90,0.000,0.000,-1.000,227.20,10.25,17.90
+52,forearm_top,selftap,M2,6,servo case (SO-100),97.20,-10.25,17.90,0.000,0.000,-1.000,227.20,-10.25,17.90
+53,forearm_bottom,SHCS,M3,10,horn (output),-4.95,-4.95,-25.90,0.000,0.000,1.000,125.05,-4.95,-25.90
+54,forearm_bottom,SHCS,M3,10,horn (output),-4.95,4.95,-25.90,0.000,0.000,1.000,125.05,4.95,-25.90
+55,forearm_bottom,SHCS,M3,10,horn (output),4.95,-4.95,-25.90,0.000,0.000,1.000,134.95,-4.95,-25.90
+56,forearm_bottom,SHCS,M3,10,horn (output),4.95,4.95,-25.90,0.000,0.000,1.000,134.95,4.95,-25.90
+57,forearm_bottom,SHCS,M3,35,fork base,62.00,-22.00,-30.10,0.000,0.000,1.000,192.00,-22.00,-30.10
+58,forearm_bottom,SHCS,M3,35,fork base,62.00,22.00,-30.10,0.000,0.000,1.000,192.00,22.00,-30.10
+59,forearm_bottom,SHCS,M3,30,clamshell,88.50,-16.30,-24.00,0.000,0.000,1.000,218.50,-16.30,-24.00
+60,forearm_bottom,SHCS,M3,30,clamshell,88.50,16.30,-24.00,0.000,0.000,1.000,218.50,16.30,-24.00
+61,forearm_bottom,SHCS,M3,30,clamshell,157.81,-14.79,-24.00,0.000,0.000,1.000,287.81,-14.79,-24.00
+62,forearm_bottom,SHCS,M3,30,clamshell,157.81,14.79,-24.00,0.000,0.000,1.000,287.81,14.79,-24.00
+63,forearm_bottom,selftap,M2,6,servo case (SO-100),101.00,10.25,-18.00,0.000,0.000,1.000,231.00,10.25,-18.00
+64,forearm_bottom,selftap,M2,6,servo case (SO-100),101.00,-10.25,-18.00,0.000,0.000,1.000,231.00,-10.25,-18.00
+65,wrist_top,insert,M3,,fork base,62.00,-22.00,0.00,0.000,0.000,1.000,322.00,-22.00,0.00
+66,wrist_top,insert,M3,,fork base,62.00,22.00,0.00,0.000,0.000,1.000,322.00,22.00,0.00
+67,wrist_bottom,SHCS,M3,10,horn (output),-4.95,-4.95,-25.90,0.000,0.000,1.000,255.05,-4.95,-25.90
+68,wrist_bottom,SHCS,M3,10,horn (output),-4.95,4.95,-25.90,0.000,0.000,1.000,255.05,4.95,-25.90
+69,wrist_bottom,SHCS,M3,10,horn (output),4.95,-4.95,-25.90,0.000,0.000,1.000,264.95,-4.95,-25.90
+70,wrist_bottom,SHCS,M3,10,horn (output),4.95,4.95,-25.90,0.000,0.000,1.000,264.95,4.95,-25.90
+71,wrist_bottom,SHCS,M3,35,fork base,62.00,-22.00,-30.10,0.000,0.000,1.000,322.00,-22.00,-30.10
+72,wrist_bottom,SHCS,M3,35,fork base,62.00,22.00,-30.10,0.000,0.000,1.000,322.00,22.00,-30.10
+73,wrist_bottom,SHCS,M3,8,pitch housing,26.00,-22.00,-30.80,0.000,0.000,-1.000,286.00,-22.00,-30.80
+74,wrist_bottom,SHCS,M3,8,pitch housing,26.00,22.00,-30.80,0.000,0.000,-1.000,286.00,22.00,-30.80
+75,wrist_bottom,SHCS,M3,8,pitch housing,54.00,-22.00,-30.80,0.000,0.000,-1.000,314.00,-22.00,-30.80
+76,wrist_bottom,SHCS,M3,8,pitch housing,54.00,22.00,-30.80,0.000,0.000,-1.000,314.00,22.00,-30.80
+77,pitch_housing_horn,insert,M3,,clamshell,-14.79,0.00,-27.81,0.000,-1.000,0.000,285.21,0.00,-102.41
+78,pitch_housing_horn,insert,M3,,clamshell,14.79,0.00,-27.81,0.000,-1.000,0.000,314.79,0.00,-102.41
+79,pitch_housing_horn,selftap,M2,6,servo case (SO-100),10.25,-17.90,32.80,0.000,1.000,0.000,310.25,-17.90,-41.80
+80,pitch_housing_horn,selftap,M2,6,servo case (SO-100),-10.25,-17.90,32.80,0.000,1.000,0.000,289.75,-17.90,-41.80
+81,pitch_housing_horn,insert,M3,,to wrist bracket,-14.00,-22.00,41.00,0.000,0.000,-1.000,286.00,-22.00,-33.60
+82,pitch_housing_horn,insert,M3,,to wrist bracket,14.00,-22.00,41.00,0.000,0.000,-1.000,314.00,-22.00,-33.60
+83,pitch_housing_idler,SHCS,M3,30,clamshell,-14.79,24.00,-27.81,0.000,-1.000,0.000,285.21,24.00,-102.41
+84,pitch_housing_idler,SHCS,M3,30,clamshell,14.79,24.00,-27.81,0.000,-1.000,0.000,314.79,24.00,-102.41
+85,pitch_housing_idler,selftap,M2,6,servo case (SO-100),10.25,18.00,29.00,0.000,-1.000,0.000,310.25,18.00,-45.60
+86,pitch_housing_idler,selftap,M2,6,servo case (SO-100),-10.25,18.00,29.00,0.000,-1.000,0.000,289.75,18.00,-45.60
+87,pitch_housing_idler,insert,M3,,to wrist bracket,-14.00,22.00,41.00,0.000,0.000,-1.000,286.00,22.00,-33.60
+88,pitch_housing_idler,insert,M3,,to wrist bracket,14.00,22.00,41.00,0.000,0.000,-1.000,314.00,22.00,-33.60
+89,tilt_fork_horn,insert,M3,,fork base,50.00,0.00,-22.00,0.000,-1.000,0.000,350.00,0.00,-96.60
+90,tilt_fork_horn,insert,M3,,fork base,50.00,0.00,22.00,0.000,-1.000,0.000,350.00,0.00,-52.60
+91,tilt_fork_horn,selftap,M2,6,roll servo case (SO-100),66.10,-10.25,32.80,1.000,0.000,0.000,366.10,-10.25,-41.80
+92,tilt_fork_horn,selftap,M2,6,roll servo case (SO-100),66.10,-10.25,8.30,1.000,0.000,0.000,366.10,-10.25,-66.30
+93,tilt_fork_horn,insert,M3,,roll clamp,75.00,0.00,38.70,0.000,-1.000,0.000,375.00,0.00,-35.90
+94,tilt_fork_horn,insert,M3,,roll clamp,96.00,0.00,38.70,0.000,-1.000,0.000,396.00,0.00,-35.90
+95,tilt_fork_horn,insert,M3,,roll clamp,56.00,0.00,24.00,0.000,-1.000,0.000,356.00,0.00,-50.60
+96,tilt_fork_horn,insert,M3,,roll clamp,61.00,0.00,-9.00,0.000,-1.000,0.000,361.00,0.00,-83.60
+97,tilt_fork_idler,SHCS,M3,10,horn (output),-4.95,25.90,-4.95,0.000,-1.000,0.000,295.05,25.90,-79.55
+98,tilt_fork_idler,SHCS,M3,10,horn (output),-4.95,25.90,4.95,0.000,-1.000,0.000,295.05,25.90,-69.65
+99,tilt_fork_idler,SHCS,M3,10,horn (output),4.95,25.90,-4.95,0.000,-1.000,0.000,304.95,25.90,-79.55
+100,tilt_fork_idler,SHCS,M3,10,horn (output),4.95,25.90,4.95,0.000,-1.000,0.000,304.95,25.90,-69.65
+101,tilt_fork_idler,SHCS,M3,35,fork base,50.00,30.10,-22.00,0.000,-1.000,0.000,350.00,30.10,-96.60
+102,tilt_fork_idler,SHCS,M3,35,fork base,50.00,30.10,22.00,0.000,-1.000,0.000,350.00,30.10,-52.60
+103,tilt_fork_idler,selftap,M2,6,roll servo case (SO-100),66.10,10.25,32.80,1.000,0.000,0.000,366.10,10.25,-41.80
+104,tilt_fork_idler,selftap,M2,6,roll servo case (SO-100),66.10,10.25,8.30,1.000,0.000,0.000,366.10,10.25,-66.30
+105,tilt_fork_idler,SHCS,M3,20,roll clamp,75.00,15.60,38.70,0.000,-1.000,0.000,375.00,15.60,-35.90
+106,tilt_fork_idler,SHCS,M3,20,roll clamp,96.00,15.60,38.70,0.000,-1.000,0.000,396.00,15.60,-35.90
+107,tilt_fork_idler,SHCS,M3,20,roll clamp,56.00,15.60,24.00,0.000,-1.000,0.000,356.00,15.60,-50.60
+108,tilt_fork_idler,SHCS,M3,20,roll clamp,61.00,15.60,-9.00,0.000,-1.000,0.000,361.00,15.60,-83.60
+109,tilt_fork_idler,SHCS,M3,55,"camera tilt bolt (both cheeks + cradle tube, nyloc nut)",85.00,25.60,110.00,0.000,-1.000,0.000,385.00,25.60,35.40
+110,tilt_fork_idler,nut,M3,,camera tilt bolt (nyloc),85.00,-25.60,110.00,0.000,-1.000,0.000,385.00,-25.60,35.40
+111,camera_cradle,selftap,M2,8,"camera board (from the front, into the standoff)",90.08,-14.00,89.35,-0.819,0.000,0.574,390.08,-14.00,14.75
+112,camera_cradle,selftap,M2,8,"camera board (from the front, into the standoff)",106.14,-14.00,112.29,-0.819,0.000,0.574,406.14,-14.00,37.69
+113,camera_cradle,selftap,M2,8,"camera board (from the front, into the standoff)",90.08,14.00,89.35,-0.819,0.000,0.574,390.08,14.00,14.75
+114,camera_cradle,selftap,M2,8,"camera board (from the front, into the standoff)",106.14,14.00,112.29,-0.819,0.000,0.574,406.14,14.00,37.69
+115,roll_yoke_gripper_housing,SHCS,M3,10,roll horn,25.60,-4.95,4.95,-1.000,0.000,0.000,410.60,-4.95,-69.65
+116,roll_yoke_gripper_housing,SHCS,M3,10,roll horn,25.60,4.95,4.95,-1.000,0.000,0.000,410.60,4.95,-69.65
+117,roll_yoke_gripper_housing,SHCS,M3,10,roll horn,25.60,-4.95,-4.95,-1.000,0.000,0.000,410.60,-4.95,-79.55
+118,roll_yoke_gripper_housing,SHCS,M3,10,roll horn,25.60,4.95,-4.95,-1.000,0.000,0.000,410.60,4.95,-79.55
+119,roll_yoke_gripper_housing,selftap,M2,6,gripper servo case (SO-100),31.10,-10.25,32.80,1.000,0.000,0.000,416.10,-10.25,-41.80
+120,roll_yoke_gripper_housing,selftap,M2,6,gripper servo case (SO-100),31.10,10.25,32.80,1.000,0.000,0.000,416.10,10.25,-41.80
+121,roll_yoke_gripper_housing,insert,M3,,gripper front plate,66.00,-16.10,-8.00,-1.000,0.000,0.000,451.00,-16.10,-82.60
+122,roll_yoke_gripper_housing,insert,M3,,gripper front plate,66.00,-16.10,30.00,-1.000,0.000,0.000,451.00,-16.10,-44.60
+123,roll_yoke_gripper_housing,insert,M3,,gripper front plate,66.00,16.10,-8.00,-1.000,0.000,0.000,451.00,16.10,-82.60
+124,roll_yoke_gripper_housing,insert,M3,,gripper front plate,66.00,16.10,30.00,-1.000,0.000,0.000,451.00,16.10,-44.60
+125,gripper_front_plate,SHCS,M3,10,front plate to housing,71.00,-16.10,-8.00,-1.000,0.000,0.000,456.00,-16.10,-82.60
+126,gripper_front_plate,SHCS,M3,10,front plate to housing,71.00,-16.10,30.00,-1.000,0.000,0.000,456.00,-16.10,-44.60
+127,gripper_front_plate,SHCS,M3,10,front plate to housing,71.00,16.10,-8.00,-1.000,0.000,0.000,456.00,16.10,-82.60
+128,gripper_front_plate,SHCS,M3,10,front plate to housing,71.00,16.10,30.00,-1.000,0.000,0.000,456.00,16.10,-44.60
+129,gripper_front_plate,SHCS,M3,12,MGN9 rail,77.00,-80.00,32.00,-1.000,0.000,0.000,462.00,-80.00,-42.60
+130,gripper_front_plate,nut,M3,,MGN9 rail (nut trap),66.00,-80.00,32.00,1.000,0.000,0.000,451.00,-80.00,-42.60
+131,gripper_front_plate,SHCS,M3,12,MGN9 rail,77.00,-60.00,32.00,-1.000,0.000,0.000,462.00,-60.00,-42.60
+132,gripper_front_plate,nut,M3,,MGN9 rail (nut trap),66.00,-60.00,32.00,1.000,0.000,0.000,451.00,-60.00,-42.60
+133,gripper_front_plate,SHCS,M3,12,MGN9 rail,77.00,-40.00,32.00,-1.000,0.000,0.000,462.00,-40.00,-42.60
+134,gripper_front_plate,nut,M3,,MGN9 rail (nut trap),66.00,-40.00,32.00,1.000,0.000,0.000,451.00,-40.00,-42.60
+135,gripper_front_plate,SHCS,M3,12,MGN9 rail,77.00,40.00,32.00,-1.000,0.000,0.000,462.00,40.00,-42.60
+136,gripper_front_plate,nut,M3,,MGN9 rail (nut trap),66.00,40.00,32.00,1.000,0.000,0.000,451.00,40.00,-42.60
+137,gripper_front_plate,SHCS,M3,12,MGN9 rail,77.00,60.00,32.00,-1.000,0.000,0.000,462.00,60.00,-42.60
+138,gripper_front_plate,nut,M3,,MGN9 rail (nut trap),66.00,60.00,32.00,1.000,0.000,0.000,451.00,60.00,-42.60
+139,gripper_front_plate,SHCS,M3,12,MGN9 rail,77.00,80.00,32.00,-1.000,0.000,0.000,462.00,80.00,-42.60
+140,gripper_front_plate,nut,M3,,MGN9 rail (nut trap),66.00,80.00,32.00,1.000,0.000,0.000,451.00,80.00,-42.60
+141,pinion_24T_m1,SHCS,M3,10,pinion to gripper horn,-4.95,-4.95,75.60,0.000,0.000,-1.000,460.60,1.00,-81.53
+142,pinion_24T_m1,SHCS,M3,10,pinion to gripper horn,-4.95,4.95,75.60,0.000,0.000,-1.000,460.60,-6.93,-75.60
+143,pinion_24T_m1,SHCS,M3,10,pinion to gripper horn,4.95,-4.95,75.60,0.000,0.000,-1.000,460.60,6.93,-73.60
+144,pinion_24T_m1,SHCS,M3,10,pinion to gripper horn,4.95,4.95,75.60,0.000,0.000,-1.000,460.60,-1.00,-67.67
+145,finger_carrier_right,SHCS,M3,8,carrier to MGN9H,89.00,12.50,24.50,-1.000,0.000,0.000,474.00,42.50,-50.10
+146,finger_carrier_right,SHCS,M3,8,carrier to MGN9H,89.00,12.50,39.50,-1.000,0.000,0.000,474.00,42.50,-35.10
+147,finger_carrier_right,SHCS,M3,8,carrier to MGN9H,89.00,28.50,24.50,-1.000,0.000,0.000,474.00,58.50,-50.10
+148,finger_carrier_right,SHCS,M3,8,carrier to MGN9H,89.00,28.50,39.50,-1.000,0.000,0.000,474.00,58.50,-35.10
+149,finger_carrier_right,SHCS,M3,10,finger,87.00,7.00,-10.00,1.000,0.000,0.000,472.00,37.00,-84.60
+150,finger_carrier_right,SHCS,M3,10,finger,87.00,7.00,10.00,1.000,0.000,0.000,472.00,37.00,-64.60
+151,finger_carrier_left,SHCS,M3,8,carrier to MGN9H,89.00,-12.50,24.50,-1.000,0.000,0.000,474.00,-42.50,-50.10
+152,finger_carrier_left,SHCS,M3,8,carrier to MGN9H,89.00,-12.50,39.50,-1.000,0.000,0.000,474.00,-42.50,-35.10
+153,finger_carrier_left,SHCS,M3,8,carrier to MGN9H,89.00,-28.50,24.50,-1.000,0.000,0.000,474.00,-58.50,-50.10
+154,finger_carrier_left,SHCS,M3,8,carrier to MGN9H,89.00,-28.50,39.50,-1.000,0.000,0.000,474.00,-58.50,-35.10
+155,finger_carrier_left,SHCS,M3,10,finger,87.00,-7.00,-10.00,1.000,0.000,0.000,472.00,-37.00,-84.60
+156,finger_carrier_left,SHCS,M3,10,finger,87.00,-7.00,10.00,1.000,0.000,0.000,472.00,-37.00,-64.60
+157,finger_right,insert,M3,,finger,92.00,7.00,-10.00,1.000,0.000,0.000,477.00,37.00,-84.60
+158,finger_right,insert,M3,,finger,92.00,7.00,10.00,1.000,0.000,0.000,477.00,37.00,-64.60
+159,finger_left,insert,M3,,finger,92.00,-7.00,-10.00,1.000,0.000,0.000,477.00,-37.00,-84.60
+160,finger_left,insert,M3,,finger,92.00,-7.00,10.00,1.000,0.000,0.000,477.00,-37.00,-64.60

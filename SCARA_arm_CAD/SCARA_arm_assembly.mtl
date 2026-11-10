@@ -1,0 +1,102 @@
+newmtl 01_base_top
+Kd 0.930 0.550 0.200
+newmtl 02_base_bottom
+Kd 0.960 0.660 0.300
+newmtl 03_upper_arm_top
+Kd 0.250 0.480 0.800
+newmtl 04_upper_arm_bottom
+Kd 0.330 0.560 0.860
+newmtl 05_forearm_top
+Kd 0.250 0.480 0.800
+newmtl 06_forearm_bottom
+Kd 0.330 0.560 0.860
+newmtl 07_wrist_top
+Kd 0.200 0.600 0.550
+newmtl 08_wrist_bottom
+Kd 0.270 0.670 0.600
+newmtl 09_pitch_housing_horn
+Kd 0.800 0.350 0.350
+newmtl 10_pitch_housing_idler
+Kd 0.860 0.450 0.420
+newmtl 11_tilt_fork_horn
+Kd 0.550 0.420 0.750
+newmtl 12_tilt_fork_idler
+Kd 0.620 0.500 0.800
+newmtl 13_camera_cradle
+Kd 0.350 0.350 0.400
+newmtl 14_roll_yoke_gripper_housing
+Kd 0.920 0.780 0.250
+newmtl 15_gripper_front_plate
+Kd 0.300 0.300 0.340
+newmtl 16_pinion_24T_m1
+Kd 0.850 0.850 0.880
+newmtl 17_finger_carrier_right
+Kd 0.200 0.200 0.220
+newmtl 18_finger_carrier_left
+Kd 0.200 0.200 0.220
+newmtl 19_finger_right
+Kd 0.120 0.120 0.130
+newmtl 20_finger_left
+Kd 0.120 0.120 0.130
+newmtl servo_shoulder_STS3215
+Kd 0.130 0.130 0.150
+newmtl servo_elbow_STS3215
+Kd 0.130 0.130 0.150
+newmtl servo_wrist_pan_STS3215
+Kd 0.130 0.130 0.150
+newmtl servo_pitch_STS3215
+Kd 0.130 0.130 0.150
+newmtl servo_roll_STS3215
+Kd 0.130 0.130 0.150
+newmtl servo_gripper_STS3215
+Kd 0.130 0.130 0.150
+newmtl bearing_6808_J1_top
+Kd 0.720 0.740 0.780
+newmtl bearing_6808_J1_bottom
+Kd 0.720 0.740 0.780
+newmtl bearing_6808_J2_top
+Kd 0.720 0.740 0.780
+newmtl bearing_6808_J2_bottom
+Kd 0.720 0.740 0.780
+newmtl bearing_6808_J3_top
+Kd 0.720 0.740 0.780
+newmtl bearing_6808_J3_bottom
+Kd 0.720 0.740 0.780
+newmtl bearing_6808_pitch_top
+Kd 0.720 0.740 0.780
+newmtl bearing_6808_pitch_bottom
+Kd 0.720 0.740 0.780
+newmtl MGN9_rail_170
+Kd 0.780 0.800 0.830
+newmtl MGN9H_block_right
+Kd 0.700 0.720 0.760
+newmtl MGN9H_block_left
+Kd 0.700 0.720 0.760
+newmtl wrist_cam_OV_32x32_(approx._envelope)
+Kd 0.120 0.250 0.200
+newmtl fasteners_SHCS_M3x10
+Kd 0.080 0.080 0.090
+newmtl fasteners_SHCS_M3x12
+Kd 0.080 0.080 0.090
+newmtl fasteners_SHCS_M3x20
+Kd 0.080 0.080 0.090
+newmtl fasteners_SHCS_M3x30
+Kd 0.080 0.080 0.090
+newmtl fasteners_SHCS_M3x35
+Kd 0.080 0.080 0.090
+newmtl fasteners_SHCS_M3x55
+Kd 0.080 0.080 0.090
+newmtl fasteners_SHCS_M3x8
+Kd 0.080 0.080 0.090
+newmtl fasteners_SHCS_M5x16
+Kd 0.080 0.080 0.090
+newmtl fasteners_insert_M3
+Kd 0.850 0.650 0.200
+newmtl fasteners_insert_M5
+Kd 0.850 0.650 0.200
+newmtl fasteners_nut_M3
+Kd 0.550 0.570 0.600
+newmtl fasteners_selftap_M2x6
+Kd 0.080 0.080 0.090
+newmtl fasteners_selftap_M2x8
+Kd 0.080 0.080 0.090

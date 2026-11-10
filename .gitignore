@@ -1,0 +1,10 @@
+# Claude Code notes: kept out of git on purpose
+CLAUDE.md
+mobile_manipulator_description/CLAUDE.md
+# Python
+__pycache__/
+*.pyc
+# Isaac Sim outputs (--save)
+*.usd
+*.usda
+*.usdc
