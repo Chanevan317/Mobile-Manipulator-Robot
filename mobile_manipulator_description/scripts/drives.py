@@ -11,6 +11,12 @@ prismatic ones. USD stores angular gains per DEGREE; `apply_drives()` converts.
 import math
 
 DEG = math.pi / 180.0
+LAYOUT = 'prototype'      # set to 'prototype_mono_arm' (set_layout) for the one-arm experiment
+
+
+def set_layout(layout):
+    global LAYOUT
+    LAYOUT = layout
 
 
 def gains(name):
@@ -19,6 +25,11 @@ def gains(name):
     if name.startswith('wheel'):               return ('angular', 0.0, 2.0, 6.0)       # velocity-driven wheels
     if name == 'lift':                         return ('linear', 100000.0, 2000.0, 300.0)  # lead-screw lift: stiff
     if 'finger' in name:                       return ('linear', 2000.0, 100.0, 80.0)
+    if 'shoulder' in name and LAYOUT == 'prototype_mono_arm':
+        # mono-arm experiment: the shoulder is a ring around the column, an STS3215 through a 4:1 gear (7.6 N m); the
+        # arm swings about the column (~0.15 kg m2): kp 160 / kd 6 gives a damping ratio of ~0.6 (kp 640 / kd 12 changed
+        # nothing in the shelf task: the sideways lag there came from the elbow / wrist servos, see mono_poses SLOW_IN)
+        return ('angular', 160.0, 6.0, 7.6)
     if 'shoulder' in name:                     return ('angular', 40.0, 1.5, 1.9)      # STS3215; stiffer: it swings the whole arm
     return ('angular', 20.0, 0.8, 1.9)                                                 # STS3215 7.4 V, SO-100 version (every other arm joint)
 
@@ -36,12 +47,13 @@ def rate_limit(previous, target, max_speed, dt, margin=0.9):
     return np.asarray(previous) + np.clip(np.asarray(target) - np.asarray(previous), -step, step)
 
 
-def apply_drives(stage, root_path):
+def apply_drives(stage, root_path, layout=None):
     """Set a force drive with our gains on every revolute/prismatic joint under root_path.
 
     Returns {joint name: UsdPhysics.DriveAPI}, so callers can set targets on it.
     """
     from pxr import UsdPhysics
+    if layout: set_layout(layout)
     root = '/' + root_path.strip('/').split('/')[0]
     drives = {}
     for prim in stage.Traverse():

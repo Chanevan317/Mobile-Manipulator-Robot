@@ -2,7 +2,10 @@
 Writes a package:  <out>/meshes/visual/*.stl, <out>/meshes/collision/*.stl (metres) and
   urdf/mobile_manipulator_prototype.urdf (+ _ros)  column 0.18 m toward the front (working face), arms right beside it at
                                               y = +-0.15 with their zero pose 45 deg toward the rear tote (layout study 2026-11-06)
-The old v0 layout (column at the rear, arms forward on carriage beams) was deleted on 2026-11-09 (user)."""
+The old v0 layout (column at the rear, arms forward on carriage beams) was deleted on 2026-11-09 (user).
+  urdf/mobile_manipulator_prototype_mono_arm.urdf (+ _ros)  EXPERIMENT (user, 2026-11-10; does not replace prototype):
+                                              one arm whose shoulder is a ring bearing AROUND the lift column
+                                              (shoulder axis = column axis), +-170 deg, ring driven by an STS3215 + 4:1 gear"""
 import sys, os, math, collections, json
 import numpy as np
 sys.path.insert(0, '.')
@@ -183,6 +186,90 @@ for lk, fs in fast_groups.items():
 
 INERTIA = {k: combine(v['props']) for k, v in LINKS.items()}
 
+# ---------------------------------------------------------------- mono-arm experiment (user, 2026-11-10)
+# One arm; its shoulder is a ring bearing around the C-Beam (shoulder axis = column axis = carriage origin). The rest of
+# the arm (elbow .. gripper) is the real CAD. Arm frame = carriage (0, 0, ARM_Z), zero pose pointing forward (+x).
+#   base (fixed, on the carriage): plate above the gantry plate (carriage z 0.020 .. 0.028) with a hole for the beam,
+#        fixed race r 60..75, ring-drive STS3215 hanging under the plate (shaft at r 88, 135 deg) + pinion
+#   upper_arm (turns): race r 50..75 (carriage z 0.033 .. 0.043), gear ring r 75..80, bracket r 50..80 to the upper-arm
+#        tube, and the real upper-arm part cut off at x 76 (its shoulder fork can't exist: the column is there)
+# The beam's corners are 44.7 mm from the axis. Estimated masses: races / plate aluminium, bracket / gear PLA.
+MONO = dict(r_in=50.0, r_out=75.0, gear=80.0, clip=76.0, ratio=4.0, az=65.5)   # az = ARM_Z in mm
+MLINKS = {k: dict(vis=list(v['vis']), col=list(v['col']), props=list(v['props'])) for k, v in LINKS.items()}
+MLINKS['base'] = dict(vis=[], col=[], props=[]); MLINKS['upper_arm'] = dict(vis=[], col=[], props=[])
+
+
+def m_add(lk, fname, loc, color, mass=None, rho=None, col=True):
+    V, F = mesh_m(loc)
+    write_stl(os.path.join(VIS, fname + '.stl'), V, F)
+    MLINKS[lk]['vis'].append((fname, color)); MLINKS[lk]['props'].append(mass_props(V / MM, F, mass=mass, rho=rho))
+    if col:
+        for k, h in enumerate(convex_pieces(loc)):
+            Vc, Fc = mesh_arrays(h); fn = f'{fname}_c{k:02d}'
+            write_stl(os.path.join(COL, fn + '.stl'), Vc * MM, Fc); MLINKS[lk]['col'].append(fn)
+
+
+def _mono_links():
+    from lib import ring
+    from joint import SERVO
+    Z = lambda zc: zc - MONO['az']                    # carriage-z (mm) -> arm frame
+    clip = box(MONO['clip'], 500, -300, 300, -300, 300)
+    for nm, p in arm.PARTS.items():                   # the real upper arm, elbow end only
+        if part_link(nm) == 'upper_arm':
+            m_add('upper_arm', 'mono_' + nm, xf(p['solid'], p['frame']) ^ clip, p['color'], rho=RHO_PRINT)
+    brg = []
+    for b in BOUGHT:                                  # elbow servo, elbow bearings (already exported for the prototype)
+        nm = b['name']
+        if bought_link(nm) != 'upper_arm': continue
+        key = next(k for k in BOUGHT_MASS if k in nm)
+        if key == 'bearing':
+            brg.append(b['solid']); continue
+        fname = 'arm_' + nm.split(' ')[0]
+        V, F = mesh_m(b['solid']); MLINKS['upper_arm']['vis'].append((fname, b['color']))
+        MLINKS['upper_arm']['props'].append(mass_props(V / MM, F, mass=BOUGHT_MASS[key]))
+        if os.path.exists(os.path.join(COL, fname + '_c.stl')): MLINKS['upper_arm']['col'].append(fname + '_c')
+    if brg:
+        V, F = mesh_m(union(brg)); write_stl(os.path.join(VIS, 'mono_upper_arm_bearings.stl'), V, F)
+        MLINKS['upper_arm']['vis'].append(('mono_upper_arm_bearings', (0.72, 0.74, 0.78)))
+        for sb in brg:
+            Vb, Fb = mesh_arrays(sb); MLINKS['upper_arm']['props'].append(mass_props(Vb, Fb, mass=BOUGHT_MASS['bearing']))
+    fs = [fastener_solid(f) for f in FAST if part_link(f['part']) == 'upper_arm']
+    m_add('upper_arm', 'mono_upper_arm_fasteners', union(fs) ^ clip, (0.08, 0.08, 0.09), rho=RHO_STEEL, col=False)
+    # turning ring + gear ring + bracket to the tube
+    m_add('upper_arm', 'mono_ring_rotor', ring(MONO['r_in'], MONO['r_out'], Z(33.0), Z(43.0)), ALU[:3], mass=0.15)
+    m_add('upper_arm', 'mono_gear_ring', ring(MONO['r_out'], MONO['gear'], Z(33.0), Z(40.0)), (0.25, 0.25, 0.28), rho=RHO_PRINT)
+    m_add('upper_arm', 'mono_bracket', box(50.0, MONO['clip'] + 4.0, -25.0, 25.0, Z(43.0), 22.0), ORANGE[:3], rho=RHO_PRINT)
+    # fixed: plate with the beam hole, fixed race, ring-drive servo under the plate + pinion
+    plate = cyl(85.0, Z(20.0), Z(28.0)) - box(-25.0, 25.0, -45.0, 45.0, Z(10.0), Z(40.0))
+    m_add('base', 'mono_ring_plate', plate, ALU[:3], mass=0.25)
+    m_add('base', 'mono_ring_stator', ring(60.0, MONO['r_out'], Z(28.0), Z(33.0)), ALU[:3], mass=0.10)
+    a = math.radians(135.0); u = np.array([math.cos(a), math.sin(a), 0.0]); px, py = 88.0 * u[0], 88.0 * u[1]
+    zs, xs = np.array([0, 0, -1.0]), -u                          # output face up, body outward
+    Rm = np.eye(4); Rm[:3, 0], Rm[:3, 2] = xs, zs; Rm[:3, 1] = np.cross(zs, xs); Rm[:3, 3] = (px, py, Z(20.0) - 18.7)
+    m_add('base', 'mono_ring_drive_STS3215', xf(SERVO, Rm), (0.12, 0.12, 0.14), mass=0.055)
+    m_add('base', 'mono_ring_pinion', cyl(8.0, Z(20.0), Z(40.0), px, py), (0.25, 0.25, 0.28), rho=RHO_PRINT, col=False)
+
+
+
+
+def mono_mast_xml():
+    """Scene camera on the CARRIAGE, always facing forward (user, 2026-11-10: it moves with the lift and sees the front by
+    default). The arm sweeps all the way round the column at the carriage, so the post goes up THROUGH the ring's centre
+    hole, in the gap between the beam's front face (x 0.020) and the ring's inner edge (r 0.050): x 0.031..0.045
+    (outside the column's top cap, |x| <= 0.030), standing on the ring plate. Above the arm (nothing of it rises past
+    carriage z ~0.11) a bar carries the camera forward to the prototype's spot: (0.14, 0, 0.19), pitched 0.95 rad down."""
+    z0 = 28.0 / 1000                                               # ring plate top (carriage z)
+    parts = [((0.014, 0.016, 0.20 - z0), (0.038, 0.0, (z0 + 0.20) / 2)), ((0.119, 0.02, 0.02), (0.0905, 0.0, 0.19))]
+    v = ''.join(vprim(f3(c), bx(*sz), ALU) for sz, c in parts); c_ = ''.join(cprim(f3(c), bx(*sz)) for sz, c in parts)
+    o = '  <link name="camera_mast">\n' + inertial(*combine([box_props(0.06, sz, c) for sz, c in parts])) + v + c_ + '  </link>\n'
+    o += joint('camera_mast_fixed', 'fixed', 'carriage', 'camera_mast', '0 0 0')
+    o += '  <link name="scene_camera">\n' + inertial(*box_props(0.07, (0.03, 0.097, 0.029))) + vprim('0 0 0', bx(0.03, 0.097, 0.029), ORANGE) + \
+         cprim('0 0 0', bx(0.03, 0.097, 0.029)) + '  </link>\n'
+    o += joint('scene_camera_fixed', 'fixed', 'camera_mast', 'scene_camera', '0.14 0 0.19', '0 0.95 0')
+    o += frame_link('scene_camera_optical')
+    o += joint('scene_camera_optical_fixed', 'fixed', 'scene_camera', 'scene_camera_optical', '0.016 0 0', '-1.5708 0 -1.5708')
+    return o
+
 
 # ---------------------------------------------------------------- URDF text helpers
 def f3(v): return ' '.join(f'{x:.6g}' for x in v)
@@ -257,15 +344,17 @@ D = math.radians
 STS15 = (1.9, 4.7, 0.05, 0.02)          # effort N m, velocity rad/s, damping, friction (STS3215 7.4 V, the SO-100 version)
 
 
-def arm_xml(side):
+def arm_xml(side, links=None, inertia=None, shoulder=None, elbow=D(125)):
+    """One arm. links / inertia / shoulder (limit tuple) override the default (prototype) ones: the mono-arm experiment."""
+    links = links or LINKS; inertia = inertia or INERTIA; shoulder = shoulder or ((-D(115), D(115)) + STS15)
     p = side
     o = ''
     for lk in LINKF:
-        m, com, I = INERTIA[lk]
-        body = ''.join(vis_mesh(fn, c) for fn, c in LINKS[lk]['vis']) + ''.join(col_mesh(fn) for fn in LINKS[lk]['col'])
+        m, com, I = inertia[lk]
+        body = ''.join(vis_mesh(fn, c) for fn, c in links[lk]['vis']) + ''.join(col_mesh(fn) for fn in links[lk]['col'])
         o += f'  <link name="{p}_{lk}">\n' + inertial(m, com, I) + body + '  </link>\n'
-    o += joint(f'{p}_shoulder_pan', 'revolute', f'{p}_base', f'{p}_upper_arm', '0 0 0', axis='0 0 1', lim=(-D(115), D(115)) + STS15)
-    o += joint(f'{p}_elbow_pan', 'revolute', f'{p}_upper_arm', f'{p}_forearm', f'{L1*MM:.6g} 0 0', axis='0 0 1', lim=(-D(125), D(125)) + STS15)
+    o += joint(f'{p}_shoulder_pan', 'revolute', f'{p}_base', f'{p}_upper_arm', '0 0 0', axis='0 0 1', lim=shoulder)
+    o += joint(f'{p}_elbow_pan', 'revolute', f'{p}_upper_arm', f'{p}_forearm', f'{L1*MM:.6g} 0 0', axis='0 0 1', lim=(-elbow, elbow) + STS15)
     o += joint(f'{p}_wrist_pan', 'revolute', f'{p}_forearm', f'{p}_wrist', f'{L2*MM:.6g} 0 0', axis='0 0 1', lim=(-D(122), D(122)) + STS15)
     o += joint(f'{p}_wrist_pitch', 'revolute', f'{p}_wrist', f'{p}_tilt', f'{40*MM:.6g} 0 {PZ*MM:.6g}', axis='0 1 0', lim=(-D(15), D(115)) + STS15)
     o += joint(f'{p}_wrist_roll', 'revolute', f'{p}_tilt', f'{p}_hand', f'{ROLL_X*MM:.6g} 0 0', axis='1 0 0', lim=(-D(120), D(120)) + STS15)   # +-120 (user, 2026-11-09): cable loop
@@ -292,7 +381,7 @@ SHELL = (0.94, 0.95, 0.96, 1); TRIM = (0.18, 0.21, 0.25, 1); ANOD = (0.30, 0.33,
 ORANGE = (0.90, 0.45, 0.12, 1); BLUE = (0.29, 0.55, 0.80, 1); RED = (0.85, 0.16, 0.14, 1); RUBBER = (0.10, 0.11, 0.12, 1)
 
 
-def base_xml():
+def base_xml(mono=False):
     o = frame_link('base_link')
     B = 0.50
     v = vprim('0 0 0.22', bx(B, B, 0.04), SHELL) + vprim('0 0 0.243', bx(B - 0.01, B - 0.01, 0.006), TRIM)
@@ -342,11 +431,11 @@ def base_xml():
     # lidar
     o += '  <link name="lidar_link">\n' + inertial(*cyl_props(0.17, 0.035, 0.055)) + vprim('0 0 0', cy(0.035, 0.055), TRIM) + '  </link>\n'
     o += joint('lidar_fixed', 'fixed', 'base_link', 'lidar_link', '0.04 0 0.165')
-    o += lift_prototype()
+    o += lift_prototype(mono)
     return o
 
 
-def lift_prototype():
+def lift_prototype(mono=False):
     """Prototype: column 0.18 m toward the front (working face), arms right beside it, tote behind it,
     scene camera on a carriage bracket in front of the column. Compact carriage: gantry plate on the column's rear face + two 8 mm arm brackets."""
     o = ''
@@ -387,11 +476,15 @@ def lift_prototype():
         cv += vprim(f'-0.016 {sy*0.0505} -0.0425', bx(0.038, 0.019, 0.11), TRIM)       # V-wheels + spacers
         cc_ += cprim(f'-0.016 {sy*0.0505} -0.0425', bx(0.038, 0.019, 0.11))
         props.append(box_props(0.06, (0.038, 0.019, 0.11), (-0.016, sy * 0.0505, -0.0425)))
+        if mono: continue                                                            # mono arm: no side brackets (ring instead)
         cv += vprim(f'0.015 {sy*0.1025} 0.0215', bx(0.15, 0.085, 0.008), ALU)            # bracket, top at 0.0255
         cc_ += cprim(f'0.015 {sy*0.1025} 0.0215', bx(0.15, 0.085, 0.008))
         props.append(box_props(0.28, (0.15, 0.085, 0.008), (0.015, sy * 0.1025, 0.0215)))
     o += '  <link name="carriage">\n' + inertial(*combine(props)) + cv + cc_ + '  </link>\n'
-    o += joint('lift', 'prismatic', 'base_link', 'carriage', f'{CX} 0 0.42', axis='0 0 1', lim=(0.0, 0.885, 300.0, LIFT_SPEED, 50.0, 5.0))
+    # mono arm: the ring around the column meets the column's top cap from lift ~0.80 (clear at 0.775): 0.77
+    o += joint('lift', 'prismatic', 'base_link', 'carriage', f'{CX} 0 0.42', axis='0 0 1', lim=(0.0, 0.77 if mono else 0.885, 300.0, LIFT_SPEED, 50.0, 5.0))
+    if mono:                      # the scene camera rides on the shoulder ring instead (mono_mast_xml)
+        return o
     # scene camera on the carriage (moves with the lift): a post on the gantry plate behind the column, a bar
     # forward beside the column (y 0.022..0.042) at carriage z 0.18..0.20, the camera in front of the column looking
     # forward and down. Higher than anything the arms sweep (their top is ~0.11), and 30 mm under the top beam at
@@ -411,6 +504,9 @@ def lift_prototype():
     return o
 
 
+_mono_links()
+MINERTIA = {k: combine(v['props']) for k, v in MLINKS.items()}
+
 ARM_Z = 0.0255 + 0.040        # arm frame origin: 40 mm above the 8 mm mount plate whose top is at carriage z 0.0255
 ARMS = ''.join(arm_xml(side) for side in ('left', 'right'))
 BODY = {}
@@ -419,6 +515,10 @@ for layout in ('prototype',):
     for side, sy in (('left', 1), ('right', -1)):
         body += joint(f'{side}_arm_mount', 'fixed', 'carriage', f'{side}_base', f'0 {sy*PROTO_ARM_Y} {ARM_Z}', f'0 0 {sy*PROTO_YAW:.6g}')
     BODY[layout] = body
+# mono-arm experiment: one arm on the shoulder ring around the column (ring drive: STS3215 x 4:1 gear)
+BODY['prototype_mono_arm'] = (base_xml(mono=True) + arm_xml('left', MLINKS, MINERTIA, (-D(170), D(170), 1.9 * MONO['ratio'],
+                               4.7 / MONO['ratio'], 0.05, 0.02), elbow=D(117)) +   # forearm meets the ring at 122-123 deg
+                               joint('left_arm_mount', 'fixed', 'carriage', 'left_base', f'0 0 {ARM_Z}') + mono_mast_xml())
 
 mats = ''.join(f'  <material name="{n}"><color rgba="{f3(k)}"/></material>\n' for k, n in MATS.items())
 xml = ('<?xml version="1.0" encoding="utf-8"?>\n'
@@ -429,7 +529,8 @@ xml = ('<?xml version="1.0" encoding="utf-8"?>\n'
        '     Joint limits are the collision-free ranges of the CAD minus a 5 deg margin. -->\n'
        '<robot name="mobile_manipulator">\n' + mats + '%BODY%' + '</robot>\n')
 for layout, body in BODY.items():
-    x = xml.replace('%BODY%', body).replace('<!-- Wheeled dual-arm picking robot (prototype).',
+    used = ''.join(l for l in mats.splitlines(True) if f'name="{l.split(chr(34))[1]}"' in body)   # only this layout's materials
+    x = xml.replace(mats, used).replace('%BODY%', body).replace('<!-- Wheeled dual-arm picking robot (prototype).',
                                             f'<!-- Wheeled dual-arm picking robot, layout {layout}.')
     open(os.path.join(OUT, 'urdf', f'mobile_manipulator_{layout}.urdf'), 'w').write(x)
     open(os.path.join(OUT, 'urdf', f'mobile_manipulator_{layout}_ros.urdf'), 'w').write(

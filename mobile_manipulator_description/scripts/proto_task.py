@@ -25,11 +25,30 @@ TCP_SPEED = 0.20          # m/s for straight-line hand moves (time follows the d
 TCP_TURN = 1.5            # rad/s for heading / pitch changes in those moves
 MIN_MOVE = 0.4            # s, shortest straight-line move
 ARM_KEYS = ('shoulder_pan', 'elbow_pan', 'wrist_pan', 'wrist_pitch', 'wrist_roll')
+RAMP = 0.3                # s, accel / decel ramp of the 'trap' profile
+
+
+def _trap(t, T, tr):
+    """Normalised trapezoid profile s(t) in [0, 1]: linear speed ramps of tr at both ends, constant speed between."""
+    vp = 1.0 / (T - tr)
+    if t <= tr: return 0.5 * vp * t * t / tr
+    if t >= T - tr: return 1.0 - 0.5 * vp * (T - t) ** 2 / tr
+    return vp * (t - tr / 2)
+
+
+def _profile(kind, base):
+    """(duration, s(i, steps)) for a move whose slowest joint needs `base` s at its speed limit.
+    cosine: peak = pi/2 x mean (the tested default);  trap: a RAMP s ramp, then the full allowed speed (~35 % faster on long moves)."""
+    if kind == 'trap':
+        tr = min(RAMP, 0.5 * base); T = base + tr          # never slower than cosine (1.5 x base at most); peak = the limit
+        return T, (lambda i, n: _trap(T * i / n, T, tr))
+    T = base * math.pi / 2
+    return T, (lambda i, n: 0.5 - 0.5 * math.cos(math.pi * i / n))
 
 
 class Task:
-    def __init__(self, app, urdf, headless, fix_base, self_collision=True):
-        K.use('prototype')
+    def __init__(self, app, urdf, headless, fix_base, self_collision=True, layout='prototype'):
+        K.use(layout); self.layout = layout
         self.app, self.headless = app, headless
         self.world = World(stage_units_in_meters=1.0, physics_dt=1 / 240.0, rendering_dt=DT)
         self.world.scene.add_ground_plane()
@@ -42,18 +61,19 @@ class Task:
         cfg.default_drive_type = _urdf.UrdfJointTargetType.JOINT_DRIVE_POSITION
         _, self.art_path = omni.kit.commands.execute('URDFParseAndImportFile', urdf_path=os.path.abspath(urdf),
                                                      import_config=cfg, get_articulation_root=True)
-        apply_drives(stage, self.art_path)
+        apply_drives(stage, self.art_path, layout)
         if self_collision:
             from self_collision import setup_self_collision
             print('self-collision on,', setup_self_collision(stage, os.path.abspath(urdf)), 'pairs ignored')
         self.results = []
         self.t = 0.0
+        self.profile = 'cosine'   # 'trap' (mono tasks): faster, same speed limits
 
     def start(self):
         """Call after the scene objects are added."""
         self.robot = self.world.scene.add(Articulation(prim_path=self.art_path, name='mobile_manipulator'))
         self.world.reset(); self.robot.initialize()
-        self.tcp = {s: SingleXFormPrim(f'/mobile_manipulator/{s}_tcp') for s in ('left', 'right')}
+        self.tcp = {s: SingleXFormPrim(f'/mobile_manipulator/{s}_tcp') for s in K.SHOULDER}   # one arm in the mono layout
         self.names = list(self.robot.dof_names); n = len(self.names)
         self.idx = {nm: i for i, nm in enumerate(self.names)}
         self.vmax = np.array(self.robot.dof_properties['maxVelocity'], dtype=float)
@@ -134,10 +154,10 @@ class Task:
         """Time-synchronised straight joint-space move of one arm (and the lift unless lift=False)."""
         a = self.arm_now(side); keys = [k for k in q if k in ARM_KEYS or (k == 'lift' and lift)]
         lim = {k: 0.88 * self.vmax[self.idx['lift' if k == 'lift' else f'{side}_{k}']] for k in keys}
-        T = max([abs(q[k] - a[k]) / lim[k] for k in keys] + [0.05]) * math.pi / 2    # cosine profile peaks at pi/2 x mean
+        T, prof = _profile(self.profile, max([abs(q[k] - a[k]) / lim[k] for k in keys] + [0.05]))
         steps = max(2, int(T * CTRL_HZ) + 1)
         for i in range(1, steps + 1):
-            s = 0.5 - 0.5 * math.cos(math.pi * i / steps)
+            s = prof(i, steps)
             self.set_arm(side, {k: a[k] + (q[k] - a[k]) * s for k in keys})
             self.step_once()
         self.settle(timeout=8.0)
@@ -196,11 +216,13 @@ class Task:
         if seconds is None:
             d = np.abs(b - a)
             vlift = 0.85 * self.vmax[self.idx['lift']]                     # the lift does all of a vertical move
-            seconds = max(MIN_MOVE, float(np.linalg.norm(d[:3])) / TCP_SPEED * math.pi / 2, max(d[3], d[4]) / TCP_TURN * math.pi / 2,
-                          d[2] / vlift * math.pi / 2)
+            base = max(float(np.linalg.norm(d[:3])) / TCP_SPEED, max(d[3], d[4]) / TCP_TURN, d[2] / vlift)
+            seconds, prof = _profile(self.profile, base); seconds = max(MIN_MOVE, seconds)
+        else:
+            _, prof = _profile('cosine', 1.0)
         steps = max(2, int(seconds * CTRL_HZ))
         for k in range(1, steps + 1):
-            s = 0.5 - 0.5 * math.cos(math.pi * k / steps)
+            s = prof(k, steps)
             q = K.ik(side, *(a + (b - a) * s), elbow=elbow)
             if q is None:
                 raise RuntimeError(f'{side}: no IK on the straight move at {np.round(a + (b - a) * s, 3)}')

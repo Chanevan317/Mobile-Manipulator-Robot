@@ -17,7 +17,7 @@ import argparse, csv, math, os, sys
 
 ap = argparse.ArgumentParser()
 here = os.path.dirname(os.path.abspath(__file__))
-ap.add_argument('--layout', default='prototype', choices=('prototype',), help='robot layout (urdf/mobile_manipulator_<layout>.urdf)')
+ap.add_argument('--layout', default='prototype', choices=('prototype', 'prototype_mono_arm'), help='robot layout (urdf/mobile_manipulator_<layout>.urdf)')
 ap.add_argument('--urdf', default=None, help='URDF path (overrides --layout)')
 ap.add_argument('--joint', default='', help='test only joints whose name contains this text')
 ap.add_argument('--headless', action='store_true')
@@ -81,7 +81,7 @@ else:
     # gains: force drives from drives.py
     sys.path.insert(0, here)
     from drives import apply_drives
-    apply_drives(stage, art_path)
+    apply_drives(stage, art_path, args.layout)
     if args.self_collision:
         from self_collision import setup_self_collision
         print('self-collision on,', setup_self_collision(stage, os.path.abspath(args.urdf)), 'pairs ignored')

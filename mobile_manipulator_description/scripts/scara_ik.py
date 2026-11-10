@@ -21,7 +21,11 @@ TOOL = 0.215              # pitch axis -> TCP
 Z0 = 0.4109               # TCP height at lift 0, pitch 0
 D = math.radians
 # per layout: side -> (shoulder x, shoulder y, arm zero-pose yaw); must match generator/urdf_build.py
-LAYOUTS = {'prototype': {'left': (0.18, 0.15, D(135)), 'right': (0.18, -0.15, -D(135))}}
+LAYOUTS = {'prototype': {'left': (0.18, 0.15, D(135)), 'right': (0.18, -0.15, -D(135))},
+           # experiment (2026-11-10): one arm, shoulder = a ring around the column (shoulder axis = column axis), zero pose forward
+           'prototype_mono_arm': {'left': (0.18, 0.0, 0.0)}}
+SHOULDER_LIM = {'prototype': D(115), 'prototype_mono_arm': D(170)}
+ELBOW_LIM = {'prototype': D(125), 'prototype_mono_arm': D(117)}   # mono: forearm meets the ring at 122-123 deg
 LAYOUT = 'prototype'
 ARM_Y = 0.15              # arm mount y (ARM_Y / SHOULDER / MOUNT_YAW are set by use(); see the end of this file)
 SHOULDER = {'left': (0.18, ARM_Y), 'right': (0.18, -ARM_Y)}
@@ -29,12 +33,14 @@ MOUNT_YAW = {'left': D(135), 'right': -D(135)}
 
 
 def use(layout):
-    """Select the robot layout (only 'prototype') for fk / ik and ARM_Y, SHOULDER, MOUNT_YAW."""
+    """Select the robot layout ('prototype' or the 'prototype_mono_arm' experiment) for fk / ik and ARM_Y, SHOULDER, MOUNT_YAW."""
     global LAYOUT, ARM_Y, SHOULDER, MOUNT_YAW
     L = LAYOUTS[layout]; LAYOUT = layout
     SHOULDER = {s: (v[0], v[1]) for s, v in L.items()}; MOUNT_YAW = {s: v[2] for s, v in L.items()}
     ARM_Y = L['left'][1]
     LIMITS['lift'] = (0.0, LIFT_MAX[layout])
+    LIMITS['shoulder_pan'] = (-SHOULDER_LIM[layout], SHOULDER_LIM[layout])
+    LIMITS['elbow_pan'] = (-ELBOW_LIM[layout], ELBOW_LIM[layout])
 
 
 def urdf_name(layout=None, ros=False):
@@ -42,7 +48,7 @@ def urdf_name(layout=None, ros=False):
     return f"mobile_manipulator_{layout or LAYOUT}{'_ros' if ros else ''}.urdf"
 LIMITS = {'shoulder_pan': (-D(115), D(115)), 'elbow_pan': (-D(125), D(125)), 'wrist_pan': (-D(122), D(122)),
           'wrist_pitch': (-D(15), D(115)), 'wrist_roll': (-D(120), D(120)), 'lift': (0.0, 0.885)}
-LIFT_MAX = {'prototype': 0.885}     # prototype: C-Beam XLarge, 1000 mm beam, 885 mm travel
+LIFT_MAX = {'prototype': 0.885, 'prototype_mono_arm': 0.77}   # mono: the shoulder ring meets the column's top cap above ~0.78     # prototype: C-Beam XLarge, 1000 mm beam, 885 mm travel
 
 
 def wrap(a):

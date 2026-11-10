@@ -16,7 +16,7 @@ Every 5 s it prints where the base is, the lift height against its target, and t
 import argparse, math, os, sys
 ap = argparse.ArgumentParser()
 here = os.path.dirname(os.path.abspath(__file__))
-ap.add_argument('--layout', default='prototype', choices=('prototype',), help='robot layout (urdf/mobile_manipulator_<layout>.urdf)')
+ap.add_argument('--layout', default='prototype', choices=('prototype', 'prototype_mono_arm'), help='robot layout (urdf/mobile_manipulator_<layout>.urdf)')
 ap.add_argument('--urdf', default=None, help='URDF path (overrides --layout)')
 ap.add_argument('--headless', action='store_true')
 ap.add_argument('--save', default='')
@@ -59,7 +59,7 @@ _, robot_path = omni.kit.commands.execute('URDFParseAndImportFile', urdf_path=os
 print('imported at', robot_path)
 
 # Drives: force drives with the gains from drives.py (the single place where gains live).
-joints = apply_drives(stage, robot_path)
+joints = apply_drives(stage, robot_path, args.layout)
 print(len(joints), 'driven/passive joints set up')
 if args.self_collision:
     from self_collision import setup_self_collision
