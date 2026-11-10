@@ -1,285 +1,249 @@
-"""Mini leader arm (2026-11-09): a 0.4-scale copy of the SCARA follower for teleoperation, one per follower arm.
+"""Leader arm v2 (2026-11-10): STS3215 low-gear servos as the joints AND the structure. One leader per follower arm.
 
-Same joints in the same order, angles 1:1: shoulder pan, elbow pan, wrist pan (Z), wrist pitch (Y), wrist roll (X),
-plus a gripper trigger. Every joint has an AS5600 magnetic encoder (Robokits RKI-6142 module, ~23 x 23 mm board, magnet
-Ø6 x 2.5 mm diametric, included). An ESP32-S3 in the base reads the analog outputs. Board size, chip height and the
-magnet are parameters (BOARD, MAG): measure a real module and update them before printing.
+User decisions (2026-11-10): STS3215 leader versions (C046 1:147 / C044 1:191; the stiffest one on the wrist pitch),
+pan links 52 mm (0.4 x the follower's 130), as few printed parts as possible, no heat-set inserts, a fork (output horn
++ idler) on the shoulder and the pitch and the horn only elsewhere, clutch + lift on a USB foot pedal (nothing but the
+trigger on the grip), and a HANGING stack: the shoulder at the top of a stand, each pan stage below the previous one,
+the wrist lowest, so the hand hangs free in every pose like the follower's (an upward stack let the hand-down pose hit
+the lower links). Same Waveshare bus and LeRobot Feetech code as the follower; joints map 1:1.
 
-Fork joint (pan joints and pitch), local frame: axis = +Z, origin at the middle of the fixed hub.
-  fixed hub     Ø28 x 12 (z -6..6) on the parent part; M5 bolt through it (head below, nyloc nut on top), fixed
-  moving fork   prongs above / below the hub (|z| 6.5..12.5) on the child part, each with a 685ZZ bearing (5 x 11 x 5)
-                on the bolt; 1 mm bosses / spacers clamp the inner races to the hub
-  encoder       magnet in a printed cap pressed on the fixed nut; AS5600 board in a housing on the moving upper prong,
-                chip facing down 1.5 mm over the magnet; lid with a wire slot
-  hold          M3 set screw down through the upper prong onto a Ø6 felt / PTFE pad on the hub's top face
-Inline joint (roll), local frame: axis = +X, x = 0 at the front face of the fixed bearing tube.
-  the grip's M5 bolt runs back through two 685ZZ in the tube; nut + magnet cap at the back turn with the grip; the board
-  sits fixed behind them in a slot that opens to +Y (slide in, clip shut); hold pad from an M3 set screw in the tube.
+Layout (body frames, Z up; every pan servo has its output face DOWN, i.e. the servo's own frame):
+  stand     two prints (too tall for the A1 in one): top = clamp block on the shoulder servo S1's rear end (4 x M2)
+            + hollow column; foot = foot plate (4 x M5 holes or a C-clamp) + column + plug; 2 x M3 bolts across
+  link1     fork on S1: bottom plate on the output horn (= the link), top prong on the idler, web in front of the case;
+            S2 hangs under the plate's far end (4 x M2 up into its socket face)
+  link2     plate under S2's horn, S3 hangs under it
+  wrist     plate under S3's horn; clamp block under it holding the top (rear) end of the pitch servo S4 (shaft along
+            Y, body up)
+  pitch     fork on S4 (output disc +Y, idler -Y) + back plate holding the roll servo S5 (shaft along X, body down)
+  grip      on S5's horn; C-channel holding the trigger servo S6 (shaft along Y), open on +Y
+  trigger   lever on S6's output disc, finger bar under the grip
+Fasteners: M3 into the threaded horns / idler discs, M2 x 6 self-tapping into the case pilot holes (the SO-100
+screws). No inserts, no bearings.
 
-Run:  python3 leader.py      (volumes)    /   leader_check.py (clashes, ranges, export, renders)
+Run:  python3 leader.py  (volumes)   /   leader_check.py (clashes, ranges)   /   leader_export.py   /   leader_render.py
 """
-import sys, os, math
+import sys, os
 import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from lib import box, cyl, union, xf, T, Rx, Ry, Rz
+from lib import box, cyl, union, xf, T, Rx, Ry, Rz, basis, CS
+from joint import SERVO, sweep, _pocket, RIM, SO100, HORN_HOLES, case_screw, CTR_D
+from hw import Reg, screw_cut
 
 # ------------------------------------------------------------------ parameters (mm)
 SCALE = 0.4
-L1, L2 = 130.0 * SCALE, 130.0 * SCALE          # 52, 52
-BOARD = dict(w=23.0, t=1.6, clear=0.25, chip_h=1.5, ledge=1.2)   # AS5600 module
-MAG = dict(d=6.0, h=2.5, gap=1.5)              # diametric magnet Ø6 x 2.5, 1.5 mm air gap to the chip
-BRG = dict(od=11.0, w=5.0)                     # 685ZZ (5 x 11 x 5)
-HUB_R, HUB_H = 14.0, 6.0
-PRONG = (6.5, 12.5)
-NUT = dict(af=8.0, h=5.0)                      # M5 nyloc
-HEAD = dict(d=8.5, h=5.0)                      # M5 socket head
-WALL = 2.0
-LIMITS = {'J1': (-115, 115), 'J2': (-125, 125), 'J3': (-122, 122), 'pitch': (-15, 115), 'roll': (-120, 120)}
-PITCH_X = 52.0                                 # pitch axis forward of J3 (44 let the pitch lid touch the forearm at J3 +120)
-ROLL_X = 66.0                                  # roll tube front face forward of the pitch axis
-GRIP = dict(x0=10.0, x1=100.0, w=30.0, h=34.0, wall=2.5) # grip box in the grip frame (x from the roll tube front face)
-TRIG_PIVOT = (80.0, 0.0, -12.0)                # trigger pivot (axis Y) in the grip frame
+L1 = L2 = 130.0 * SCALE                 # 52
+OUT_F, IDL_F = 18.7, 17.7               # output / idler disc faces from the servo centre (servo frame -Z / +Z)
+PT = 8.0                                # link plate thickness (6 -> 8 on 2026-11-10: strength, see CLAUDE.md item 18)
+BOSS = 2.2                              # idler-side prong boss (prong clears the case-face protrusions)
+DZ = -(OUT_F + PT + RIM)                # -40.6: next pan servo centre below this one
+XP = 16.0                               # pitch axis forward of the wrist-pan axis = 0.4 x the follower's 40 (was 50: the hand
+                                        # then reached 1.44 x too far for the links and moved unlike the follower's)
+ROOF = 2.8                              # plastic over the pitch servo's top end
+ZPD = OUT_F + PT + ROOF + 35.2          # 62.7: pitch axis below the wrist-pan servo centre (S4 clamp right under the plate)
+XR = 38.0                               # roll servo centre forward of the pitch axis
+GRIP_L = 80.0                           # grip length from the roll horn face
+S6X = 41.0                              # trigger servo centre in the grip frame
+H_B = 306.0                             # shoulder servo centre above the desk (hanging hand >= ~19 mm over the desk)
+COL_X = -130.0                          # stand column centre behind the shoulder axis; hand-down poses touching the stand
+                                        # (605-pose grid, XP 16): 13.2 % at -60, 9.6 % at -90, 0 % at -130
+LIMITS = {'J1': (-120, 120), 'J2': (-130, 130), 'J3': (-127, 127), 'pitch': (-20, 120), 'roll': (-125, 125)}
+TRIG = (0.0, 25.0)                      # trigger range (deg)
+PLUG = dict(x=(-18.5, -10.0), y=9.6)    # cable plugs on the socket face (servo frame): through-slot in seat plates
 
-# fork-joint stack along the axis
-Z_NUT = PRONG[1]                               # nut on a 1 mm spacer above the upper bearing (6.5..11.5)
-Z_CAP0 = Z_NUT + 0.1
-Z_MAG1 = Z_NUT + NUT['h'] + 0.8 + 1.0 + MAG['h']
-Z_CHIP = Z_MAG1 + MAG['gap']
-Z_BOARD0 = Z_CHIP + BOARD['chip_h']
-Z_BOARD1 = Z_BOARD0 + BOARD['t']
-Z_LID1 = Z_BOARD1 + 2.0
-HOUSING = BOARD['w'] + 2 * BOARD['clear'] + 2 * WALL
-C_IN = BOARD['w'] / 2 + BOARD['clear']
+# servo frame -> body frame
+S4_IN_WRIST = T(XP, 0, -ZPD) @ basis((0, 0, -1), (1, 0, 0), (0, -1, 0))   # shaft +-Y, output +Y, body up
+S4_ROT = basis((0, 0, -1), (1, 0, 0), (0, -1, 0))
+S5_IN_PITCH = T(XR, 0, 0) @ basis((0, 0, 1), (0, 1, 0), (-1, 0, 0))       # shaft X, output +X, body down
+S5_IN_GRIP = T(-OUT_F, 0, 0) @ basis((0, 0, 1), (0, 1, 0), (-1, 0, 0))    # (grip frame: origin on the roll horn face)
+S6_IN_GRIP = T(S6X, 0, 0) @ basis((1, 0, 0), (0, 0, 1), (0, -1, 0))       # shaft Y, output +Y, body back
+S6_ROT = basis((1, 0, 0), (0, 0, 1), (0, -1, 0))
 
-
-def m5(lo, hi):
-    return cyl(2.65, lo, hi, hole=True)
-
-
-# ------------------------------------------------------------------ fork joint pieces (local frame, axis +Z)
-def hub():
-    s = union([cyl(HUB_R, -HUB_H, HUB_H), cyl(3.5, HUB_H - 0.01, PRONG[0]), cyl(3.5, -PRONG[0], -HUB_H + 0.01)])
-    return s - m5(-20, 20)
+_cache = {}
 
 
-def fork(reach, W=10.0, r_web=17.0):
-    """Moving prongs, the web joining them at r >= 17, and the board housing on top. Child side; reach along +X."""
-    plates = []
-    for z0, z1 in ((PRONG[0], PRONG[1]), (-PRONG[1], -PRONG[0])):
-        plates += [cyl(HUB_R, z0, z1), box(0, reach, -W, W, z0, z1)]
-    web = box(r_web, reach, -W, W, -PRONG[1], PRONG[1])
-    h = HOUSING / 2
-    housing = box(-h, h, -h, h, PRONG[1] - 0.01, Z_BOARD1)
-    s = union(plates + [web, housing])
-    cut = [cyl(BRG['od'] / 2, PRONG[0] - 0.01, PRONG[0] + BRG['w'], hole=True),
-           cyl(BRG['od'] / 2, -PRONG[0] - BRG['w'], -PRONG[0] + 0.01, hole=True),
-           cyl(4.6, PRONG[0] + BRG['w'] - 0.01, PRONG[1] + 0.1, hole=True),
-           cyl(4.6, -PRONG[1] - 0.1, -PRONG[0] - BRG['w'] + 0.01, hole=True),
-           cyl(8.0, PRONG[1] - 0.02, Z_BOARD0 + 0.01, hole=True),                                   # magnet-cap cavity
-           box(-C_IN, C_IN, -C_IN, C_IN, Z_BOARD0, Z_BOARD1 + 0.01),                                # board on its ledge
-           box(-C_IN + BOARD['ledge'], C_IN - BOARD['ledge'], -C_IN + BOARD['ledge'], C_IN - BOARD['ledge'], Z_CHIP - 0.5, Z_BOARD0 + 0.01),
-           cyl(1.25, PRONG[0] - 0.1, Z_BOARD1 + 0.1, y=-10.5, hole=True),                           # hold set screw
-           cyl(3.1, PRONG[0] - 0.1, PRONG[0] + 2.0, y=-10.5, hole=True)]                            # pad pocket
-    for sx, sy in ((1, 1), (-1, -1)):                                                                # lid screws M2
-        cut.append(cyl(0.8, Z_BOARD1 - 4.0, Z_BOARD1 + 0.1, x=sx * (h - 1.1), y=sy * (h - 1.1), hole=True))
-    return s - union(cut)
+def clamp_pocket():
+    """Space the servo's rear end needs in a clamp block it slides into along -X (servo frame); X range -42..-18."""
+    if 'clamp' not in _cache:
+        M = basis((0, 0, 1), (0, 1, 0), (-1, 0, 0))               # servo X -> Z'
+        sw = sweep(xf(SERVO, M), +1, -42.0, -18.0, c=0.0, cz=0.0)
+        _cache['clamp'] = xf(sw, np.linalg.inv(M))
+    return _cache['clamp']
 
 
-def lid():
-    h = HOUSING / 2
-    s = box(-h, h, -h, h, Z_BOARD1, Z_LID1) - box(h - 7.0, h + 1, -7.0, 7.0, Z_BOARD1 - 1, Z_LID1 + 1)
-    for sx, sy in ((1, 1), (-1, -1)):
-        s = s - cyl(1.1, Z_BOARD1 - 1, Z_LID1 + 1, x=sx * (h - 1.1), y=sy * (h - 1.1), hole=True)
-    return s
+def clamp_screws():
+    """4 x M2 case screws (servo frame) for a clamp on the rear end: 2 on the socket face, 2 on the output face."""
+    S = SO100; cut = []
+    for (x, y) in S['horn']:
+        cut.append(case_screw((x, y, RIM + S['wall']), (0, 0, -1), None, cb=20.0))
+    for (x, y) in S['idler']:
+        cut.append(case_screw((x, y, -RIM - S['cz_idler'] - S['wall']), (0, 0, 1), None, cb=20.0))
+    return union(cut)
 
 
-def magnet_cap():
-    r_hex = NUT['af'] / 2 / math.cos(math.pi / 6) + 0.15
-    return cyl(7.0, Z_CAP0, Z_MAG1) - union([cyl(r_hex, Z_CAP0 - 0.1, Z_CAP0 + NUT['h'] + 0.6, n=6),
-                                            cyl(MAG['d'] / 2 + 0.1, Z_MAG1 - MAG['h'], Z_MAG1 + 0.1, hole=True)])
+def seat_cut():
+    """Cut (servo frame) for a plate on the servo's socket face (+Z): exact relief + plug slot + 4 M2 case screws."""
+    if 'seat' not in _cache:
+        S = SO100
+        x0, x1, yy, rr = PLUG['x'][0], PLUG['x'][1], PLUG['y'], 1.5      # plug slot, corners rounded (FEA 2026-11-10)
+        slot = union([box(x0 + rr, x1 - rr, -yy, yy, 14.0, 40.0), box(x0, x1, -yy + rr, yy - rr, 14.0, 40.0)] +
+                     [cyl(rr, 14.0, 40.0, x, y) for x in (x0 + rr, x1 - rr) for y in (-yy + rr, yy - rr)])
+        cut = [_pocket(+1), slot,
+               cyl(CTR_D / 2, 14.0, 40.0, hole=True)]
+        for (x, y) in [(-32.8, 10.25), (-32.8, -10.25), (-8.3, 10.25), (-8.3, -10.25)]:
+            cut.append(case_screw((x, y, RIM + S['wall']), (0, 0, -1), None, cb=30.0))
+        _cache['seat'] = union(cut)
+    return _cache['seat']
 
 
-def fork_hw():
-    """(hardware fixed to the hub, magnet, board) in the local frame."""
-    hw = union([cyl(BRG['od'] / 2 - 0.05, PRONG[0] + 0.05, PRONG[0] + BRG['w'] - 0.05),
-                cyl(BRG['od'] / 2 - 0.05, -PRONG[0] - BRG['w'] + 0.05, -PRONG[0] - 0.05),
-                cyl(2.4, -PRONG[1] - 1, Z_NUT + NUT['h']), cyl(HEAD['d'] / 2, -PRONG[1] - 1 - HEAD['h'], -PRONG[1] - 1),
-                cyl(NUT['af'] / 2 / math.cos(math.pi / 6), Z_NUT, Z_NUT + NUT['h'], n=6)])
-    mag = cyl(MAG['d'] / 2, Z_MAG1 - MAG['h'], Z_MAG1)
-    brd = union([box(-BOARD['w'] / 2, BOARD['w'] / 2, -BOARD['w'] / 2, BOARD['w'] / 2, Z_BOARD0, Z_BOARD1),
-                 box(-2.5, 2.5, -2.5, 2.5, Z_CHIP + 0.05, Z_BOARD0)])
-    return hw, mag, brd
+def horn_cut(face, thick, screw_len, side=-1):
+    """Cut (servo frame) for a plate screwed to a disc: side -1 = output disc (face at -OUT_F), +1 = idler (+IDL_F).
+    4 x M3 on the 9.9 mm square, `screw_len` long, 2.5 mm into the disc; counterbore from the plate's outer face."""
+    z_face = side * face
+    seat = z_face + side * (screw_len - 2.5)
+    outer = z_face + side * thick
+    cut = [cyl(CTR_D / 2, -60, 60, hole=True)]                     # centre screw / nub, through
+    for (x, y) in HORN_HOLES:
+        cut.append(screw_cut((x, y, seat), (0, 0, -side), 'M3', screw_len, cb=abs(outer - seat) + 0.5))
+    return union(cut)
 
 
-# ------------------------------------------------------------------ inline joint (roll): local frame, axis +X
-TUBE_R = 9.5
-X_B1 = -BRG['w']                        # front bearing  -5..0
-X_B2 = (-16.0, -11.0)                   # rear bearing
-X_NUT = (-22.0, -17.0)                  # nut on a 1 mm spacer behind the rear bearing (turns with the grip)
-X_MAG0 = X_NUT[0] - 3.9 - 1.0 - MAG['h']          # magnet back face (cap clears the bolt tip, 1 mm floor)
-X_CHIP = X_MAG0 - MAG['gap']
-X_BOARD = (X_CHIP - BOARD['chip_h'] - BOARD['t'], X_CHIP - BOARD['chip_h'])
-
-
-def roll_tube():
-    """Fixed bearing tube + board housing (parent side, pitch link). Slot opens to +Y for the board."""
-    h = HOUSING / 2
-    s = union([xf(cyl(TUBE_R, X_NUT[1] + 0.01, 0.0), Ry(90)),
-               box(X_BOARD[0] - WALL, X_NUT[1] + 0.02, -h, h, -h, h)])
-    cut = [xf(cyl(BRG['od'] / 2, X_B1 - 0.01, 0.1, hole=True), Ry(90)),
-           xf(cyl(BRG['od'] / 2, X_B2[0] - 0.1, X_B2[1] + 0.01, hole=True), Ry(90)),
-           xf(cyl(4.4, X_B1 - 6.0, X_B1 + 0.02, hole=True), Ry(90)),                     # spacer room between races
-           xf(cyl(8.0, X_CHIP + 0.01, X_B2[0] + 0.02, hole=True), Ry(90)),               # nut + magnet cap turn here
-           box(X_BOARD[0], X_BOARD[1] + 0.01, -C_IN, h + 1, -C_IN, C_IN),                 # board slot, open to +Y
-           box(X_BOARD[1] - 0.01, X_CHIP + 0.5, -C_IN + BOARD['ledge'], h + 1, -C_IN + BOARD['ledge'], C_IN - BOARD['ledge']),   # window chip-side
-           cyl(1.25, -TUBE_R - 1, 0, x=-8.5, hole=True),                                   # hold set screw from below...
-           ]
-    cut[-1] = xf(cyl(1.25, 0, TUBE_R + 1, hole=True), T(-8.5, 0, 0) @ Rx(180))             # (radial, onto the spacer)
-    return s - union(cut)
-
-
-def roll_clip():
-    """Closes the board slot on +Y (2 x M2)."""
-    h = HOUSING / 2
-    s = box(X_BOARD[0] - WALL, X_NUT[1] - 0.5, h, h + 2.0, -h, h) - box(X_BOARD[0] - 3, X_BOARD[1] + 3, h - 1, h + 3, -6.0, 6.0)
-    return s
-
-
-def roll_cap():
-    """Pressed on the grip's nut (turns with the grip); magnet in its back face."""
-    r_hex = NUT['af'] / 2 / math.cos(math.pi / 6) + 0.15
-    c = cyl(7.0, 0.0, X_NUT[1] - X_MAG0 - 0.1) - union([cyl(r_hex, -0.1, NUT['h'] + 3.9, n=6),
-                                                        cyl(MAG['d'] / 2 + 0.1, X_NUT[1] - X_MAG0 - MAG['h'] - 0.1, 99, hole=True)])
-    return xf(c, T(X_NUT[1] - 0.1, 0, 0) @ Ry(-90))          # local +z -> -X
-
-
-def roll_hw():
-    hw = union([xf(cyl(BRG['od'] / 2 - 0.05, X_B1 + 0.05, -0.05), Ry(90)), xf(cyl(BRG['od'] / 2 - 0.05, X_B2[0] + 0.05, X_B2[1] - 0.05), Ry(90)),
-                xf(cyl(2.4, X_NUT[0] - 3.5, 5.0), Ry(90)), xf(cyl(NUT['af'] / 2 / math.cos(math.pi / 6), X_NUT[0], X_NUT[1], n=6), Ry(90))])
-    mag = xf(cyl(MAG['d'] / 2, X_MAG0, X_MAG0 + MAG['h']), Ry(90))
-    brd = union([box(X_BOARD[0], X_BOARD[1], -BOARD['w'] / 2, BOARD['w'] / 2, -BOARD['w'] / 2, BOARD['w'] / 2),
-                 box(X_CHIP - 0.0, X_BOARD[1], -2.5, 2.5, -2.5, 2.5)])
-    return hw, mag, brd
-
-
-# NB Ry(90) maps local +z to +x, so cyl(r, a, b) under Ry(90) spans x in [a, b] (cylinders above are built that way).
-
-
-# ------------------------------------------------------------------ assembly frames
+# ------------------------------------------------------------------ frames
 def frames(q=(0, 0, 0, 0, 0), trig=0.0):
-    a1, a2, a3, p, r = q
-    F = {'base': np.eye(4)}
-    F['upper'] = Rz(a1)
-    F['fore'] = F['upper'] @ T(L1, 0, 0) @ Rz(a2)
-    F['wrist'] = F['fore'] @ T(L2, 0, 0) @ Rz(a3)
-    F['pchild'] = F['wrist'] @ T(PITCH_X, 0, 0) @ Ry(p)              # + p = grip tip down
-    F['grip'] = F['pchild'] @ T(ROLL_X, 0, 0) @ Rx(r)
-    F['trig'] = F['grip'] @ T(*TRIG_PIVOT) @ Ry(-trig)
-    # joint frames: (parent-side frame, child-side frame) in local joint coordinates (fork joints: axis local Z)
-    F['J1p'], F['J1c'] = F['base'], F['upper']
-    F['J2p'], F['J2c'] = F['upper'] @ T(L1, 0, 0), F['fore']
-    F['J3p'], F['J3c'] = F['fore'] @ T(L2, 0, 0), F['wrist']
-    F['PJp'], F['PJc'] = F['wrist'] @ T(PITCH_X, 0, 0) @ Rx(-90), F['pchild'] @ Rx(-90)
-    F['RJp'], F['RJc'] = F['pchild'] @ T(ROLL_X, 0, 0), F['grip']
+    q1, q2, q3, qp, qr = q
+    F = {'base': T(0, 0, 0)}
+    F['link1'] = Rz(q1)
+    F['link2'] = F['link1'] @ T(L1, 0, DZ) @ Rz(q2)
+    F['wrist'] = F['link2'] @ T(L2, 0, DZ) @ Rz(q3)
+    F['pitch'] = F['wrist'] @ T(XP, 0, -ZPD) @ Ry(qp)
+    F['grip'] = F['pitch'] @ T(XR + OUT_F, 0, 0) @ Rx(qr)
+    F['trigger'] = F['grip'] @ T(S6X, 0, 0) @ Ry(-trig)
     return F
 
 
+# servos: (name, body they are fixed to, servo frame -> body frame)
+SERVOS = [('S1_shoulder', 'base', T()), ('S2_elbow', 'link1', T(L1, 0, DZ)), ('S3_wrist_pan', 'link2', T(L2, 0, DZ)),
+          ('S4_pitch', 'wrist', S4_IN_WRIST), ('S5_roll', 'pitch', S5_IN_PITCH), ('S6_trigger', 'grip', S6_IN_GRIP)]
+
 # ------------------------------------------------------------------ parts
 PARTS = {}
+FASTENERS = []          # (kind, size, length, qty, note)
 
 
 def add(name, solid, frame, color, note, qty=1):
     PARTS[name] = dict(solid=solid, frame=frame, color=color, note=note, qty=qty)
 
 
+def fast(kind, size, length, qty, note):
+    FASTENERS.append((kind, size, length, qty, note))
+
+
+def pan_link(L, fork):
+    """Plate under a pan servo's output horn (= the link) carrying the next servo under its far end. With fork=True
+    (shoulder): + a prong on the idler above and a web in front of the case joining them."""
+    W = 7.0 if fork else 15.0     # neck half width: narrow only on the shoulder fork (clears the stand's clamp block at
+                                  # +-125 deg); the other links are full width (a 14 mm neck had a safety factor ~1.7)
+    z0, z1 = -OUT_F - PT, -OUT_F
+    parts = [cyl(13.0, z0, z1), box(0, 21.0, -W, W, z0, z1), box(14.0, L + 12.0, -15.0, 15.0, z0, z1)]
+    cut = [horn_cut(OUT_F, PT, 8), xf(seat_cut(), T(L, 0, DZ))]
+    if fork:
+        t0, t1 = IDL_F + BOSS, IDL_F + BOSS + PT
+        parts += [cyl(13.0, t0, t1), cyl(11.0, IDL_F, t0 + 0.01), box(0, 26.0, -W, W, t0, t1),
+                  box(21.0, 26.0, -W, W, z0, t1)]
+        cut.append(horn_cut(IDL_F, PT + BOSS, 8, side=+1))
+    return union(parts) - union(cut)
+
+
 def build():
-    PARTS.clear()
-    # base: J1 hub, arm back to a pillar, plate (clamp behind the desk edge), ESP32-S3 bay with a USB slot
-    pz = -60.0
-    # short neck at the hub (the J1 fork's web sweeps r 17..26 up to +-145 deg), wide pillar from r 30 back
-    base = union([hub(), box(-31.0, -10.0, -8.0, 8.0, -HUB_H, HUB_H), box(-74.0, -30.0, -16.0, 16.0, pz, HUB_H),
-                  box(-150.0, -30.0, -45.0, 45.0, pz - 6.0, pz)])
-    bay = box(-146.0, -96.0, -23.0, 23.0, pz - 0.01, pz + 14.0) - box(-144.0, -98.0, -21.0, 21.0, pz + 1.5, pz + 15.0)
-    base = union([base, bay]) - union([m5(-20, 20), box(-147.0, -143.0, -6.0, 6.0, pz + 2.0, pz + 12.0)])
-    add('base', base, 'base', (0.85, 0.45, 0.15), 'desk-edge base: J1 hub, pillar, plate, ESP32-S3 bay (USB at the back)')
-    for nm, L, fr in (('upper_link', L1, 'upper'), ('fore_link', L2, 'fore')):
-        # full-height box section between the forks; thin (|z| <= 6) only within 17 mm of the next hub, where the
-        # next fork's prongs pass above and below
-        s = union([fork(26.0, W=7.0), box(17.0, L - 17.0, -7.0, 7.0, -PRONG[1], PRONG[1]), box(L - 17.5, L, -7.0, 7.0, -HUB_H, HUB_H),
-                   xf(hub(), T(L, 0, 0))]) - xf(m5(-20, 20), T(L, 0, 0))
-        add(nm, s, fr, (0.30, 0.55, 0.85), f'pan link {L:.0f} mm: encoder fork at the near joint, hub of the next joint')
-    # wrist: J3 fork + arm to the pitch hub (axis Y)
-    w = union([fork(26.0, W=7.0), box(17.0, PITCH_X - 17.0, -7.0, 7.0, -PRONG[1], PRONG[1]),
-               box(20.0, PITCH_X, -HUB_H, HUB_H, -8.0, 8.0) - xf(cyl(HUB_R + 0.5, -30, 30), T(PITCH_X, 0, 0) @ Rx(-90)),
-               xf(hub(), T(PITCH_X, 0, 0) @ Rx(-90))])
-    w = w - xf(m5(-20, 20), T(PITCH_X, 0, 0) @ Rx(-90))
-    add('wrist', w, 'wrist', (0.20, 0.60, 0.55), 'wrist-pan fork + pitch hub (axis Y)')
-    # pitch link: pitch fork (frame PJc = pchild @ Rx(-90)) + arm to the roll tube's back
-    h = HOUSING / 2
-    pf = xf(fork(28.0, W=8.0, r_web=20.0), Rx(-90))      # narrow web: clears the wrist arm at pitch +120
-    back = X_BOARD[0] - WALL + ROLL_X
-    pl = union([pf, box(22.0, back + 0.5, -10.0, 10.0, -8.0, 8.0), xf(roll_tube(), T(ROLL_X, 0, 0))])
-    add('pitch_link', pl, 'pchild', (0.55, 0.42, 0.75), 'pitch fork + roll bearing tube with the roll encoder bay')
-    add('roll_clip', xf(roll_clip(), T(ROLL_X, 0, 0)), 'pchild', (0.35, 0.35, 0.40), 'closes the roll board slot (2 x M2)')
-    # grip (frame 'grip', x = 0 at the roll tube's front face): flange + boss on the bolt, hollow grip box, trigger bay
-    g0, g1, gw, gh = GRIP['x0'], GRIP['x1'], GRIP['w'] / 2, GRIP['h'] / 2
-    flange = union([xf(cyl(HUB_R, 0.5, 4.5), Ry(90)), xf(cyl(3.5, 0.0, 0.51), Ry(90)), box(4.0, g0 + 0.5, -10.0, 10.0, -10.0, 10.0)])
-    gt = GRIP['wall']
-    shell = box(g0, g1, -gw, gw, -gh, gh) - box(g0 + gt, g1 - gt, -gw + gt, gw - gt, -gh + gt, gh - gt)
-    grip = union([flange, shell])
-    tx, ty, tz = TRIG_PIVOT
-    cut = [xf(m5(-1, 4.6), Ry(90)), xf(cyl(HEAD['d'] / 2 + 0.3, 4.6, g0 + WALL + 0.1, hole=True), Ry(90)),   # bolt head from inside
-           box(tx - 30.0, tx + 7.0, -5.6, 5.6, -gh - 1, tz + 7.0),                                           # trigger slot
-           xf(cyl(1.6, -gw - 1, gw + 1, hole=True), T(tx, 0, tz) @ Rx(90)),                                   # trigger pivot M3
-           cyl(8.0, gh - 3, gh + 1, x=g0 + 20.0, hole=True),                                                  # thumbstick Ø16
-           cyl(3.6, gh - 3, gh + 1, x=g1 - 22.0, hole=True),                                                  # clutch button Ø7
-           box(g1 - 3, g1 + 1, -5.0, 5.0, -4.0, 4.0)]                                                        # wire exit at the front end
-    grip = grip - union(cut)
-    # trigger encoder bay inside the +Y wall: board in the XZ plane, chip facing -Y onto the trigger hub's magnet face
-    yc = 5.6 + MAG['gap']                         # chip face (hub face at y 5.5, magnet flush with it)
-    yb0, yb1 = yc + BOARD['chip_h'], yc + BOARD['chip_h'] + BOARD['t']
-    bay = box(tx - C_IN - 1.5, tx + C_IN + 1.5, yb0 - 1.5, gw - WALL + 0.01, max(tz - C_IN - 1.5, -gh + 0.01), gh - WALL + 0.01)
-    bay = bay - union([box(tx - C_IN, tx + C_IN, yb0, yb1, tz - C_IN, gh), box(tx - C_IN + 1.2, tx + C_IN - 1.2, yb0 - 2, yb0 + 0.01, tz - C_IN + 1.2, tz + C_IN - 1.2)])
-    add('grip', union([grip, bay]), 'grip', (0.92, 0.78, 0.25),
-        'hand grip: roll flange on the M5, hollow grip, trigger slot + encoder bay, thumbstick (lift) and clutch-button holes')
-    add('roll_cap', roll_cap(), 'RJc', (0.95, 0.95, 0.95), 'roll magnet cap (pressed on the grip bolt nut)')
-    trig = union([xf(cyl(6.0, -5.5, 5.5), Rx(-90)), box(-30.0, 2.0, -5.5, 5.5, -24.0, -3.0)])
-    trig = trig - union([xf(cyl(1.6, -7, 7, hole=True), Rx(-90)), xf(cyl(MAG['d'] / 2 + 0.1, 5.5 - MAG['h'], 6.0, hole=True), Rx(-90))])
-    add('trigger', trig, 'trig', (0.15, 0.15, 0.17), 'gripper trigger: M3 pivot, magnet in the +Y hub face')
-    # inner-race spacers: 1 mm rings under each bolt head / nut (fork joints) and behind the rear roll bearing, and the
-    # 6 mm tube between the two roll bearings (rings small enough to clear the outer races)
-    ring = cyl(3.7, 0.0, 1.0) - cyl(2.65, -1, 2, hole=True)
-    for k in range(9):
-        add(f'spacer_{k}', xf(ring, T(0, 0, -200.0 - 3 * k)), 'base', (0.95, 0.95, 0.95), 'inner-race spacer ring Ø7.4 / Ø5.3 x 1 mm')
-    add('roll_spacer', xf(cyl(3.7, 0.0, 6.0) - cyl(2.65, -1, 7, hole=True), T(0, 0, -260.0)), 'base', (0.95, 0.95, 0.95),
-        'spacer tube between the two roll bearings, Ø7.4 / Ø5.3 x 6 mm')
-    for j in ('J1', 'J2', 'J3', 'PJ'):
-        add(f'lid_{j}', lid(), f'{j}c', (0.35, 0.35, 0.40), 'encoder board lid (2 x M2 self-tapping)')
-        add(f'magnet_cap_{j}', magnet_cap(), f'{j}p', (0.95, 0.95, 0.95), 'magnet cap, pressed on the fixed nyloc nut')
+    PARTS.clear(); FASTENERS.clear()
+
+    # ---- stand: two prints (the A1 builds 256 mm high), joined by a plug + 2 x M3 bolts across the column
+    #   stand_top : clamp block on S1's rear end (between the link-1 fork's prong and plate) + upper column
+    #   stand_foot: foot plate (4 x M5 holes / clamp) + lower column + plug up into the upper column
+    zf = -H_B
+    zt, zb = IDL_F + BOSS - 0.3, -OUT_F + 0.3                      # block between the fork's top prong and link plate
+    CX, CY, WALL = (COL_X - 13.0, COL_X + 13.0), 20.0, 3.0         # column 26 x 40, hollow, 3 mm walls
+    zs = zf + 150.0                                                # split height
+    inner = lambda z0, z1, e=0.0: box(CX[0] + WALL + e, CX[1] - WALL - e, -CY + WALL + e, CY - WALL - e, z0, z1)
+    PLUG_L, CH = 45.0, 2.0                                         # plug length (30 -> 45) and root chamfer (FEA 2026-11-10)
+    bolts = [xf(cyl(1.7, -30, 30, hole=True), T((CX[0] + CX[1]) / 2, 0, zs + z) @ Rx(90)) for z in (12.0, 34.0)]
+    wP, hP = CX[1] - CX[0] - 2 * WALL - 0.4, 2 * CY - 2 * WALL - 0.4
+    def frustum(e):     # chamfer ring at the plug root: plug + CH (+ e) at zs, plug (+ e) at zs + CH
+        w0, h0 = wP + 2 * CH + 2 * e, hP + 2 * CH + 2 * e
+        return CS.square((w0, h0), True).extrude(CH, 0, 0.0, ((wP + 2 * e) / w0, (hP + 2 * e) / h0)).translate(((CX[0] + CX[1]) / 2, 0, zs))
+    top = union([box(-42.0, -21.0, -16.0, 16.0, zb, zt), box(CX[0], -21.0, -16.0, 16.0, zb, zt),   # clamp + beam back
+                 box(CX[0], CX[1], -CY, CY, zs, zt)])
+    top = top - union([clamp_pocket(), clamp_screws(), inner(zs - 1.0, zt - 25.0), frustum(0.2)] + bolts)
+    add('stand_top', top, 'base', (0.85, 0.45, 0.15), 'stand, upper part: clamp on the shoulder servo + hollow column')
+    foot = union([box(CX[0] - 40.0, 20.0, -45.0, 45.0, zf, zf + 5.0), box(CX[0], CX[1], -CY, CY, zf + 4.0, zs),
+                  box(CX[0] - 40.0, CX[0] + 0.01, -3.0, 3.0, zf + 4.0, zf + 50.0), box(CX[1] - 0.01, 10.0, -3.0, 3.0, zf + 4.0, zf + 14.0),
+                  box(CX[0], CX[1], -45.0, 45.0, zf + 4.0, zf + 12.0),       # ribs <= 14 mm: the hanging hand passes 19 mm up
+                  inner(zs - 1.0, zs + PLUG_L, 0.2), frustum(0.0)])         # plug, 0.2 mm clearance in the upper column
+    holes = [cyl(2.75, zf - 1, zf + 6, x, y, hole=True) for x in (CX[0] - 30.0, 10.0) for y in (-35.0, 35.0)]
+    # 3 mm column walls; the plug's hollow starts 8 mm down, so a solid 8 mm band (was 1 mm) joins plug and column walls
+    foot = foot - union([inner(zf + 7.0, zs - 8.0), inner(zs - 8.1, zs + PLUG_L + 1.0, 3.2)] + bolts + holes)
+    add('stand_foot', foot, 'base', (0.85, 0.45, 0.15), 'stand, lower part: foot plate (4 x M5 / clamp) + column + plug')
+    fast('selftap', 'M2', 6, 4, 'shoulder servo case (stand clamp)')
+    fast('SHCS', 'M3', 50, 2, 'stand joint (across the column, nyloc nut)'); fast('nut', 'M3', None, 2, 'stand joint (nyloc)')
+
+    add('link1', pan_link(L1, True), 'link1', (0.30, 0.55, 0.85),
+        'shoulder fork (output horn + idler) = link 52 mm; the elbow servo hangs under its far end')
+    fast('SHCS', 'M3', 8, 8, 'shoulder horn (4) + idler (4)'); fast('selftap', 'M2', 6, 4, 'elbow servo case')
+    add('link2', pan_link(L2, False), 'link2', (0.30, 0.55, 0.85),
+        'link 52 mm under the elbow horn; the wrist-pan servo hangs under its far end')
+    fast('SHCS', 'M3', 8, 4, 'elbow horn'); fast('selftap', 'M2', 6, 4, 'wrist-pan servo case')
+
+    # ---- wrist: plate under S3's horn + clamp block under it on S4's top (rear) end
+    z0, z1 = -OUT_F - PT, -OUT_F
+    plate = union([cyl(14.0, z0, z1), box(0, XP + 14.0, -14.0, 14.0, z0, z1)])
+    blk = box(XP - 14.0, XP + 14.0, -18.2, 18.2, -ZPD + 18.0, z1)
+    w = union([plate, blk]) - union([horn_cut(OUT_F, PT, 8), xf(clamp_pocket(), S4_IN_WRIST),
+                                     xf(clamp_screws(), S4_IN_WRIST)])
+    add('wrist', w, 'wrist', (0.93, 0.70, 0.25), 'plate under the wrist-pan horn + clamp holding the pitch servo')
+    fast('SHCS', 'M3', 8, 4, 'wrist-pan horn'); fast('selftap', 'M2', 6, 4, 'pitch servo case (wrist clamp)')
+
+    # ---- pitch fork (frame: origin on the pitch axis, X forward, Y = axis): prongs on S4's discs + back plate for S5
+    xb1 = XR - RIM                                                  # back plate front face = S5's socket-face rim
+    xb0 = xb1 - 4.0                                                 # 2.5 -> 4 mm (FEA 2026-11-10: weak under a side push)
+    pr = []
+    for sgn, face in ((+1, OUT_F), (-1, IDL_F)):
+        y0, y1 = sorted((sgn * 19.2, sgn * 25.2))
+        b0, b1 = sorted((sgn * face, sgn * 19.2))
+        pr += [xf(cyl(13.0, y0, y1), Rx(-90)), box(0, xb1, y0, y1, -11.0, 11.0),
+               box(12.0, xb1, y0, y1, -36.0, 11.0), xf(cyl(11.0, b0, b1), Rx(-90))]
+    gus = [box(xb0 - 3.0, xb0 + 0.01, y0, y1, -36.0, 0.0) for (y0, y1) in ((13.5, 16.5), (-16.5, -13.5))]   # behind the plate; low
+    pf = union(pr + [box(xb0, xb1, -25.2, 25.2, -36.0, 12.0)] + gus)        # half only (the upper half meets S4 at pitch -20)
+    pf = pf - union([xf(horn_cut(OUT_F, 6.5, 8), S4_ROT), xf(horn_cut(IDL_F, 7.5, 8, side=+1), S4_ROT),
+                     xf(seat_cut(), S5_IN_PITCH)])
+    add('pitch_fork', pf, 'pitch', (0.80, 0.35, 0.35), 'pitch fork (output horn + idler) and back plate holding the roll servo')
+    fast('SHCS', 'M3', 8, 8, 'pitch horn (4) + idler (4)'); fast('selftap', 'M2', 6, 4, 'roll servo case')
+
+    # ---- grip (frame: origin on the roll horn face, X forward): back plate + C-channel around S6, open on +Y
+    GY = (-17.9, 17.4)
+    g = union([box(0, 4.0, GY[0], GY[1], -14.4, 14.4),                     # back plate on the roll horn
+               box(0, GRIP_L, GY[0], -15.9, -14.4, 14.4),                  # -Y wall (on S6's socket face)
+               box(0, GRIP_L, GY[0], GY[1], 12.4, 14.4), box(0, GRIP_L, GY[0], GY[1], -14.4, -12.4),
+               box(GRIP_L - 2.0, GRIP_L, GY[0], GY[1], -14.4, 14.4)])
+    g = g - union([xf(horn_cut(OUT_F, 4.0, 6), S5_IN_GRIP), xf(seat_cut(), S6_IN_GRIP)])
+    add('grip', g, 'grip', (0.25, 0.25, 0.28), 'grip on the roll horn; holds the trigger servo (slides in from the +Y side)')
+    fast('SHCS', 'M3', 6, 4, 'roll horn (from inside the grip)'); fast('selftap', 'M2', 6, 4, 'trigger servo case')
+
+    # ---- trigger lever (frame: on S6's axis, X forward, Y = axis): disc on the output horn, arm down, finger bar under
+    y0, y1 = OUT_F, OUT_F + 4.0
+    tr = union([xf(cyl(13.0, y0, y1), Rx(-90)), box(-6.0, 6.0, y0, y1, -32.0, 0.0),
+                box(-6.0, 26.0, y0, y1, -36.0, -30.0), box(8.0, 26.0, -16.0, y1, -36.0, -30.0)])
+    tr = tr - xf(horn_cut(OUT_F, 4.0, 6), S6_ROT)
+    add('trigger', tr, 'trigger', (0.20, 0.20, 0.22), 'trigger lever on the trigger servo horn; finger bar under the grip')
+    fast('SHCS', 'M3', 6, 4, 'trigger horn')
 
 
 def world(q=(0, 0, 0, 0, 0), trig=0.0, bought=True):
-    """Every part placed at joint angles q = (J1, J2, J3, pitch, roll) in degrees: [(name, solid, color, body)].
-    body = the rigid body it moves with (for clash checks)."""
+    """(name, solid in world, colour, body) for every part (+ servos when bought). Desk at z = -H_B."""
     F = frames(q, trig)
-    body = {'base': 'base', 'upper': 'upper', 'fore': 'fore', 'wrist': 'wrist', 'pchild': 'pchild', 'grip': 'grip', 'trig': 'trig',
-            'J1c': 'upper', 'J2c': 'fore', 'J3c': 'wrist', 'PJc': 'pchild', 'J1p': 'base', 'J2p': 'upper', 'J3p': 'fore',
-            'PJp': 'wrist', 'RJc': 'grip', 'RJp': 'pchild'}
-    out = [(nm, xf(p['solid'], F[p['frame']]), p['color'], body[p['frame']]) for nm, p in PARTS.items() if 'spacer' not in nm]
+    out = [(nm, xf(p['solid'], F[p['frame']]), p['color'], p['frame']) for nm, p in PARTS.items()]
     if bought:
-        for j in ('J1', 'J2', 'J3', 'PJ'):
-            hw, mag, brd = fork_hw()
-            out += [(f'hw_{j}', xf(hw, F[j + 'p']), (0.6, 0.6, 0.62), body[j + 'p']),
-                    (f'magnet_{j}', xf(mag, F[j + 'p']), (0.75, 0.1, 0.1), body[j + 'p']),
-                    (f'board_{j}', xf(brd, F[j + 'c']), (0.1, 0.45, 0.2), body[j + 'c'])]
-        hw, mag, brd = roll_hw()
-        out += [('hw_RJ', xf(hw, F['RJc']), (0.6, 0.6, 0.62), 'grip'), ('magnet_RJ', xf(mag, F['RJc']), (0.75, 0.1, 0.1), 'grip'),
-                ('board_RJ', xf(brd, F['RJp']), (0.1, 0.45, 0.2), 'pchild')]
-        tx, ty, tz = TRIG_PIVOT
-        yc = 5.6 + MAG['gap']
-        tb = box(tx - BOARD['w'] / 2, tx + BOARD['w'] / 2, yc + BOARD['chip_h'], yc + BOARD['chip_h'] + BOARD['t'], tz - BOARD['w'] / 2, tz + BOARD['w'] / 2)
-        out += [('board_trig', xf(tb, F['grip']), (0.1, 0.45, 0.2), 'grip'),
-                ('magnet_trig', xf(xf(cyl(MAG['d'] / 2, 5.5 - MAG['h'], 5.5), Rx(-90)), F['trig']), (0.75, 0.1, 0.1), 'trig')]
+        for nm, body, M in SERVOS:
+            out.append((nm, xf(SERVO, F[body] @ M), (0.12, 0.12, 0.14), body))
     return out
 
 
@@ -288,5 +252,5 @@ if __name__ == '__main__':
     tot = 0
     for nm, p in PARTS.items():
         v = p['solid'].volume() / 1000; tot += v
-        print(f'{nm:16s} {v:6.1f} cm3')
-    print('total printed volume', round(tot, 1), 'cm3')
+        print(f'{nm:12s} {v:6.1f} cm3  bbox {[round(x, 1) for x in p["solid"].bounding_box()]}')
+    print(f'total {tot:.1f} cm3')

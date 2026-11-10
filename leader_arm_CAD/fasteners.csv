@@ -1,0 +1,6 @@
+type,size,length_mm,qty_per_leader,used for
+selftap,M2,6,24,shoulder servo case (stand clamp); elbow servo case; wrist-pan servo case; pitch servo case (wrist clamp); roll servo case; trigger servo case
+SHCS,M3,50,2,"stand joint (across the column, nyloc nut)"
+nut,M3,,2,stand joint (nyloc)
+SHCS,M3,8,24,shoulder horn (4) + idler (4); elbow horn; wrist-pan horn; pitch horn (4) + idler (4)
+SHCS,M3,6,8,roll horn (from inside the grip); trigger horn
