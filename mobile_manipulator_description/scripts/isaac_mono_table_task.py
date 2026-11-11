@@ -10,7 +10,7 @@ table B; both products back out of the tote onto table B; stow.
 Plan: mono_poses.table_steps (checked offline: 320 samples, robot / table / tote products / carried product all clear),
 aimed at the products' measured positions.
 
-    python scripts/isaac_mono_table_task.py [--headless] [--table_h 0.75]
+    python scripts/isaac_mono_table_task.py [--headless] [--table_h 0.75] [--no_smooth]
 """
 import argparse, math, os, sys
 
@@ -20,6 +20,7 @@ ap.add_argument('--urdf', default=os.path.join(here, '..', 'urdf', 'mobile_manip
 ap.add_argument('--headless', action='store_true')
 ap.add_argument('--table_h', type=float, default=0.75)
 ap.add_argument('--no_self_collision', action='store_true')
+ap.add_argument('--no_smooth', action='store_true', help='step-by-step moves instead of the TOPP-RA blended ones (smooth_path.py)')
 args = ap.parse_args()
 
 from isaacsim import SimulationApp
@@ -47,6 +48,7 @@ def world(goal, xy):
 task = Task(app, args.urdf, args.headless, fix_base=False, self_collision=not args.no_self_collision, layout='prototype_mono_arm')
 w = task.world
 task.profile = 'trap'     # trapezoid moves: full allowed speed after a 0.3 s ramp (same limits)
+task.settle_mode = 'still'   # a move is done once the joints stop (the wrist pitch's gravity sag never gets within 2 deg)
 WOOD = np.array([0.62, 0.48, 0.33])
 w.scene.add(FixedCuboid(prim_path='/World/tableA', name='tableA', position=np.array([2.35, 0.0, H / 2]), scale=np.array([0.70, 1.20, H]), color=WOOD))
 w.scene.add(FixedCuboid(prim_path='/World/tableB', name='tableB', position=np.array([1.0, -1.85, H / 2]), scale=np.array([1.20, 0.70, H]), color=WOOD))
@@ -90,11 +92,11 @@ def note(label):
 try:
     task.drive_to(GOAL_A, 'drive to table A')
     src = [tuple(task.to_base(task.obj_state(items[k])[0])[:2]) for k in range(2)]      # where the products are
-    MP.run(task, MP.table_steps(H, order=(0, 1), to_tote=True, src=src), on_jaw=note)
+    MP.run(task, MP.table_steps(H, order=(0, 1), to_tote=True, src=src), on_jaw=note, smooth=not args.no_smooth)
     task.drive_to(GOAL_B, 'drive to table B')
     src = [tuple(task.to_base(task.obj_state(items[k])[0])[:2]) for k in range(2)]
     dst = [tuple(task.to_base(np.array([*TARGET[k], 0.0]))[:2]) for k in range(2)]
-    MP.run(task, MP.table_steps(H, order=(1, 0), to_tote=False, src=src, dst=dst), on_jaw=note)
+    MP.run(task, MP.table_steps(H, order=(1, 0), to_tote=False, src=src, dst=dst), on_jaw=note, smooth=not args.no_smooth)
 except RuntimeError as e:
     task.report('aborted', str(e), ok=False)
 print(f'task time {task.t:.0f} s')

@@ -174,10 +174,13 @@ def shelf_place_steps(target, grab_yaw, grab_elbow=None, item_in_tote=None, item
     return steps
 
 
-def run(task, steps, jaw_open=JAW_OPEN, on_jaw=None, debug=None):
+def run(task, steps, jaw_open=JAW_OPEN, on_jaw=None, debug=None, smooth=False):
     """Execute a step list on a proto_task.Task (Isaac). on_jaw(label) is called after every jaw action;
     debug(label) after every step (MONO_DEBUG=1 prints jaw opening + TCP)."""
     import numpy as np, os
+    if smooth:                       # TOPP-RA: blended, time-optimal runs between the jaw actions (smooth_path.py)
+        import smooth_path as SP
+        return SP.run(task, steps, {1: jaw_open, 0: 0.0, 2: SHELF['release'], 3: SHELF['open']}, JAW_WAIT, on_jaw)
     if debug is None and os.environ.get('MONO_DEBUG'):
         def debug(label):
             q = task.robot.get_joint_positions(); t = task.to_base(task.tcp['left'].get_world_pose()[0])

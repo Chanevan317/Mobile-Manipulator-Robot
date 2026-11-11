@@ -11,7 +11,7 @@ release wide, out; stow.
 Plan: mono_poses.shelf_pick_steps / shelf_place_steps (checked offline: 224 samples clear, incl. the carried product
 upright and lying), aimed at the product's measured position and axis.
 
-    python scripts/isaac_mono_shelf_task.py [--headless]
+    python scripts/isaac_mono_shelf_task.py [--headless] [--no_smooth]
 """
 import argparse, math, os, sys
 
@@ -20,6 +20,7 @@ here = os.path.dirname(os.path.abspath(__file__))
 ap.add_argument('--urdf', default=os.path.join(here, '..', 'urdf', 'mobile_manipulator_prototype_mono_arm.urdf'))
 ap.add_argument('--headless', action='store_true')
 ap.add_argument('--no_self_collision', action='store_true')
+ap.add_argument('--no_smooth', action='store_true', help='step-by-step moves instead of the TOPP-RA blended ones (smooth_path.py)')
 args = ap.parse_args()
 
 from isaacsim import SimulationApp
@@ -50,6 +51,7 @@ def goal_for(item_xy, yaw):
 task = Task(app, args.urdf, args.headless, fix_base=False, self_collision=not args.no_self_collision, layout='prototype_mono_arm')
 w = task.world
 task.profile = 'trap'     # trapezoid moves: full allowed speed after a 0.3 s ramp (same limits)
+task.settle_mode = 'still'   # a move is done once the joints stop (the wrist pitch's gravity sag never gets within 2 deg)
 
 
 def shelf(name, center, size):
@@ -102,13 +104,13 @@ try:
         print(f'      [debug] {label:28s} product ({pb[0]:+.3f}, {pb[1]:+.3f})  TCP ({t[0]:+.3f}, {t[1]:+.3f}, {t[2]:.3f})', flush=True)
         bp, byaw = task.base_pose(); pw = task.obj_state(item)[0]
         print(f'      [debug]   base world ({bp[0]:+.4f}, {bp[1]:+.4f}) yaw {math.degrees(byaw):+.2f}  product world ({pw[0]:+.4f}, {pw[1]:+.4f})', flush=True)
-    MP.run(task, steps[:k_out + 1], on_jaw=note, debug=dbg if os.environ.get('MONO_DEBUG') else None)
+    MP.run(task, steps[:k_out + 1], on_jaw=note, debug=dbg if os.environ.get('MONO_DEBUG') else None, smooth=not args.no_smooth)
     q = task.robot.get_joint_positions()
     gap = (q[task.idx['left_finger_right']] + q[task.idx['left_finger_left']]) * 1000
     rise = (task.obj_state(item)[0][2] - start_z['z']) * 1000
     task.report('pick shelf A', f'jaw gap {gap:.1f} mm (item 45), item lifted {rise:.0f} mm (gripper 30) and out of the shelf',
                 ok=abs(gap - 45) < 5 and rise > 20)
-    MP.run(task, steps[k_out + 1:], on_jaw=note)
+    MP.run(task, steps[k_out + 1:], on_jaw=note, smooth=not args.no_smooth)
     task.drive_to(goal_for(ITEM_B[:2], -P), 'drive to shelf B')
     c, up = task.obj_state(item); cb = task.to_base(c)
     _, byaw = task.base_pose()
@@ -116,10 +118,10 @@ try:
     tb = task.to_base(ITEM_B)
     steps = MP.shelf_place_steps(tuple(tb), axis, item_in_tote=(cb[0], cb[1]), item_z=cb[2])
     k_lift = [i for i, s in enumerate(steps) if s[1] == 'lift it'][0]
-    MP.run(task, steps[:k_lift + 1])
+    MP.run(task, steps[:k_lift + 1], smooth=not args.no_smooth)
     rise = (task.obj_state(item)[0][2] - c[2]) * 1000
     task.report('pick from tote', f'item lifted {rise:.0f} mm (gripper {MP.TOTE_UP*1000:.0f} mm)', ok=rise > MP.TOTE_UP * 1000 - 30)
-    MP.run(task, steps[k_lift + 1:])
+    MP.run(task, steps[k_lift + 1:], smooth=not args.no_smooth)
     task.wait(2.0)
 except RuntimeError as e:
     task.report('aborted', str(e), ok=False)

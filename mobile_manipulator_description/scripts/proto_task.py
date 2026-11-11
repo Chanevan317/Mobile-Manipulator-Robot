@@ -26,6 +26,7 @@ TCP_TURN = 1.5            # rad/s for heading / pitch changes in those moves
 MIN_MOVE = 0.4            # s, shortest straight-line move
 ARM_KEYS = ('shoulder_pan', 'elbow_pan', 'wrist_pan', 'wrist_pitch', 'wrist_roll')
 RAMP = 0.3                # s, accel / decel ramp of the 'trap' profile
+STILL_V = 0.1             # rad/s or m/s: 'stopped' for settle_mode 'still' (the wrist pitch holding a product hunts at 0.03-0.06)
 
 
 def _trap(t, T, tr):
@@ -68,6 +69,9 @@ class Task:
         self.results = []
         self.t = 0.0
         self.profile = 'cosine'   # 'trap' (mono tasks): faster, same speed limits
+        self.settle_log = []      # (seconds spent settling, None or the joint that never got within tol)
+        self.settle_mode = 'tol'  # 'still' (mono tasks): also done once the arm joints + lift have stopped (< STILL_V for 0.1 s)
+        self.still = 0
 
     def start(self):
         """Call after the scene objects are added."""
@@ -79,6 +83,7 @@ class Task:
         self.vmax = np.array(self.robot.dof_properties['maxVelocity'], dtype=float)
         self.wheel = [self.idx[f'wheel_{w}_joint'] for w in ('fl', 'fr', 'rl', 'rr')]
         self.driven = [i for i, nm in enumerate(self.names) if 'roller' not in nm and not nm.startswith('wheel')]
+        self.still_idx = [i for i in self.driven if 'finger' not in self.names[i]]
         self.substeps = max(1, round(DT / self.world.get_physics_dt()))
         self.q_goal = np.zeros(n); self.q_cmd = np.zeros(n); self.wheel_v = np.zeros(4)
         self.hold = None           # parked base pose (x, y, yaw) the wheels hold while the arms work (set by drive_to)
@@ -120,13 +125,25 @@ class Task:
             self.step_once()
 
     def settle(self, tol=0.035, timeout=6.0):
-        d = self.driven
+        d = self.driven; t0 = self.t
         for _ in range(int(timeout * CTRL_HZ)):
             self.step_once()
             q = self.robot.get_joint_positions()
-            if np.max(np.abs(self.q_cmd[d] - self.q_goal[d])) < 1e-6 and np.max(np.abs(q[d] - self.q_goal[d])) < tol:
-                self.wait(0.1); return True
-        return False
+            reached = np.max(np.abs(self.q_cmd[d] - self.q_goal[d])) < 1e-6
+            if reached and np.max(np.abs(q[d] - self.q_goal[d])) < tol:
+                self.wait(0.1); self.settle_log.append((self.t - t0, False)); return True
+            if reached and self.settle_mode == 'still':
+                # stopped moving: a steady gravity sag (the wrist pitch holding a product, ~2-3 deg) won't shrink by waiting
+                # arm joints + lift only: the fingers squeezing a product jitter and never read as stopped
+                v = np.abs(self.robot.get_joint_velocities()[self.still_idx])
+                self.still = self.still + 1 if np.max(v) < STILL_V else 0
+                if self.still >= 6:
+                    self.still = 0; self.settle_log.append((self.t - t0, False)); return True
+        worst = self.names[d[int(np.argmax(np.abs(q[d] - self.q_goal[d])))]]
+        if self.settle_mode == 'still':
+            v = np.abs(self.robot.get_joint_velocities()[self.still_idx])
+            worst += f' (fastest {self.names[self.still_idx[int(np.argmax(v))]]} {np.max(v):.3f})'
+        self.settle_log.append((self.t - t0, worst)); return False
 
     def set_pose(self, q_all):
         """Teleport the joints (start of a task only)."""
@@ -282,3 +299,5 @@ class Task:
 
     def summary(self):
         print(f"\n{sum(ok for _, ok, _ in self.results)}/{len(self.results)} steps OK. Simulated time {self.t:.0f} s.")
+        to = [(t, j) for t, j in self.settle_log if j]
+        print(f"settling: {sum(t for t, _ in self.settle_log):.1f} s in {len(self.settle_log)} moves; {len(to)} timed out ({sum(t for t, _ in to):.1f} s), joints: { {j: sum(1 for _, k in to if k == j) for _, j in to} }")
