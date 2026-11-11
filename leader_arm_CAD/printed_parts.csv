@@ -1,9 +1,13 @@
-file,part,qty_per_leader,qty_pair,size_mm,volume_cm3,note
-01_stand_top.stl,stand_top,1,2,122.0 x 40.0 x 175.6,184.9,"stand, upper part: clamp on the shoulder servo + hollow column"
-02_stand_foot.stl,stand_foot,1,2,203.0 x 90.0 x 195.0,186.5,"stand, lower part: foot plate (4 x M5 / clamp) + column + plug"
-03_link1.stl,link1,1,2,77.0 x 30.0 x 54.6,20.9,shoulder fork (output horn + idler) = link 52 mm; the elbow servo hangs under its far end
-04_link2.stl,link2,1,2,77.0 x 30.0 x 8.0,13.8,link 52 mm under the elbow horn; the wrist-pan servo hangs under its far end
-05_wrist.stl,wrist,1,2,44.0 x 36.4 x 28.0,16.3,plate under the wrist-pan horn + clamp holding the pitch servo
-06_pitch_fork.stl,pitch_fork,1,2,35.1 x 49.0 x 50.4,18.0,pitch fork (output horn + idler) and back plate holding the roll servo
-07_grip.stl,grip,1,2,80.0 x 28.8 x 35.3,18.6,grip on the roll horn; holds the trigger servo (slides in from the +Y side)
-08_trigger.stl,trigger,1,2,39.0 x 49.0 x 38.7,7.1,trigger lever on the trigger servo horn; finger bar under the grip
+file,part,group,qty_mono,qty_proto,size_mm,volume_cm3,note
+01_shoulder_mount.stl,shoulder_mount,arm module,1,2,76.6 x 76.0 x 36.6,45.8,holds the shoulder servo (horn up) by its socket face; 4 x M3 down into the pedestal (any multiple of 45 deg)
+02_link1.stl,link1,arm module,1,2,87.0 x 35.8 x 29.0,28.2,"upper arm 91 mm: plate on the shoulder horn, clamp on the elbow servo"
+03_link2.stl,link2,arm module,1,2,86.0 x 54.6 x 29.0,32.4,"forearm 91 mm: fork on the elbow servo (horn + idler), clamp on the wrist-pan servo; prints on its side"
+04_forearm_handle.stl,forearm_handle,arm module,1,2,80.0 x 47.0 x 24.0,39.5,handle bar on the forearm for the second hand (steers the elbow)
+05_wrist.stl,wrist,arm module,1,2,59.0 x 72.6 x 35.8,32.3,fork on the wrist-pan servo (horn + idler) + clamp holding the pitch servo
+06_pitch_fork.stl,pitch_fork,arm module,1,2,56.6 x 49.0 x 50.4,30.1,pitch fork (output horn + idler) + back plate holding the roll servo
+07_gripper_base.stl,gripper_base,arm module,1,2,98.0 x 59.0 x 67.9,45.2,pinch gripper base on the roll horn: holds the gripper servo; fixed jaw with a finger loop (+Y); prints upright
+08_gripper_jaw.stl,gripper_jaw,arm module,1,2,69.0 x 54.0 x 31.3,20.8,"moving jaw on the gripper servo horn, with a finger loop (-Y); opens 0..40 deg; prints upside down (horn plate on the bed)"
+09_pedestal.stl,pedestal,base,1,2,104.0 x 104.0 x 213.4,180.9,column under the shoulder mount; 8 nut traps (arm at any multiple of 45 deg); 3 x M5 to a foot
+10_mono_foot.stl,mono_foot,base,1,0,220.0 x 170.0 x 6.0,173.5,foot for one leader (mono follower): C-clamp the slotted corners to the desk
+11_proto_foot_left.stl,proto_foot_left,base,0,1,180.0 x 171.0 x 66.0,205.1,"foot half for the two-arm prototype (left arm); bolts to the right half (2 x M3 through the stand-in, 2 x M5 under)"
+12_proto_foot_right.stl,proto_foot_right,base,0,1,180.0 x 171.0 x 66.0,205.1,foot half for the two-arm prototype (right arm)

@@ -1,6 +1,7 @@
-type,size,length_mm,qty_per_leader,used for
-selftap,M2,6,24,shoulder servo case (stand clamp); elbow servo case; wrist-pan servo case; pitch servo case (wrist clamp); roll servo case; trigger servo case
-SHCS,M3,50,2,"stand joint (across the column, nyloc nut)"
-nut,M3,,2,stand joint (nyloc)
-SHCS,M3,8,24,shoulder horn (4) + idler (4); elbow horn; wrist-pan horn; pitch horn (4) + idler (4)
-SHCS,M3,6,8,roll horn (from inside the grip); trigger horn
+type,size,length_mm,qty_per_arm_module,used for
+selftap,M2,6,24,shoulder servo case; elbow servo case (link 1 clamp); wrist-pan servo case (link 2 clamp); pitch servo case (wrist clamp); roll servo case; gripper servo case
+SHCS,M3,20,5,"shoulder mount to pedestal (nut in the cap underside); forearm handle, front post (nut under link 2's top prong)"
+nut,M3,,6,shoulder mount; forearm handle
+SHCS,M3,8,32,shoulder horn; elbow horn (4) + idler (4); wrist-pan horn (4) + idler (4); pitch horn (4) + idler (4); gripper servo horn
+SHCS,M3,45,1,"forearm handle, rear post (nut in link 2's beam)"
+SHCS,M3,6,4,roll horn (gripper base back plate)
