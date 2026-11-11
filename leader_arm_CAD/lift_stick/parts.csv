@@ -1,3 +1,3 @@
 file,size_mm,volume_cm3,note
-S1_stick_case.stl,117.3 x 54.8 x 28.6,39.9,"case: Pico + KY-023 on standoffs, USB opening, 2 ears for M4 / rubber feet; prints flat"
-S2_stick_lid.stl,117.3 x 44.8 x 2.0,10.3,lid with the front-back slot around the stick shaft (blocks sideways motion); depends most on the KY-023 measurements; prints top down
+S1_stick_tray.stl,103.8 x 37.4 x 7.4,10.9,"bottom tray: Pico (back) + KY-023 (front) on standoffs, USB opening, 3 countersunk M2.5 from underneath, 4 rubber-feet recesses; prints flat"
+S2_stick_top.stl,103.8 x 37.4 x 22.2,17.2,"top shell (the wedge): front-back slot around the stick shaft, ""up"" arrow to the tip; depends most on the KY-023 measurements; prints upside down"
