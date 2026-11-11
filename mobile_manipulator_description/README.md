@@ -30,6 +30,7 @@ The arm links use the real CAD parts from the `SCARA_arm_CAD` package, with thei
 | `launch/display.launch.py`, `rviz/display.rviz`, `package.xml`, `CMakeLists.txt` | ROS 2 package: `ros2 launch mobile_manipulator_description display.launch.py` opens RViz with the robot and a slider for every joint |
 | `scripts/ros_joint_check.py` | ROS 2: checks joint limits, the zero pose and the direction of every joint, through TF |
 | `arm_link_masses.json` | Mass and centre of mass of each arm link |
+| `preview.png`, `preview_mono.png` | Pictures of the two-arm prototype and of the mono-arm experiment (`generator/render_robot.py` draws any layout from its URDF) |
 
 ## Layout (prototype)
 
@@ -115,9 +116,13 @@ The arm that waits parks straight out to its side with the hand level. Both arms
 
 | Task | Result (Isaac, headless, self-collision on) |
 |---|---|
-| `isaac_shelf_task.py` (shelf A 0.70 m -> tote -> shelf B 0.50 m) | **6/6 OK in 90 s**: item flat in the tote, placed 17 mm from the target on shelf B, upright |
-| `isaac_table_task.py` (table A -> tote -> table B, 0.75 m, both arms at once) | **10/10 OK in 93 s** (0.12 m vertical approach with the 0.885 m lift) |
-| same with `--sequential` (one arm at a time) | 10/10 OK in 174 s |
+| `isaac_shelf_task.py` (shelf A 0.70 m -> tote -> shelf B 0.50 m) | **6/6 OK in 66 s** (was 90 s): item flat in the tote, placed on shelf B, upright |
+| `isaac_table_task.py` (table A -> tote -> table B, 0.75 m, both arms at once) | **10/10 OK in 76 s** (was 93 s; 0.12 m vertical approach with the 0.885 m lift) |
+| same with `--sequential` (one arm at a time) | 10/10 OK in 174 s (before the speed-up; not rerun) |
+
+Since 2026-11-11 both use the faster moves the mono tasks use: full allowed speed after a 0.3 s ramp (instead of a
+cosine profile), and a move ends once the joints stop (holding a product the wrist pitch sags a little and never got
+within the old 2° tolerance). Same paths and speed limits as before.
 
 Re-planned for the shorter links: the stow pose is now hand level (30°, 105°, −120°), inside the footprint and
 clear at any lift; the shelf item sits at (0.66, 0.22) m in the robot frame; the shelf task uses a tote spot with
@@ -215,6 +220,8 @@ column**, so the arm can swing all the way round the robot (front, both sides, t
 | Lift travel | 0–0.885 m | 0–0.77 m (the ring can't pass the column's top cap) |
 | Scene camera | carriage bracket, faces forward | carriage, faces forward: a post in a socket on the fixed clamp ring, in front of the beam, and a bar over the arm |
 
+![mono-arm robot](preview_mono.png)
+
 **The ring** is the **draft** printable design in `../SCARA_arm_CAD/mono_ring_draft/` (a printed two-row ball bearing with 6 mm steel balls, 4 : 1
 gear, drive servo under the disc at the front left, a reversing-loop cable channel, a homing magnet). The URDF uses
 those parts directly; only the lift's gantry plate it bolts to is estimated.
@@ -247,8 +254,8 @@ Add `--headless` for no window. In RViz: `ros2 launch mobile_manipulator_descrip
 | Joint sweep | 7/7 OK (the geared shoulder lags 1.6° at most) |
 | Hold, 3 poses × 30 s | 18/18 OK, no drift |
 | Stationary table → tote → table | 4/5 (fast moves): the product slides ~25 mm in the jaws on the 160° swing, and the task picks it up again at the planned spot instead of where it lies. Was 5/5 with the slower moves |
-| Table-to-table, 2 products | 6/6 OK, **121 s** (products 0 mm from target). Prototype: 93 s with both arms at once, 174 s one after the other |
-| Shelf, 1 product | 6/6 OK, **71 s** (0 mm from target). Prototype: 90 s |
+| Table-to-table, 2 products | 6/6 OK, **121 s** (products 0 mm from target). Prototype: 76 s with both arms at once |
+| Shelf, 1 product | 6/6 OK, **71 s** (0 mm from target). Prototype: 66 s |
 
 The mono tasks use a faster move profile (full allowed speed after a 0.3 s ramp) and move the lift during the swings;
 the prototype tasks still use the original slower profile. A move also counts as finished once the joints have stopped:

@@ -64,6 +64,8 @@ def world(goal, xy):
 
 task = Task(app, args.urdf, args.headless, fix_base=False, self_collision=not args.no_self_collision)
 w = task.world
+task.profile = 'trap'        # full allowed speed after a 0.3 s ramp (same limits)
+task.settle_mode = 'still'   # a move is done once the joints stop (the wrist pitch sags under a product)
 WOOD = np.array([0.62, 0.48, 0.33])
 w.scene.add(FixedCuboid(prim_path='/World/tableA', name='tableA', position=np.array([2.35, 0.0, H / 2]),
                         scale=np.array([0.70, 1.20, H]), color=WOOD))

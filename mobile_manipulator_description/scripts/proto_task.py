@@ -189,9 +189,10 @@ class Task:
         Ts = [0.05, abs(l1 - l0) / (0.88 * self.vmax[self.idx['lift']])]
         for s in tgt:
             Ts += [abs(tgt[s][k] - a[s][k]) / (0.88 * self.vmax[self.idx[f'{s}_{k}']]) for k in tgt[s]]
-        steps = max(2, int(max(Ts) * math.pi / 2 * CTRL_HZ) + 1)
+        Tm, prof = _profile(self.profile, max(Ts))
+        steps = max(2, int(Tm * CTRL_HZ) + 1)
         for i in range(1, steps + 1):
-            u = 0.5 - 0.5 * math.cos(math.pi * i / steps)
+            u = prof(i, steps)
             for s in tgt:
                 self.set_arm(s, {k: a[s][k] + (tgt[s][k] - a[s][k]) * u for k in tgt[s]})
             self.q_goal[self.idx['lift']] = l0 + (l1 - l0) * u
@@ -206,11 +207,11 @@ class Task:
         aL, bL, aR, bR = (np.asarray(v, float) for v in (aL, bL, aR, bR))
         d = np.maximum(np.abs(bL - aL), np.abs(bR - aR))
         vlift = 0.85 * self.vmax[self.idx['lift']]
-        seconds = max(MIN_MOVE, float(np.linalg.norm(d[:3])) / TCP_SPEED * math.pi / 2,
-                      max(d[3], d[4]) / TCP_TURN * math.pi / 2, d[2] / vlift * math.pi / 2)
+        base = max(float(np.linalg.norm(d[:3])) / TCP_SPEED, max(d[3], d[4]) / TCP_TURN, d[2] / vlift)
+        seconds, prof = _profile(self.profile, base); seconds = max(MIN_MOVE, seconds)
         steps = max(2, int(seconds * CTRL_HZ))
         for k in range(1, steps + 1):
-            u = 0.5 - 0.5 * math.cos(math.pi * k / steps)
+            u = prof(k, steps)
             qL = K.ik('left', *(aL + (bL - aL) * u), elbow=eL); qR = K.ik('right', *(aR + (bR - aR) * u), elbow=eR)
             if qL is None or qR is None:
                 raise RuntimeError(f'no IK on the two-arm straight move at u={u:.2f}')
