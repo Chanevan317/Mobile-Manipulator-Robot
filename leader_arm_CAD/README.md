@@ -21,11 +21,14 @@ follower's hand moves, without translating in your head.
   other; squeezing closes the jaws, opening your hand opens them, so you feel how wide the robot's gripper is. The
   loops pull the jaws open too (as on surgical robots' masters). It sits where the follower's gripper sits, on the
   roll axis, so turning your hand turns the robot's gripper the same way.
-- **Two hands**: one on the gripper, the other on the **forearm handle**, which steers the elbow (the same hand
-  position can be reached with the elbow bent either way, so the hand alone can't pin it down). The lift and the
-  base are on a **gamepad**, used between picks; the clutch on a pedal or a gamepad button.
-- **Made for sitting at a desk.** The arm is 26 cm above the desk; with the gripper hanging straight down it stays
-  21 mm above it.
+- **One hand or two, both on the gripper** (as you held the SO-100 leader): one pinching in the loops, the other
+  steadying and steering the gripper. No handle on the arm is needed: holding the gripper's position and heading
+  fixes the arm's whole shape (it moves in a plane, with three pan joints for three things: x, y and heading).
+  The lift and the base are on a **gamepad**, used between picks; the clutch on a pedal or a gamepad button.
+- **The pinch:** thumb and fingers sit **38 mm apart closed and 84 mm apart fully open (40°)**, the comfortable pinch
+  range, with 46 mm of finger travel for the robot's 0–90 mm.
+- **Made for sitting at a desk.** The arm is 28 cm above the desk; with the gripper hanging straight down it stays
+  22 mm above it.
 
 Made by `mobile_manipulator_description/generator/leader.py` (shape), `leader_check.py` (collision checks),
 `leader_export.py` (these files) and `leader_render.py` (the preview). v1 (AS5600 encoders) and v2 (hanging servo
@@ -38,17 +41,17 @@ stack, 0.4 scale) are in the git history.
 | `01_shoulder_mount.stl` | holds the shoulder servo upright (horn up); 4 × M3 onto the pedestal | 1 | 2 | 46 |
 | `02_link1.stl` | upper arm (91 mm): plate on the shoulder horn, clamp on the elbow servo | 1 | 2 | 28 |
 | `03_link2.stl` | forearm (91 mm): fork around the elbow servo, clamp on the wrist-pan servo | 1 | 2 | 32 |
-| `04_forearm_handle.stl` | handle bar for the second hand, on the forearm | 1 | 2 | 40 |
-| `05_wrist.stl` | fork around the wrist-pan servo + clamp holding the pitch servo | 1 | 2 | 32 |
-| `06_pitch_fork.stl` | fork around the pitch servo + plate holding the roll servo | 1 | 2 | 30 |
-| `07_gripper_base.stl` | on the roll horn: holds the gripper servo; the fixed jaw with its finger loop | 1 | 2 | 45 |
-| `08_gripper_jaw.stl` | the moving jaw on the gripper servo's horn, with its finger loop | 1 | 2 | 21 |
-| `09_pedestal.stl` | column from the desk to the shoulder mount | 1 | 2 | 167 |
+| `04_wrist.stl` | fork around the wrist-pan servo + clamp holding the pitch servo | 1 | 2 | 32 |
+| `05_pitch_fork.stl` | fork around the pitch servo + plate holding the roll servo | 1 | 2 | 30 |
+| `06_gripper_frame.stl` | on the roll horn: holds the gripper servo (horn down, body forward) | 1 | 2 | 22 |
+| `07_gripper_fixed_jaw.stl` | the fixed jaw with its finger loop, bolted under the frame | 1 | 2 | 33 |
+| `08_gripper_jaw.stl` | the moving jaw on the gripper servo's horn, with its finger loop | 1 | 2 | 27 |
+| `09_pedestal.stl` | column from the desk to the shoulder mount | 1 | 2 | 190 |
 | `10_mono_foot.stl` | foot for one leader (mono) | 1 | – | 174 |
 | `11_proto_foot_left.stl`, `12_proto_foot_right.stl` | the two halves of the prototype foot, with the column stand-in | – | 1 each | 205 each |
 
 Print like the follower (0.2 mm, 4 walls, 15 % cubic). Orientations are set in the STLs: the links, wrist and
-handle print on their side, the gripper base upright, the moving jaw upside down. The pedestal's cap overhangs its column by 8 mm (use tree supports there if your printer sags).
+the wrist print on their side, the gripper frame and the moving jaw upside down, the fixed jaw standing on its loop. The pedestal's cap overhangs its column by 8 mm (use tree supports there if your printer sags).
 Sizes are in `printed_parts.csv`; screws in `fasteners.csv` (per arm module).
 
 ## Purchased parts (one arm module)
@@ -63,9 +66,9 @@ Sizes are in `printed_parts.csv`; screws in `fasteners.csv` (per arm module).
 | USB foot pedal (optional) | 1 | clutch, if you'd rather keep it off the gamepad |
 | M2 × 6 self-tapping | 24 | servo cases (4 per servo) |
 | M3 × 8 | 28 | horns |
-| M3 × 6 | 4 | roll horn (gripper base) |
+| M3 × 6 | 4 | roll horn (gripper frame) |
 | M3 × 20 + nut | 4 + 4 | shoulder mount to pedestal (nuts in the pedestal cap's underside) |
-| M3 × 20 + M3 × 45 + 2 nuts | 1 + 1 + 2 | forearm handle |
+| M3 × 30 + 2 nuts | 2 | fixed jaw to the gripper frame (nuts slide into the frame's side wall) |
 | M5 × 12 + nut | 3 | pedestal to foot |
 | C-clamps | 2 | hold the foot on the desk |
 
@@ -87,14 +90,12 @@ Never put a C044 or C046 in the follower: it can't hold the follower's load.
 3. Link 1 goes on the shoulder horn (4 × M3 × 8).
 4. Pitch servo: rear end up into the wrist's clamp (4 × M2); pitch fork on its two horns; roll servo into the fork's
    back plate (4 × M2).
-5. Gripper servo into the gripper base's clamp, horn down (4 × M2; the two bottom ones through the holes in the
-   block); gripper base on the roll horn (4 × M3 × 6); moving jaw on the gripper servo's horn (4 × M3 × 8) with the
-   jaws parallel.
-6. Forearm handle onto the forearm (M3 × 20 at the front post, nut under the top prong; M3 × 45 at the rear post,
-   nut in the beam).
-7. Pedestal onto the foot (3 × M5). Shoulder mount onto the pedestal (4 × M3 × 20, nuts in the cap's underside),
+5. Gripper servo into the gripper frame's clamp, horn down, body forward (4 × M2); frame on the roll horn
+   (4 × M3 × 6); fixed jaw under the frame (2 × M3 × 30 into the nuts in the frame's side wall); moving jaw on the
+   gripper servo's horn (4 × M3 × 8) with the blades just touching.
+6. Pedestal onto the foot (3 × M5). Shoulder mount onto the pedestal (4 × M3 × 20, nuts in the cap's underside),
    **turned like the follower's arm**: straight ahead for the mono base, ±135° on the prototype base.
-8. Run the servo cables along the links to the bus board; the pedestal has a cable exit at its foot.
+7. Run the servo cables along the links to the bus board; the pedestal has a cable exit at its foot.
 
 ## Joint ranges (checked in CAD)
 
@@ -107,7 +108,7 @@ Every joint reaches at least the follower's limit + 5°:
 | Wrist pan | ±127° | ±144° | ±122° |
 | Wrist pitch | −20° … +120° | −20° … +125° (just touches at −25°) | −15° … +115° |
 | Wrist roll | ±125° | ±130° | ±120° |
-| Gripper | 0 … 40° (thumb-to-fingers ~46 → 85 mm) | −4° (closed stop) … 45° | 0 … 90 mm |
+| Gripper | 0 … 40° (thumb-to-fingers 38 → 84 mm) | 0° (the blades touch: closed stop) … 45° | 0 … 90 mm |
 
 **Where it can't go** (and the follower can't either): with the elbow folded to its limit and the wrist turned back,
 a level hand points into the pedestal. The follower's hand hits its own column and carriage in those poses, much
@@ -117,8 +118,8 @@ more. On the prototype base the two leaders meet when both reach far inward, as 
 
 - **Sit facing the leader as you would face the robot.** On the mono base the arm's zero pose points straight ahead;
   on the prototype base each arm points 45° back, like the follower arms.
-- **Hands:** thumb and two or three fingers in the gripper's loops (either hand), the other hand on the forearm
-  handle. Release the clutch before letting go: the pitch servo's gear friction holds the gripper in most poses; if
+- **Hands:** thumb and two or three fingers in the gripper's loops (either hand); the other hand, if you like, on
+  the gripper frame to steady it. Release the clutch before letting go: the pitch servo's gear friction holds the gripper in most poses; if
   it sinks, the software can hold it with a little servo torque.
 - The gripper servo can act as a soft spring (low torque toward open) so the jaws open when you relax your hand.
 - The hand moves sideways and forward at a fixed height, like the SCARA follower; the height is on the pedals.

@@ -11,8 +11,8 @@ for d in ('print_ready_stl', 'assembly_stl', 'assembly_stl/mono', 'assembly_stl/
     os.makedirs(os.path.join(OUT, d), exist_ok=True)
     for f in os.listdir(os.path.join(OUT, d)):
         if f.endswith('.stl'): os.remove(os.path.join(OUT, d, f))
-# print orientations: links / wrist / handle on their side (profiles in the XZ plane), moving jaw upside down
-PRINT_ROT = {'link1': Rx(90), 'link2': Rx(90), 'wrist': Rx(90), 'forearm_handle': Rx(90), 'pitch_fork': Rx(-90),
+# print orientations: links / wrist on their side (fork profiles in the XZ plane), gripper frame + moving jaw upside down
+PRINT_ROT = {'link1': Rx(90), 'link2': Rx(90), 'wrist': Rx(90), 'pitch_fork': Rx(-90), 'gripper_frame': Rx(180),
              'gripper_jaw': Rx(180)}
 LD.build()
 rows = []; i = 0

@@ -29,6 +29,6 @@ draw(fig.add_subplot(2, 2, 2, projection='3d'), (40, -70, 30, 90, 0), 20, -125, 
      title='hand down: J1 40, J2 -70, J3 30, pitch 90, gripper open 20 deg')
 draw(fig.add_subplot(2, 2, 3, projection='3d'), (0, 0, 0, 0, 0), 25, -60, variant='proto', zoom=1.05,
      title='same arm modules on the prototype base (yaw +-135, column stand-in between)')
-draw(fig.add_subplot(2, 2, 4, projection='3d'), (0, 0, 0, 0, 0), 35, -50, trig=25, zoom=2.2, center=(LD.L1 + LD.L2 + LD.XP + LD.XR + 50, 0, -LD.ZPD - 20),
-     title='pinch gripper: fixed jaw + jaw on the gripper servo, a finger loop on each (open 25 deg)')
+draw(fig.add_subplot(2, 2, 4, projection='3d'), (0, 0, 0, 0, 0), 35, -50, trig=25, zoom=2.2, center=(LD.L1 + LD.L2 + LD.XP + LD.XR + 60, 0, -LD.ZPD - 20),
+     title='pinch gripper: frame + fixed jaw, moving jaw on the gripper servo, a finger loop on each (open 25 deg)')
 plt.tight_layout(); plt.savefig(sys.argv[1], dpi=55)
