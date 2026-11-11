@@ -189,12 +189,10 @@ INERTIA = {k: combine(v['props']) for k, v in LINKS.items()}
 # ---------------------------------------------------------------- mono-arm experiment (user, 2026-11-10)
 # One arm; its shoulder is a ring bearing around the C-Beam (shoulder axis = column axis = carriage origin). The rest of
 # the arm (elbow .. gripper) is the real CAD. Arm frame = carriage (0, 0, ARM_Z), zero pose pointing forward (+x).
-#   base (fixed, on the carriage): plate above the gantry plate (carriage z 0.020 .. 0.028) with a hole for the beam,
-#        fixed race r 60..75, ring-drive STS3215 hanging under the plate (shaft at r 88, 135 deg) + pinion
-#   upper_arm (turns): race r 50..75 (carriage z 0.033 .. 0.043), gear ring r 75..80, bracket r 50..80 to the upper-arm
-#        tube, and the real upper-arm part cut off at x 76 (its shoulder fork can't exist: the column is there)
-# The beam's corners are 44.7 mm from the axis. Estimated masses: races / plate aluminium, bracket / gear PLA.
-MONO = dict(r_in=50.0, r_out=75.0, gear=80.0, clip=76.0, ratio=4.0, az=65.5)   # az = ARM_Z in mm
+# Since 2026-11-11 the ring is the DRAFT printable design in mono_ring.py (2 x 61820 bearings, 72 / 18 T gear, drive
+# STS3215 at r 90 / 60 deg under the disc, reversing-loop cable channel, homing magnet): fixed parts -> left_base,
+# turning parts (rotor, cable tray, upper arm cut at x 70) -> left_upper_arm.
+MONO = dict(ratio=4.0, az=65.5)             # gear ratio (mono_ring: 72 / 18), az = ARM_Z in mm
 MLINKS = {k: dict(vis=list(v['vis']), col=list(v['col']), props=list(v['props'])) for k, v in LINKS.items()}
 MLINKS['base'] = dict(vis=[], col=[], props=[]); MLINKS['upper_arm'] = dict(vis=[], col=[], props=[])
 
@@ -210,13 +208,19 @@ def m_add(lk, fname, loc, color, mass=None, rho=None, col=True):
 
 
 def _mono_links():
-    from lib import ring
+    """The DRAFT printable ring (mono_ring.py, exported to SCARA_arm_CAD/mono_ring_draft): fixed parts -> left_base,
+    turning parts -> left_upper_arm, plus the elbow servo / bearings / fasteners of the prototype upper arm (x >= 70)."""
+    import mono_ring as MR
     from joint import SERVO
-    Z = lambda zc: zc - MONO['az']                    # carriage-z (mm) -> arm frame
-    clip = box(MONO['clip'], 500, -300, 300, -300, 300)
-    for nm, p in arm.PARTS.items():                   # the real upper arm, elbow end only
-        if part_link(nm) == 'upper_arm':
-            m_add('upper_arm', 'mono_' + nm, xf(p['solid'], p['frame']) ^ clip, p['color'], rho=RHO_PRINT)
+    MR.build_all()
+    toarm = T(0, 0, -MONO['az'])                       # carriage frame (mm) -> arm frame (z 0 = arm plane)
+    for nm, p in MR.PARTS.items():
+        lk = 'upper_arm' if p['moving'] else 'base'
+        m_add(lk, nm if nm.startswith('mono_') else 'mono_' + nm, xf(p['solid'], toarm), p['color'], rho=RHO_PRINT)
+    m_add('base', 'mono_ring_balls', xf(MR.balls(), toarm), (0.72, 0.74, 0.78), mass=2 * MR.BALL['n'] * 0.00088, col=False)   # 6 mm steel
+    m_add('base', 'mono_ring_drive_STS3215', xf(SERVO, toarm @ MR.servo_frame()), (0.12, 0.12, 0.14), mass=0.055)
+    m_add('base', 'mono_servo_board', xf(MR.CONTEXT['servo_board'], toarm), (0.10, 0.35, 0.20), mass=0.045)   # plate + Waveshare board
+    clip = box(MR.TUBE_X0, 500, -300, 300, -300, 300)
     brg = []
     for b in BOUGHT:                                  # elbow servo, elbow bearings (already exported for the prototype)
         nm = b['name']
@@ -229,36 +233,23 @@ def _mono_links():
         MLINKS['upper_arm']['props'].append(mass_props(V / MM, F, mass=BOUGHT_MASS[key]))
         if os.path.exists(os.path.join(COL, fname + '_c.stl')): MLINKS['upper_arm']['col'].append(fname + '_c')
     if brg:
-        V, F = mesh_m(union(brg)); write_stl(os.path.join(VIS, 'mono_upper_arm_bearings.stl'), V, F)
+        V, F = mesh_m(union(brg) ^ clip); write_stl(os.path.join(VIS, 'mono_upper_arm_bearings.stl'), V, F)
         MLINKS['upper_arm']['vis'].append(('mono_upper_arm_bearings', (0.72, 0.74, 0.78)))
         for sb in brg:
             Vb, Fb = mesh_arrays(sb); MLINKS['upper_arm']['props'].append(mass_props(Vb, Fb, mass=BOUGHT_MASS['bearing']))
     fs = [fastener_solid(f) for f in FAST if part_link(f['part']) == 'upper_arm']
     m_add('upper_arm', 'mono_upper_arm_fasteners', union(fs) ^ clip, (0.08, 0.08, 0.09), rho=RHO_STEEL, col=False)
-    # turning ring + gear ring + bracket to the tube
-    m_add('upper_arm', 'mono_ring_rotor', ring(MONO['r_in'], MONO['r_out'], Z(33.0), Z(43.0)), ALU[:3], mass=0.15)
-    m_add('upper_arm', 'mono_gear_ring', ring(MONO['r_out'], MONO['gear'], Z(33.0), Z(40.0)), (0.25, 0.25, 0.28), rho=RHO_PRINT)
-    m_add('upper_arm', 'mono_bracket', box(50.0, MONO['clip'] + 4.0, -25.0, 25.0, Z(43.0), 22.0), ORANGE[:3], rho=RHO_PRINT)
-    # fixed: plate with the beam hole, fixed race, ring-drive servo under the plate + pinion
-    plate = cyl(85.0, Z(20.0), Z(28.0)) - box(-25.0, 25.0, -45.0, 45.0, Z(10.0), Z(40.0))
-    m_add('base', 'mono_ring_plate', plate, ALU[:3], mass=0.25)
-    m_add('base', 'mono_ring_stator', ring(60.0, MONO['r_out'], Z(28.0), Z(33.0)), ALU[:3], mass=0.10)
-    a = math.radians(135.0); u = np.array([math.cos(a), math.sin(a), 0.0]); px, py = 88.0 * u[0], 88.0 * u[1]
-    zs, xs = np.array([0, 0, -1.0]), -u                          # output face up, body outward
-    Rm = np.eye(4); Rm[:3, 0], Rm[:3, 2] = xs, zs; Rm[:3, 1] = np.cross(zs, xs); Rm[:3, 3] = (px, py, Z(20.0) - 18.7)
-    m_add('base', 'mono_ring_drive_STS3215', xf(SERVO, Rm), (0.12, 0.12, 0.14), mass=0.055)
-    m_add('base', 'mono_ring_pinion', cyl(8.0, Z(20.0), Z(40.0), px, py), (0.25, 0.25, 0.28), rho=RHO_PRINT, col=False)
 
 
 
 
 def mono_mast_xml():
     """Scene camera on the CARRIAGE, always facing forward (user, 2026-11-10: it moves with the lift and sees the front by
-    default). The arm sweeps all the way round the column at the carriage, so the post goes up THROUGH the ring's centre
-    hole, in the gap between the beam's front face (x 0.020) and the ring's inner edge (r 0.050): x 0.031..0.045
-    (outside the column's top cap, |x| <= 0.030), standing on the ring plate. Above the arm (nothing of it rises past
+    default). The arm sweeps all the way round the column at the carriage, so the post stands in the socket on the
+    (fixed) clamp ring, inside the cable channel, in front of the beam: x 0.031..0.045 (outside the column's top cap,
+    |x| <= 0.030). Above the arm (nothing of it rises past
     carriage z ~0.11) a bar carries the camera forward to the prototype's spot: (0.14, 0, 0.19), pitched 0.95 rad down."""
-    z0 = 28.0 / 1000                                               # ring plate top (carriage z)
+    z0 = 66.0 / 1000                                               # bottom of the clamp ring's post socket (mono_ring.py)
     parts = [((0.014, 0.016, 0.20 - z0), (0.038, 0.0, (z0 + 0.20) / 2)), ((0.119, 0.02, 0.02), (0.0905, 0.0, 0.19))]
     v = ''.join(vprim(f3(c), bx(*sz), ALU) for sz, c in parts); c_ = ''.join(cprim(f3(c), bx(*sz)) for sz, c in parts)
     o = '  <link name="camera_mast">\n' + inertial(*combine([box_props(0.06, sz, c) for sz, c in parts])) + v + c_ + '  </link>\n'
@@ -516,7 +507,7 @@ for layout in ('prototype',):
         body += joint(f'{side}_arm_mount', 'fixed', 'carriage', f'{side}_base', f'0 {sy*PROTO_ARM_Y} {ARM_Z}', f'0 0 {sy*PROTO_YAW:.6g}')
     BODY[layout] = body
 # mono-arm experiment: one arm on the shoulder ring around the column (ring drive: STS3215 x 4:1 gear)
-BODY['prototype_mono_arm'] = (base_xml(mono=True) + arm_xml('left', MLINKS, MINERTIA, (-D(170), D(170), 1.9 * MONO['ratio'],
+BODY['prototype_mono_arm'] = (base_xml(mono=True) + arm_xml('left', MLINKS, MINERTIA, (-D(180), D(180), 1.9 * MONO['ratio'],
                                4.7 / MONO['ratio'], 0.05, 0.02), elbow=D(117)) +   # forearm meets the ring at 122-123 deg
                                joint('left_arm_mount', 'fixed', 'carriage', 'left_base', f'0 0 {ARM_Z}') + mono_mast_xml())
 

@@ -24,7 +24,7 @@ D = math.radians
 LAYOUTS = {'prototype': {'left': (0.18, 0.15, D(135)), 'right': (0.18, -0.15, -D(135))},
            # experiment (2026-11-10): one arm, shoulder = a ring around the column (shoulder axis = column axis), zero pose forward
            'prototype_mono_arm': {'left': (0.18, 0.0, 0.0)}}
-SHOULDER_LIM = {'prototype': D(115), 'prototype_mono_arm': D(170)}
+SHOULDER_LIM = {'prototype': D(115), 'prototype_mono_arm': D(170)}   # mono: URDF +-180 (cable loop +-195, servo multi-turn: bench test pending); plans keep 10 deg margin
 ELBOW_LIM = {'prototype': D(125), 'prototype_mono_arm': D(117)}   # mono: forearm meets the ring at 122-123 deg
 LAYOUT = 'prototype'
 ARM_Y = 0.15              # arm mount y (ARM_Y / SHOULDER / MOUNT_YAW are set by use(); see the end of this file)

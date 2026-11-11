@@ -10,6 +10,7 @@ The arm links use the real CAD parts from the `SCARA_arm_CAD` package, with thei
 |---|---|
 | `urdf/mobile_manipulator_prototype.urdf` | **Prototype layout** (the current design): Isaac Sim, PyBullet, MuJoCo (`compile`), Gazebo. Mesh paths are relative (`../meshes/...`). |
 | `urdf/mobile_manipulator_prototype_ros.urdf` | The same robot for ROS 2 / RViz, with `package://mobile_manipulator_description/...` paths. |
+| `urdf/mobile_manipulator_prototype_mono_arm.urdf` (+ `_ros`) | **Experiment:** one arm whose shoulder is a ring around the lift column. See [Mono-arm experiment](#mono-arm-experiment-prototype_mono_arm). |
 | `meshes/visual/` | STL files in metres. Shared by both arms. |
 | `meshes/collision/` | Convex pieces of every part, about 350 per arm. Each one is ready for PhysX. |
 | `scripts/drives.py` | The motor gains, in one place. Both Isaac scripts use it. |
@@ -20,6 +21,9 @@ The arm links use the real CAD parts from the `SCARA_arm_CAD` package, with thei
 | `scripts/isaac_shelf_task.py` | Full task: drive to shelf A, pick a product, put it in the tote, drive to shelf B, place it there (`--layout prototype` uses `shelf_task_prototype.py`). |
 | `scripts/isaac_table_task.py` | Prototype: drive to table A, both arms pick a product each (top-down) at the same time into the tote, drive to table B, place both there (`--table_h`, `--sequential`). |
 | `scripts/reach_test.py` | No simulator: maps which spots on tables and shelf boards each arm can reach (IK + collision checks), writes a CSV and a PNG. |
+| `scripts/isaac_mono_task.py`, `isaac_mono_table_task.py`, `isaac_mono_shelf_task.py` | Mono-arm experiment: table → tote → table without driving, and the table and shelf tasks above done with one arm. |
+| `scripts/mono_poses.py` | Mono-arm experiment: the planned poses and moves for those tasks. |
+| `scripts/smooth_path.py` | Mono-arm experiment: blends the planned moves into smooth, time-optimal motions (TOPP-RA; `pip install toppra`). On by default; `--no_smooth` turns it off. |
 | `scripts/proto_task.py`, `scripts/proto_poses.py` | Prototype task helpers (time-synchronised moves, IK lines, reporting) and the planned poses and routes. |
 | `scripts/scara_ik.py` | Inverse kinematics for one arm plus the lift (gripper position, heading and tilt to joint angles). |
 | `scripts/self_collision.py` | Turns on self-collision (`--self_collision` in the other scripts). |
@@ -196,6 +200,68 @@ tilt. Wheel speeds come from standard mecanum mixing (positive wheel speed rolls
 fl = (vx - vy - (LX+LY)·wz) / R      fr = (vx + vy + (LX+LY)·wz) / R
 rl = (vx + vy - (LX+LY)·wz) / R      rr = (vx - vy + (LX+LY)·wz) / R
 ```
+
+## Mono-arm experiment (`prototype_mono_arm`)
+
+An experiment next to the prototype, not a replacement: **one arm, whose shoulder is a ring bearing around the lift
+column**, so the arm can swing all the way round the robot (front, both sides, the tote behind). The rest of the arm
+(elbow to gripper) is the same CAD as the prototype's. The prototype URDFs are not changed by it.
+
+| | Prototype | Mono arm |
+|---|---|---|
+| Arms | 2, beside the column, zero pose 45° toward the tote | 1, shoulder ring around the column, zero pose forward |
+| Shoulder | STS3215 in the arm base, ±115° | ring on a printed two-row ball bearing (2 × 57 steel balls, 6 mm) driven by an STS3215 through a 72 / 18 gear (4:1): 7.6 N·m, ±180° (cables in a reversing loop, no slip ring; needs the servo's multi-turn mode) |
+| Elbow | ±125° | ±117° (the forearm meets the ring at 121°) |
+| Lift travel | 0–0.885 m | 0–0.77 m (the ring can't pass the column's top cap) |
+| Scene camera | carriage bracket, faces forward | carriage, faces forward: a post in a socket on the fixed clamp ring, in front of the beam, and a bar over the arm |
+
+**The ring** is the **draft** printable design in `../SCARA_arm_CAD/mono_ring_draft/` (a printed two-row ball bearing with 6 mm steel balls, 4 : 1
+gear, drive servo under the disc at the front left, a reversing-loop cable channel, a homing magnet). The URDF uses
+those parts directly; only the lift's gantry plate it bolts to is estimated.
+
+**Reach** (`reach_test.py --layout prototype_mono_arm`, hand down on tables / level into shelves):
+
+| | Prototype, both arms together | Mono, one arm |
+|---|---|---|
+| Tables 0.45–0.90 m | 0.095 m², two separate patches (y ±0.42) with a dead strip in the middle | 0.070 m², one patch (y ±0.25) **including the middle** |
+| Shelf boards 0.70 / 1.10 m | 0.058 m² | 0.045 m² |
+| Tote floor (hand down) | 45 % | 36 % |
+| Shelf board 0.30 m | no | no |
+
+**Run it** (from this folder, with `conda activate env_isaaclab`):
+
+```bash
+python scripts/isaac_mono_task.py               # stationary: table in front -> tote behind -> table
+python scripts/isaac_mono_table_task.py         # the table-to-table task, 2 products, one arm
+python scripts/isaac_mono_shelf_task.py         # the shelf task, 1 product, one arm
+python scripts/isaac_joint_test.py --layout prototype_mono_arm [--hold]
+python scripts/isaac_import_and_test.py --layout prototype_mono_arm
+python scripts/reach_test.py --layout prototype_mono_arm
+```
+Add `--headless` for no window. In RViz: `ros2 launch mobile_manipulator_description display.launch.py layout:=prototype_mono_arm`.
+
+**Isaac Sim results (2026-11-10, headless):**
+
+| Test | Result |
+|---|---|
+| Joint sweep | 7/7 OK (the geared shoulder lags 1.6° at most) |
+| Hold, 3 poses × 30 s | 18/18 OK, no drift |
+| Stationary table → tote → table | 4/5 (fast moves): the product slides ~25 mm in the jaws on the 160° swing, and the task picks it up again at the planned spot instead of where it lies. Was 5/5 with the slower moves |
+| Table-to-table, 2 products | 6/6 OK, **121 s** (products 0 mm from target). Prototype: 93 s with both arms at once, 174 s one after the other |
+| Shelf, 1 product | 6/6 OK, **71 s** (0 mm from target). Prototype: 90 s |
+
+The mono tasks use a faster move profile (full allowed speed after a 0.3 s ramp) and move the lift during the swings;
+the prototype tasks still use the original slower profile. A move also counts as finished once the joints have stopped:
+holding a product, the wrist pitch sags 2–3° and never gets within the normal 2° tolerance, so before this fix every
+move with a product waited out an 8 s timeout (33 s of the shelf task). About a third of the time is the lift (0.10 m/s, set to
+match the real lift) going 0.6 m down into the tote and back for every product.
+
+**Things learned:**
+- Isaac Sim starts the robot in its zero pose: with this arm pointing forward and low, its hand is inside a table
+  placed in front of it, and the overlap throws the robot. The tasks place the table only after the arm is up.
+- Move into shelves slowly (2.5 s for 80 mm): at normal speed the elbow and wrist servos lag about 8 mm sideways and an
+  open fingertip knocks the product into the shelf. Open the jaws 35–40 mm for a 45 mm product.
+- Coming back from a table, swing away first and lower afterwards; going to the tote, lowering during the swing is fine.
 
 ## ROS 2 (Jazzy, Ubuntu 24.04)
 
