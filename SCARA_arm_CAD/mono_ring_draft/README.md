@@ -151,6 +151,12 @@ Everything electrical stays on the **carriage** except the arm itself:
 - **Gear strength:** at full stall (7.6 N·m) the teeth see about 25 MPa, which PLA takes but not for long. Limit the
   servo's torque in its settings; swinging the arm needs far less.
 
+## Bench rig
+
+Before building the rest of the mono arm, test the ring on its own: [`bench_rig/`](bench_rig/README.md) has two
+extra prints (a lift stand-in and a test lever) and 8 tests: smoothness, play, tipping load, backlash, multi-turn,
+homing, the cable loop and the drive under load.
+
 ## Bench test first: can the servo do several turns?
 
 The 4 : 1 gear means the servo turns 4 times for one turn of the shoulder. In its normal mode an STS3215 covers only
