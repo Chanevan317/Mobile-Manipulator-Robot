@@ -24,7 +24,8 @@ follower's hand moves, without translating in your head.
 - **One hand or two, both on the gripper** (as you held the SO-100 leader): one pinching in the loops, the other
   steadying and steering the gripper. No handle on the arm is needed: holding the gripper's position and heading
   fixes the arm's whole shape (it moves in a plane, with three pan joints for three things: x, y and heading).
-  The lift and the base are on a **gamepad**, used between picks; the clutch on a pedal or a gamepad button.
+  The base is on a **gamepad** between picks. The **lift** is on a small **joystick box** beside the leader (KY-023
+  thumbstick + Raspberry Pi Pico; push forward = up): see [`lift_stick/`](lift_stick/README.md).
 - **The pinch:** thumb and fingers sit **38 mm apart closed and 84 mm apart fully open (40°)**, the comfortable pinch
   range, with 46 mm of finger travel for the robot's 0–90 mm.
 - **Made for sitting at a desk.** The arm is 28 cm above the desk; with the gripper hanging straight down it stays
