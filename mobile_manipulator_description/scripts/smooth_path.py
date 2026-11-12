@@ -21,6 +21,9 @@ KEYS = ('lift', 'shoulder_pan', 'elbow_pan', 'wrist_pan', 'wrist_pitch', 'wrist_
 DQ, DZ, DX = 0.02, 0.004, 0.004          # waypoint spacing: rad per joint, m of lift, m of TCP along a line
 SPEED = 0.88                             # fraction of the URDF speed limits (as Task.joint_move)
 RAMP = 0.3                               # s: accel limit = speed limit / RAMP (as the 'trap' profile)
+CARRY = dict(speed=0.5, ramp=1.0)        # optional (expand(carry=CARRY)): swings while a product is held (after a 'grasp...' jaw
+                                         # step until the next open) at half speed, 1 s ramps; lines keep full speed. Not used by
+                                         # default: in Isaac the 150 g product moved 2.2 / 2.5 mm in the jaws either way
 CTRL_HZ = 60
 
 
@@ -47,8 +50,9 @@ def _line_points(cur, tgt):
     return out
 
 
-def time_path(W, vmax):
-    """TOPP-RA through the waypoints W (N x 6). vmax: 6 speed limits (lift m/s, joints rad/s). Returns Q at CTRL_HZ."""
+def time_path(W, vmax, speed=SPEED, ramp=RAMP):
+    """TOPP-RA through the waypoints W (N x 6). vmax: 6 speed limits (lift m/s, joints rad/s); speed: fraction of
+    them; ramp: s to full speed (accel limit = speed / ramp). Returns Q at CTRL_HZ."""
     import toppra as ta, toppra.constraint as tc, toppra.algorithm as algo
     W = np.asarray(W, float)
     keep = [0] + [i for i in range(1, len(W)) if np.max(np.abs(W[i] - W[i - 1])) > 1e-7]
@@ -59,7 +63,7 @@ def time_path(W, vmax):
         W = np.array([W[0], (W[0] + W[1]) / 2, W[1]])
     ss = np.linspace(0.0, 1.0, len(W))
     path = ta.SplineInterpolator(ss, W)
-    v = SPEED * np.asarray(vmax, float); acc = v / RAMP
+    v = speed * np.asarray(vmax, float); acc = v / ramp
     inst = algo.TOPPRA([tc.JointVelocityConstraint(np.stack([-v, v], 1)), tc.JointAccelerationConstraint(np.stack([-acc, acc], 1))],
                        path, gridpoints=np.linspace(0, 1, min(2000, 4 * len(W))), parametrizer='ParametrizeConstAccel')
     tr = inst.compute_trajectory(0.0, 0.0)
@@ -69,18 +73,23 @@ def time_path(W, vmax):
     return tr(np.minimum(t, tr.duration))
 
 
-def expand(steps, start, vmax):
-    """Turn a mono plan into blended trajectories. start: dict of KEYS. Returns (plan, end vector)."""
-    cur = _vec(start); plan = []; run, labels = [cur], []
+def expand(steps, start, vmax, carry=None):
+    """Turn a mono plan into blended trajectories. start: dict of KEYS. carry: dict(speed, ramp) used while a product
+    is held (e.g. CARRY; None = full speed throughout). Returns (plan, end vector). The waypoints are the same either
+    way: carry only changes the timing, so the offline collision checks still hold."""
+    cur = _vec(start); plan = []; run, labels = [cur], []; held = False
 
-    def flush():
+    def flush(line=False):
         nonlocal run, labels
         if len(run) > 1:
-            plan.append(('traj', ' + '.join(labels), time_path(run, vmax)))
+            lim = carry if (carry and held and not line) else dict(speed=SPEED, ramp=RAMP)     # only the swings slow down
+            plan.append(('traj', ' + '.join(labels), time_path(run, vmax, **lim)))
         run, labels = [cur], []
     for st in steps:
         kind, label, tgt = st
-        if kind == 'jaw' or (kind == 'line' and len(tgt) > 6):      # jaw actions and the timed (slow) lines: as before
+        if kind == 'jaw':
+            flush(); plan.append(st); held = label.startswith('grasp'); continue
+        if kind == 'line' and len(tgt) > 6:        # the timed (slow) lines: as before
             flush(); plan.append(st)
             if kind == 'line':
                 cur = _line_points(cur, tgt)[-1]; run = [cur]
@@ -90,7 +99,7 @@ def expand(steps, start, vmax):
             for k, v in tgt.items(): b[KEYS.index(k)] = v
             pts = _dense(cur, b)
         else:                                    # straight lines (approach / leave a product): own run, stop at both ends
-            flush(); pts = _line_points(cur, tgt); run += pts; labels.append(label); cur = pts[-1]; flush()
+            flush(); pts = _line_points(cur, tgt); run += pts; labels.append(label); cur = pts[-1]; flush(line=True)
             continue
         run += pts; labels.append(label); cur = pts[-1]
     flush()

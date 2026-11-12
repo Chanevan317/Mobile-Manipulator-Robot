@@ -26,7 +26,9 @@ TCP_TURN = 1.5            # rad/s for heading / pitch changes in those moves
 MIN_MOVE = 0.4            # s, shortest straight-line move
 ARM_KEYS = ('shoulder_pan', 'elbow_pan', 'wrist_pan', 'wrist_pitch', 'wrist_roll')
 RAMP = 0.3                # s, accel / decel ramp of the 'trap' profile
-STILL_V = 0.1             # rad/s or m/s: 'stopped' for settle_mode 'still' (the wrist pitch holding a product hunts at 0.03-0.06)
+STILL_V = 0.1             # rad/s: 'stopped' for settle_mode 'still' (the wrist pitch holding a product hunts at 0.03-0.06)
+STILL_V_LIFT = 0.005      # m/s for the lift: its top speed is 0.10 m/s, so 0.1 counted it as stopped while it was still
+                          # ~19 mm behind going into the tote (the jaws then opened 20 mm above the floor)
 
 
 def _trap(t, T, tr):
@@ -84,6 +86,7 @@ class Task:
         self.wheel = [self.idx[f'wheel_{w}_joint'] for w in ('fl', 'fr', 'rl', 'rr')]
         self.driven = [i for i, nm in enumerate(self.names) if 'roller' not in nm and not nm.startswith('wheel')]
         self.still_idx = [i for i in self.driven if 'finger' not in self.names[i]]
+        self.still_v = np.array([STILL_V_LIFT if self.names[i] == 'lift' else STILL_V for i in self.still_idx])
         self.substeps = max(1, round(DT / self.world.get_physics_dt()))
         self.q_goal = np.zeros(n); self.q_cmd = np.zeros(n); self.wheel_v = np.zeros(4)
         self.hold = None           # parked base pose (x, y, yaw) the wheels hold while the arms work (set by drive_to)
@@ -136,7 +139,7 @@ class Task:
                 # stopped moving: a steady gravity sag (the wrist pitch holding a product, ~2-3 deg) won't shrink by waiting
                 # arm joints + lift only: the fingers squeezing a product jitter and never read as stopped
                 v = np.abs(self.robot.get_joint_velocities()[self.still_idx])
-                self.still = self.still + 1 if np.max(v) < STILL_V else 0
+                self.still = self.still + 1 if np.all(v < self.still_v) else 0
                 if self.still >= 6:
                     self.still = 0; self.settle_log.append((self.t - t0, False)); return True
         worst = self.names[d[int(np.argmax(np.abs(q[d] - self.q_goal[d])))]]

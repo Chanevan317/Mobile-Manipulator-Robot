@@ -254,12 +254,12 @@ Add `--headless` for no window. In RViz: `ros2 launch mobile_manipulator_descrip
 |---|---|
 | Joint sweep | 7/7 OK (the geared shoulder lags 1.6° at most) |
 | Hold, 3 poses × 30 s | 18/18 OK, no drift |
-| Stationary table → tote → table | 4/5 (fast moves): the product slides ~25 mm in the jaws on the 160° swing, and the task picks it up again at the planned spot instead of where it lies. Was 5/5 with the slower moves |
+| Stationary table → tote → table | 7/7 OK, **49 s** (2026-11-12; product 0.2 mm from target). Was 4/5: with the table edge at 0.30 m the scene camera went under the table top when the lift dropped for the tote and tipped the robot back 4°. The table now stands at 0.36 m like the other table task |
 | Table-to-table, 2 products | 6/6 OK, **121 s** (products 0 mm from target). Prototype: 76 s with both arms at once |
 | Shelf, 1 product | 6/6 OK, **71 s** (0 mm from target). Prototype: 66 s |
 
 The mono tasks use a faster move profile (full allowed speed after a 0.3 s ramp) and move the lift during the swings;
-the prototype tasks still use the original slower profile. A move also counts as finished once the joints have stopped:
+the two-arm tasks use the same profile since 2026-11-11. A move also counts as finished once the joints have stopped:
 holding a product, the wrist pitch sags 2–3° and never gets within the normal 2° tolerance, so before this fix every
 move with a product waited out an 8 s timeout (33 s of the shelf task). About a third of the time is the lift (0.10 m/s, set to
 match the real lift) going 0.6 m down into the tote and back for every product.

@@ -14,9 +14,11 @@ K.use('prototype_mono_arm')
 D = math.radians
 P = math.pi / 2
 ITEM_H = 0.070                       # 45 x 45 x 70 mm product, grasped at its middle
-TABLE_EDGE = 0.30                    # table front edge, m in front of the base centre (bumper at 0.259)
-PICK = (0.375, 0.09)                 # on the table
-PLACE = (0.375, -0.09)               # on the table, the second spot
+TABLE_EDGE = 0.36                    # table front edge, m in front of the base centre (bumper at 0.259). Was 0.30: the scene
+                                     # camera on the carriage reaches x 0.341 and went under the table top whenever the lift
+                                     # dropped below 0.161 for the tote; it levered the robot back 4 deg (Isaac, 2026-11-12)
+PICK = (0.40, 0.09)                  # on the table (was 0.375; the table task uses x 0.40 at the same edge)
+PLACE = (0.40, -0.09)                # on the table, the second spot
 TOTE = (-0.073, 0.06)                # in the tote behind the column (floor top 0.263 m)
 TOTE_FLOOR = 0.263
 CLEAR = 0.005                        # put the product down 5 mm above the surface

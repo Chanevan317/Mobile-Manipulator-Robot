@@ -11,6 +11,7 @@ rate-limited as on the real servos.
     python scripts/isaac_mono_task.py               # window
     python scripts/isaac_mono_task.py --headless
     add --no_smooth for step-by-step moves instead of the TOPP-RA blended ones
+    MONO_DEBUG=1: per step, joint errors, base tilt and the PhysX contacts (found the scene camera hitting the table)
 """
 import argparse, math, os, sys
 
@@ -20,6 +21,7 @@ ap.add_argument('--urdf', default=os.path.join(here, '..', 'urdf', 'mobile_manip
 ap.add_argument('--headless', action='store_true')
 ap.add_argument('--table_h', type=float, default=0.75)
 ap.add_argument('--no_self_collision', action='store_true')
+ap.add_argument('--slow_carry', action='store_true', help='half-speed swings while holding the product (smooth_path.CARRY); made no difference here')
 ap.add_argument('--no_smooth', action='store_true', help='step-by-step moves instead of the TOPP-RA blended ones (smooth_path.py)')
 args = ap.parse_args()
 
@@ -47,6 +49,24 @@ table = w.scene.add(FixedCuboid(prim_path='/World/table', name='table', position
                         scale=np.array([0.70, 1.20, H]), color=np.array([0.62, 0.48, 0.33])))
 item = w.scene.add(DynamicCuboid(prim_path='/World/product', name='product', position=np.array([MP.PICK[0], MP.PICK[1], H + ITEM[2] / 2]) + AWAY,
                                  scale=ITEM, mass=ITEM_MASS, color=np.array([0.2, 0.6, 0.9])))
+CONTACTS = None
+if os.environ.get('MONO_DEBUG'):            # PhysX contact report on every robot link + the product (debug only)
+    from pxr import PhysxSchema, UsdPhysics
+    from omni.physx import get_physx_simulation_interface
+    stage = w.stage
+    for prim in stage.Traverse():
+        if prim.HasAPI(UsdPhysics.RigidBodyAPI) and ('/mobile_manipulator/' in str(prim.GetPath()) or 'product' in str(prim.GetPath())) \
+                and 'roller' not in str(prim.GetPath()):
+            PhysxSchema.PhysxContactReportAPI.Apply(prim).CreateThresholdAttr().Set(0.0)
+    from pxr import PhysicsSchemaTools
+    CONTACTS = {}
+
+    def _on_contacts(headers, data):
+        for h in headers:
+            a = str(PhysicsSchemaTools.intToSdfPath(h.actor0)).split('/')[-1]; b = str(PhysicsSchemaTools.intToSdfPath(h.actor1)).split('/')[-1]
+            imp = sum(float(np.linalg.norm([d.impulse[0], d.impulse[1], d.impulse[2]])) for d in data[h.contact_data_offset:h.contact_data_offset + h.num_contact_data])
+            k = tuple(sorted((a, b))); CONTACTS[k] = CONTACTS.get(k, 0.0) + imp
+    _sub = get_physx_simulation_interface().subscribe_contact_report_events(_on_contacts)
 task.start()
 if not args.headless:
     from isaacsim.core.utils.viewports import set_camera_view
@@ -63,10 +83,16 @@ task.wait(1.0)
 bp, yaw = task.base_pose(); task.report('start', f'base at ({bp[0]*1000:+.1f}, {bp[1]*1000:+.1f}) mm, {math.degrees(yaw):+.2f} deg; arm over the product')
 t0 = task.t
 tote_ok = None
+held_off = None            # product offset from the TCP right after lifting it (mm, in the base frame)
+
+
+def offset():
+    p, _ = Task.obj_state(item); tcp = task.to_base(task.tcp['left'].get_world_pose()[0])
+    return (task.to_base(p) - tcp) * 1000
 run_steps = steps[1:]
 if not args.no_smooth:                       # TOPP-RA: blended runs between the jaw actions (smooth_path.py)
     import smooth_path as SP
-    run_steps, _ = SP.expand(run_steps, task.arm_now('left'), SP.vmax_of(task))
+    run_steps, _ = SP.expand(run_steps, task.arm_now('left'), SP.vmax_of(task), carry=SP.CARRY if args.slow_carry else None)
 for kind, label, tgt in run_steps:
     if kind == 'jaw':
         task.jaw('left', JAW_OPEN if tgt == 1 else JAW_CLOSED, 0.8)
@@ -79,6 +105,7 @@ for kind, label, tgt in run_steps:
         elif label.startswith('grasp'):
             task.report(label, f'product at ({pb[0]:+.3f}, {pb[1]:+.3f}, {pb[2]:.3f})')
         continue
+    if CONTACTS is not None: CONTACTS.clear()
     if kind == 'traj':
         SP.play(task, tgt)
     elif kind == 'joint':
@@ -90,8 +117,26 @@ for kind, label, tgt in run_steps:
         tcp = task.to_base(task.tcp['left'].get_world_pose()[0])
         slip = np.linalg.norm(pb - tcp) * 1000
         task.report(label, f'product {slip:.1f} mm from the TCP (held)', ok=slip < 15 and pb[2] > info['zb'] + 0.05)
+        held_off = offset()
+    elif label.startswith('swing') and held_off is not None:       # how far it slid in the jaws during the swing
+        d = np.linalg.norm(offset() - held_off)
+        task.report(label, f'product slid {d:.1f} mm in the jaws during the swing', ok=d < 5); held_off = None
     else:
-        task.report(label, f'done, product at ({pb[0]:+.3f}, {pb[1]:+.3f}, {pb[2]:.3f})')
+        o = offset()
+        if os.environ.get('MONO_DEBUG'):
+            qa = task.robot.get_joint_positions()
+            err = {k: math.degrees(task.q_goal[task.idx[k]] - qa[task.idx[k]]) for k in
+                   ('left_shoulder_pan', 'left_elbow_pan', 'left_wrist_pan', 'left_wrist_pitch')}
+            print('      [debug] goal - actual (deg): ' + ', '.join(f'{k[5:]} {v:+.1f}' for k, v in err.items())
+                  + f", lift {(task.q_goal[task.idx['lift']] - qa[task.idx['lift']]) * 1000:+.1f} mm", flush=True)
+            _, qu = task.robot.get_world_pose(); w_, x_, y_, z_ = [float(v) for v in qu]
+            roll = math.degrees(math.atan2(2 * (w_ * x_ + y_ * z_), 1 - 2 * (x_ * x_ + y_ * y_)))
+            pitch = math.degrees(math.asin(max(-1.0, min(1.0, 2 * (w_ * y_ - z_ * x_)))))
+            bp_, _ = task.base_pose()
+            top = sorted(((v, k) for k, v in (CONTACTS or {}).items() if 'wheel' not in k[0] + k[1] or v > 0), reverse=True)[:8]
+            print('      [debug] contacts (N s): ' + ', '.join(f'{a}-{b} {v:.2f}' for v, (a, b) in top), flush=True)
+            print(f'      [debug] base tilt roll {roll:+.2f} pitch {pitch:+.2f} deg, base at ({bp_[0]*1000:+.1f}, {bp_[1]*1000:+.1f}, {bp_[2]*1000:+.1f}) mm', flush=True)
+        task.report(label, f'done, product at ({pb[0]:+.3f}, {pb[1]:+.3f}, {pb[2]:.3f}), {o[0]:+.0f} {o[1]:+.0f} {o[2]:+.0f} mm from the TCP')
 task.wait(1.0)
 p, up = Task.obj_state(item); pb = task.to_base(p)
 err = math.hypot(pb[0] - MP.PLACE[0], pb[1] - MP.PLACE[1]) * 1000
