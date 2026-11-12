@@ -48,12 +48,18 @@ if __name__ == '__main__':
     idx = {'J1': 0, 'J2': 1, 'J3': 2, 'pitch': 3, 'roll': 4}
     for nm, i in idx.items():
         lo, hi = LD.LIMITS[nm]; angs = [float(a) for a in np.arange(lo - 5, hi + 5.01, 5)]
-        if nm == 'J1': angs = [float(a) for a in np.arange(-180, 180.01, 10)]
+        if nm == 'J1': angs = sorted(set([float(a) for a in np.arange(-170, 170.01, 10)] + [float(lo), float(hi)]))
         jobs = []
         for a in angs:
             q = [0, 0, 0, 0, 0]; q[i] = a; jobs.append((tuple(q), 0.0, 'mono'))
         res = [(j[0][i], c[:2]) for j, c in zip(jobs, run(jobs)) if c]
         print(f'{nm:6s} {LD.LIMITS[nm]} (+-5): {"clear" if not res else res}')
+    # shoulder end stop: the peg under link 1 meets the rib on the support ring (before the servo's +-180 wrap)
+    for sg in (1, -1):
+        for a in np.arange(170.0, 180.01, 0.5):
+            c = clashes((sg * float(a), 0, 0, 0, 0), tol=0.01)
+            if c: print(f'J1 end stop at {sg * a:+.1f} deg: {c[:2]}'); break
+        else: print(f'J1 NO END STOP up to {sg * 180} deg')
     # first contact of the folding joints
     for nm, i in (('J2', 1), ('J3', 2)):
         for sg in (1, -1):
@@ -70,7 +76,7 @@ if __name__ == '__main__':
         for p in (0, 90, 120):
             for j3 in (-127, 0, 127):
                 combos.append((0, q2, j3, p, 0))
-    for q1 in (-180, -90, 90, 180):
+    for q1 in (-173, -90, 90, 173):
         combos += [(q1, 0, 0, 90, 0), (q1, 130, -127, 90, 0), (q1, -130, 127, 90, 0), (q1, 130, 127, 120, 90)]
     res = run([(q, 0.0, 'mono') for q in combos])
     bad = [(q, c[:2]) for q, c in zip(combos, res) if c]

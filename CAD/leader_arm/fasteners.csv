@@ -2,7 +2,8 @@ type,size,length_mm,qty_per_arm_module,used for
 selftap,M2,6,24,shoulder servo case; elbow servo case (link 1 clamp); wrist-pan servo case (link 2 clamp); pitch servo case (wrist clamp); roll servo case; gripper servo case
 SHCS,M3,20,4,shoulder mount to pedestal (nut in the cap underside)
 nut,M3,,6,shoulder mount; fixed jaw
-SHCS,M3,8,32,shoulder horn; elbow horn (4) + idler (4); wrist-pan horn (4) + idler (4); pitch horn (4) + idler (4); gripper servo horn
+SHCS,M3,8,20,shoulder horn; elbow horn; wrist-pan horn; pitch horn; gripper servo horn
+SHCS,M3,14,12,elbow idler (through the tall boss); wrist-pan idler (through the tall boss); pitch idler (through the tall boss)
 SHCS,M3,6,4,roll horn (gripper frame back plate)
 SHCS,M3,30,2,fixed jaw to the gripper frame (nuts in the frame)
 SHCS,M5,12,3,pedestal to foot (nut in the pocket under the foot)

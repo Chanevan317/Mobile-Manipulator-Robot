@@ -324,18 +324,22 @@ At zero, each arm points along its zero heading (±135°, toward the rear and pa
 - `left_/right_wrist_camera` and `*_wrist_camera_optical`: the 32 × 32 mm OV camera on each wrist (frame at the default 35° tilt; the real tilt is set by hand, 0–60°).
 - `scene_camera` and `scene_camera_optical`: the scene camera (on a carriage bracket in front of the column). The optical frames follow ROS conventions: z forward, x right, y down.
 
-## Masses (per arm: 2.17 kg in the URDF, a conservative estimate)
+## Masses (per arm: 2.09 kg in the URDF, a conservative estimate)
 
-| Link | Mass |
-|---|---|
-| `<side>_base` | 380 g |
-| `<side>_upper_arm` | 432 g |
-| `<side>_forearm` | 412 g |
-| `<side>_wrist` | 370 g |
-| `<side>_tilt` | 260 g |
-| `<side>_hand` | 199 g |
-| `<side>_finger_right` | 57 g |
-| `<side>_finger_left` | 57 g |
+| Link | Two-arm prototype (each arm) | One-arm experiment (shoulder ring) |
+|---|---|---|
+| `<side>_base` | 382 g | 512 g (ring base, drive servo, board) |
+| `<side>_upper_arm` | 389 g | 432 g (with the ring rotor) |
+| `<side>_forearm` | 389 g | 389 g |
+| `<side>_wrist` | 369 g | 369 g |
+| `<side>_tilt` | 251 g | 251 g |
+| `<side>_hand` | 201 g | 201 g |
+| `<side>_finger_right` | 58 g | 58 g |
+| `<side>_finger_left` | 58 g | 58 g |
+| **Total** | **2,094 g** | **2,267 g** |
+
+About 1.27 kg of each prototype arm is printed PLA (1,627 cm³), 330 g is the six servos, and the rest is bearings,
+rail, camera and fasteners. The same numbers per link are in `arm_link_masses.json`.
 
 How the masses were worked out:
 - **Printed parts:** PLA at 0.781 g/cm³ effective, scaling the former 0.80 PETG estimate by the filament density ratio 1.24 / 1.27. This preserves the old effective-fill assumption (about 60 %).

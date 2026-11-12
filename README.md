@@ -13,7 +13,7 @@ the robot is tested in simulation (Isaac Sim, ROS 2).
 | `CAD/SCARA_arm/` | the follower arm: print files, STEP, assembly, fastener lists |
 | `CAD/mono_ring_draft/` | draft shoulder ring for the one-arm version, with a bench test rig |
 | `CAD/leader_arm/` | the leader arm for teleoperation |
-| `CAD/lift_stick/` | handheld joystick for the lift |
+| `CAD/lift_stick/` | one-hand controller for the lift: thumbstick, dead-man and stored-position buttons |
 | `mobile_manipulator_description/` | the robot model (URDF, meshes), the CAD generator and the simulation scripts |
 
 Large files (STL, STEP, PNG, ...) are stored with Git LFS: run `git lfs install` before cloning.
