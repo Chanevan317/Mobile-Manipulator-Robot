@@ -300,9 +300,17 @@ def build_bases():
     ped = pedestal()
     BASE_PARTS['pedestal'] = dict(solid=ped, variant='both', qty_mono=1, qty_proto=2, color=(0.55, 0.57, 0.60),
                                   note='column under the shoulder mount; 8 nut traps (arm at any multiple of 45 deg); 3 x M5 to a foot')
+    # one pedestal per arm module; grip = pedestal flange 6 + foot plate 6 = 12 mm, nut in a pocket under the foot
+    fast('SHCS', 'M5', 12, 3, 'pedestal to foot (nut in the pocket under the foot)'); fast('nut', 'M5', None, 3, 'pedestal to foot')
     zd = -H_ARM
-    holes = lambda cx, cy, yaw: [cyl(2.75, zd - 7.0, zd + 1, cx + 44 * math.cos(math.radians(120 * k + yaw)),
-                                     cy + 44 * math.sin(math.radians(120 * k + yaw)), hole=True) for k in range(3)]
+    def holes(cx, cy, yaw):
+        """3 x M5 under a pedestal, each with a hex nut pocket (M5 nut 8 AF x 4) open on the foot's underside, so the
+        foot sits flat on the desk; an M5 x 12 from the flange top (6 + 6 mm) ends flush with the bottom."""
+        out = []
+        for k in range(3):
+            x, y = cx + 44 * math.cos(math.radians(120 * k + yaw)), cy + 44 * math.sin(math.radians(120 * k + yaw))
+            out += [cyl(2.75, zd - 7.0, zd + 1, x, y, hole=True), nut_cut((x, y, zd - 6.01), (0, 0, 1), 'M5', depth=4.5, af=8.3)]
+        return out
     mono = box(-110.0, 110.0, -85.0, 85.0, zd - 6.0, zd) - union(holes(0, 0, 0) +
            [box(x - 10, x + 10, y - 4, y + 4, zd - 7, zd + 1) for x in (-95.0, 95.0) for y in (-70.0, 70.0)])
     mono = mono - union([box(x0, x1, y0, y1, zd - 7, zd + 1) for (x0, x1) in ((-85.0, -58.0), (58.0, 85.0)) for (y0, y1) in ((-60.0, -8.0), (8.0, 60.0))]

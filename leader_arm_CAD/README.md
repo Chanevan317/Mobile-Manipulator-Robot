@@ -66,11 +66,11 @@ Sizes are in `printed_parts.csv`; screws in `fasteners.csv` (per arm module).
 | Gamepad (USB / Bluetooth) | 1 | drives the base and the lift between picks (one for both leaders) |
 | USB foot pedal (optional) | 1 | clutch, if you'd rather keep it off the gamepad |
 | M2 × 6 self-tapping | 24 | servo cases (4 per servo) |
-| M3 × 8 | 28 | horns |
+| M3 × 8 | 32 | horns: 4 on the shoulder and the gripper servo, 4 + 4 (output + idler) on the elbow, wrist pan and pitch |
 | M3 × 6 | 4 | roll horn (gripper frame) |
 | M3 × 20 + nut | 4 + 4 | shoulder mount to pedestal (nuts in the pedestal cap's underside) |
 | M3 × 30 + 2 nuts | 2 | fixed jaw to the gripper frame (nuts slide into the frame's side wall) |
-| M5 × 12 + nut | 3 | pedestal to foot |
+| M5 × 12 + nut | 3 + 3 | pedestal to foot (nuts in the hex pockets under the foot; the bolt ends flush) |
 | C-clamps | 2 | hold the foot on the desk |
 
 **Which servo goes where.** Gravity acts only on the wrist pitch, so put the stiffest servo there.
@@ -94,7 +94,7 @@ Never put a C044 or C046 in the follower: it can't hold the follower's load.
 5. Gripper servo into the gripper frame's clamp, horn down, body forward (4 × M2); frame on the roll horn
    (4 × M3 × 6); fixed jaw under the frame (2 × M3 × 30 into the nuts in the frame's side wall); moving jaw on the
    gripper servo's horn (4 × M3 × 8) with the blades just touching.
-6. Pedestal onto the foot (3 × M5). Shoulder mount onto the pedestal (4 × M3 × 20, nuts in the cap's underside),
+6. Pedestal onto the foot: 3 × M5 × 12 down through the flange into nuts in the hex pockets under the foot. Shoulder mount onto the pedestal (4 × M3 × 20, nuts in the cap's underside),
    **turned like the follower's arm**: straight ahead for the mono base, ±135° on the prototype base.
 7. Run the servo cables along the links to the bus board; the pedestal has a cable exit at its foot.
 

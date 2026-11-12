@@ -5,3 +5,5 @@ nut,M3,,6,shoulder mount; fixed jaw
 SHCS,M3,8,32,shoulder horn; elbow horn (4) + idler (4); wrist-pan horn (4) + idler (4); pitch horn (4) + idler (4); gripper servo horn
 SHCS,M3,6,4,roll horn (gripper frame back plate)
 SHCS,M3,30,2,fixed jaw to the gripper frame (nuts in the frame)
+SHCS,M5,12,3,pedestal to foot (nut in the pocket under the foot)
+nut,M5,,3,pedestal to foot
