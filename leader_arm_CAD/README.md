@@ -1,6 +1,6 @@
 # Leader arm v3 (teleoperation)
 
-![leader arm](preview.png)
+![leader arm](preview_leader_arm.png)
 
 You move this arm by hand, and the follower arm copies its joint angles 1:1. **v3 is a 0.7-scale copy of the
 follower**: the same joints in the same order, the same layout and the same proportions. Your hand moves the way the

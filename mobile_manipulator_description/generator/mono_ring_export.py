@@ -42,7 +42,7 @@ def export(out):
         w = csv.writer(f); w.writerow(['kind', 'size', 'length_mm', 'qty', 'where'])
         for (k, s, L, n), q in sorted(fast.items(), key=lambda t: (t[0][1], t[0][0], str(t[0][2]))):
             w.writerow([k, s, L, q, n])
-    render(os.path.join(out, 'preview.png'))
+    render(os.path.join(out, 'preview_mono_ring.png'))
     print(f'exported {len(rows)} parts to {out}')
 
 

@@ -30,7 +30,8 @@ The arm links use the real CAD parts from the `SCARA_arm_CAD` package, with thei
 | `launch/display.launch.py`, `rviz/display.rviz`, `package.xml`, `CMakeLists.txt` | ROS 2 package: `ros2 launch mobile_manipulator_description display.launch.py` opens RViz with the robot and a slider for every joint |
 | `scripts/ros_joint_check.py` | ROS 2: checks joint limits, the zero pose and the direction of every joint, through TF |
 | `arm_link_masses.json` | Mass and centre of mass of each arm link |
-| `preview.png`, `preview_mono.png` | Pictures of the two-arm prototype and of the mono-arm experiment (`generator/render_robot.py` draws any layout from its URDF) |
+| `preview_prototype_dual.png`, `preview_prototype_mono.png` | Pictures of the two-arm prototype and of the mono-arm experiment (two views: facing the front / turned 150° toward the tote). `generator/render_robot.py` draws any layout from its URDF |
+| `preview_piper_mono.png`, `preview_piper_dual.png` | Pictures only: our body with AgileX PiPER arms instead of the SCARA arms. Mono: one PiPER on a plate on our shoulder ring, so it turns around the column (facing the front / turned 150° toward the tote). Dual: one on each side bracket, each base on a 30° wedge so the arm leans out to its side, away from the lift, each in a different pose (≥ 49 mm from the column and carriage, 136 mm between the arms). PiPER model from agilexrobotics/piper_ros (MIT); not part of this package |
 
 ## Layout (prototype)
 
@@ -220,7 +221,7 @@ column**, so the arm can swing all the way round the robot (front, both sides, t
 | Lift travel | 0–0.885 m | 0–0.77 m (the ring can't pass the column's top cap) |
 | Scene camera | carriage bracket, faces forward | carriage, faces forward: a post in a socket on the fixed clamp ring, in front of the beam, and a bar over the arm |
 
-![mono-arm robot](preview_mono.png)
+![mono-arm robot](preview_prototype_mono.png)
 
 **The ring** is the **draft** printable design in `../SCARA_arm_CAD/mono_ring_draft/` (a printed two-row ball bearing with 6 mm steel balls, 4 : 1
 gear, drive servo under the disc at the front left, a reversing-loop cable channel, a homing magnet). The URDF uses

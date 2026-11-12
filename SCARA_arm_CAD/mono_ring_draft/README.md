@@ -7,7 +7,7 @@ This is the shoulder for the **mono-arm experiment**: one arm whose shoulder tur
 instead of beside it. It replaces the prototype's base parts (`01_base_top`, `02_base_bottom`) and the upper arm's
 shoulder fork. Everything from the elbow outward (forearm, wrist, pitch, roll, gripper) is the same as the prototype's.
 
-![preview](preview.png)
+![preview](preview_mono_ring.png)
 
 ## How it works
 

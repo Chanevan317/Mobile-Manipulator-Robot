@@ -117,7 +117,7 @@ def export(out):
                          volume_cm3=round(p['solid'].volume() / 1000, 1), note=p['note']))
     with open(os.path.join(out, 'rig_parts.csv'), 'w', newline='') as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0])); w.writeheader(); w.writerows(rows)
-    render(os.path.join(out, 'rig_preview.png'))
+    render(os.path.join(out, 'preview_ring_bench_rig.png'))
     return rows
 
 

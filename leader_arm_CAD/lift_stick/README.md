@@ -15,6 +15,8 @@ leader's gripper and wrist can come lower than the box (about 50 mm with the cap
 (checked over 610 poses). Further out the leader only passes high above it. For mono, 40 cm to the left of the
 pedestal is about where your free hand rests anyway.
 
+![lift joystick](preview_lift_stick.png)
+
 Made by `mobile_manipulator_description/generator/lift_stick.py`.
 
 | File | What | Print |

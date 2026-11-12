@@ -8,7 +8,7 @@ Tests the **riskiest part of the mono arm, the shoulder ring**, on its own on a 
 - the cable loop: do your real cables follow ±180° without buckling?
 - the load: does the ring hold the arm's tipping load (about 6 N·m)?
 
-![rig](rig_preview.png)
+![rig](preview_ring_bench_rig.png)
 
 ## What to print
 
