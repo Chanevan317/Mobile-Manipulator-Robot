@@ -2,7 +2,7 @@
 
 This package is the full robot: a mecanum mobile base, the lift, the carriage, and two SCARA arms. Every joint moves.
 
-The arm links use the real CAD parts from the `SCARA_arm_CAD` package, with their real masses. The base, column and carriage are simple shapes with estimated masses, the same as in the earlier concept model.
+The arm links use the real CAD parts from `../CAD/SCARA_arm/`, with their real masses. The base, column and carriage are simple shapes with estimated masses, the same as in the earlier concept model.
 
 ## Files
 
@@ -223,7 +223,7 @@ column**, so the arm can swing all the way round the robot (front, both sides, t
 
 ![mono-arm robot](preview_prototype_mono.png)
 
-**The ring** is the **draft** printable design in `../SCARA_arm_CAD/mono_ring_draft/` (a printed two-row ball bearing with 6 mm steel balls, 4 : 1
+**The ring** is the **draft** printable design in `../CAD/mono_ring_draft/` (a printed two-row ball bearing with 6 mm steel balls, 4 : 1
 gear, drive servo under the disc at the front left, a reversing-loop cable channel, a homing magnet). The URDF uses
 those parts directly; only the lift's gantry plate it bolts to is estimated.
 
@@ -352,7 +352,7 @@ How the masses were worked out:
 ## Servo sockets (same as the SO-100)
 
 Every servo is an STS3215 held exactly the way the SO-ARM100 holds it, so a servo moves between the SO-100 and this arm
-with its own screws. Measured from the SO-100 leader print files (`../SCARA_arm_CAD/SO100/`):
+with its own screws. Measured from the SO-100 leader print files (`../CAD/SCARA_arm/SO100/`):
 
 - The pocket is line-to-line with the servo case: the horn face sits flush, the idler side has 0.1 mm play.
 - Case screws are **M2×6 self-tapping** (the SO-100 ones) through a 2.0 mm wall into the servo's case holes:
@@ -369,13 +369,13 @@ The generator code is `SO100` / `case_screw()` in `generator/joint.py`.
 
 ## Printing (Bambu Lab A1, PLA Pro+)
 
-The files in `../SCARA_arm_CAD/print_ready_stl/` are already in the print orientation. Print 2 of each part for the two arms.
+The files in `../CAD/SCARA_arm/print_ready_stl/` are already in the print orientation. Print 2 of each part for the two arms.
 
 - **Start with a fit test:** print `01_base_top` and `02_base_bottom` first. They are small and have the same servo socket
   as the other joints. Check that a servo goes in and the M2 screws line up before you print the long links.
 - **Plate:** every part fits the 256 × 256 mm bed. The upper-arm halves are 254 mm long: rotate them 45° on the plate.
 - **Settings:** 0.4 mm nozzle, 0.20 mm layers (0.12 mm for `17_pinion_24T_m1`), 4 walls, 5 top / 5 bottom layers,
-  15 % cubic infill (like the SO-100). Use the temperatures on your PLA Pro+ spool. Full notes: `../SCARA_arm_CAD/README.md`.
+  15 % cubic infill (like the SO-100). Use the temperatures on your PLA Pro+ spool. Full notes: `../CAD/SCARA_arm/README.md`.
 - **Supports:** tree (auto), threshold 30°, *not* "build plate only". A few small ceilings (cable slots) need support
   that starts on the part. Clean the servo-pocket ceilings well: the servo face sits on them.
 - **Keep the fit exact:** elephant-foot compensation 0.15 mm (the Bambu default), because the pocket openings are on

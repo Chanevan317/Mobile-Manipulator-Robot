@@ -208,7 +208,7 @@ def m_add(lk, fname, loc, color, mass=None, rho=None, col=True):
 
 
 def _mono_links():
-    """The DRAFT printable ring (mono_ring.py, exported to SCARA_arm_CAD/mono_ring_draft): fixed parts -> left_base,
+    """The DRAFT printable ring (mono_ring.py, exported to CAD/mono_ring_draft): fixed parts -> left_base,
     turning parts -> left_upper_arm, plus the elbow servo / bearings / fasteners of the prototype upper arm (x >= 70)."""
     import mono_ring as MR
     from joint import SERVO

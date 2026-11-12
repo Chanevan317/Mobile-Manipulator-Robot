@@ -6,7 +6,7 @@ The Pico's dimensions are its datasheet's (exact). The KY-023's are ASSUMED from
 front-back slot around the stick's shaft) is the part that depends on them most; it's a separate, quick reprint.
 
 Frame: mm, z up from the case bottom, x = toward the tip (= push = up), y to the left.
-    python3 lift_stick.py [out_dir]       (default ../../leader_arm_CAD/lift_stick)
+    python3 lift_stick.py [out_dir]       (default ../../CAD/lift_stick)
 """
 import math, os, sys, csv
 import numpy as np
@@ -155,7 +155,7 @@ def export(out):
 
 if __name__ == '__main__':
     import lift_stick as LS
-    out = sys.argv[1] if len(sys.argv) > 1 else os.path.join('..', '..', 'leader_arm_CAD', 'lift_stick')
+    out = sys.argv[1] if len(sys.argv) > 1 else os.path.join('..', '..', 'CAD', 'lift_stick')
     LS.build()
     res, lid_z, ky_top = LS.check()
     print('boards / stick clear of the case and lid:', 'yes' if not res else res)

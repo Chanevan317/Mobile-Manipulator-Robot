@@ -17,7 +17,7 @@ Stack (carriage z):
 Why so low: the forearm's bottom fork prong is 33.6 mm under the arm plane (z 31.9) and sweeps r 92..168 around the
 column whenever the elbow passes; anything fixed out there must stay below it (pinion top 30.5).
 
-    python3 mono_ring.py [out_dir]      checks + export (default ../../SCARA_arm_CAD/mono_ring_draft)
+    python3 mono_ring.py [out_dir]      checks + export (default ../../CAD/mono_ring_draft)
 """
 import math, os, sys, csv
 import numpy as np
@@ -455,7 +455,7 @@ def check():
 
 if __name__ == '__main__':
     import mono_ring as MR                     # one module instance (the export imports it too)
-    out = sys.argv[1] if len(sys.argv) > 1 else os.path.join('..', '..', 'SCARA_arm_CAD', 'mono_ring_draft')
+    out = sys.argv[1] if len(sys.argv) > 1 else os.path.join('..', '..', 'CAD', 'mono_ring_draft')
     tz = MR.build_all()
     print(f'upper-arm tube underside (lug top) at carriage z {tz:.2f}')
     res, g, pin_out = MR.check()

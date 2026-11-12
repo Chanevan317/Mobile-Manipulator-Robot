@@ -9,7 +9,7 @@ Two new prints; every ring part (M03..M13 except the upper arm halves) is used a
                ~2.4 kg at 250 mm = the stretched arm + a 0.25 kg product (~6 N m)
 Frame: the ring's carriage frame (mm). The lever points along +x (shoulder 0): clamp the rig with +x over the edge.
 
-    python3 mono_ring_rig.py [out_dir]     (default ../../SCARA_arm_CAD/mono_ring_draft/bench_rig)
+    python3 mono_ring_rig.py [out_dir]     (default ../../CAD/mono_ring_draft/bench_rig)
 """
 import math, os, sys
 import numpy as np
@@ -154,7 +154,7 @@ def render(path):
 
 if __name__ == '__main__':
     import mono_ring_rig as RR
-    out = sys.argv[1] if len(sys.argv) > 1 else os.path.join('..', '..', 'SCARA_arm_CAD', 'mono_ring_draft', 'bench_rig')
+    out = sys.argv[1] if len(sys.argv) > 1 else os.path.join('..', '..', 'CAD', 'mono_ring_draft', 'bench_rig')
     RR.build()
     res, m = RR.check()
     print(f'test load: 2.4 kg at 250 mm = {m:.1f} N m tipping moment')

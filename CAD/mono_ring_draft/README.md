@@ -175,7 +175,7 @@ horn except a small tape flag, so you can count the turns.
 3. Run the test (ID 1 is the default; an SO-100 servo keeps the ID of its joint, 1 to 6):
    ```bash
    conda activate lerobot_env
-   cd ~/Documents/Mobile-Manipulator-Robot/SCARA_arm_CAD/mono_ring_draft/bench
+   cd ~/Documents/Mobile-Manipulator-Robot/CAD/mono_ring_draft/bench
    python servo_multiturn_test.py --port /dev/ttyACM0 --id 1
    ```
 4. Follow the prompts:
@@ -204,4 +204,4 @@ The script sets the angle limits back to what they were at the end, even if you 
 - No hard stop: the range is kept by software limits after homing. A mechanical stop for more than one turn needs a
   floating stop ring; add it if the software limits ever fail.
 - The scene-camera post and bar (the clamp ring has the socket for it).
-- Regenerate everything: `cd mobile_manipulator_description/generator && python3 mono_ring.py ../../SCARA_arm_CAD/mono_ring_draft`
+- Regenerate everything: `cd mobile_manipulator_description/generator && python3 mono_ring.py ../../CAD/mono_ring_draft`

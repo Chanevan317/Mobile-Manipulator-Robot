@@ -17,7 +17,8 @@ One arm. For the two-arm robot, print and buy everything twice. Both arms use th
 | `fastener_BOM.csv` | How many of each screw, insert and nut, and what each is for | Excel, Sheets |
 | `fasteners_by_location.csv` | Every fastener: which part it goes in, its exact position and direction (part frame and arm frame, in mm) | Excel, Sheets |
 | `printed_parts.csv` | Printed parts with their print size and volume | Excel, Sheets |
-| `../mobile_manipulator_description/generator/` | The Python generator. Change a number and rebuild. | Python 3 + manifold3d |
+| `SO100/` | SO-100 files used as **reference**: the SO-100 leader prints the servo sockets (screw holes, pocket fit) were measured from (not part of this arm), and the SO-101 Waveshare board plate, which you do print: it slides into the base's dovetail. Kept by hand; the export doesn't touch it | Any slicer or viewer |
+| `../../mobile_manipulator_description/generator/` | The Python generator. Change a number and rebuild. | Python 3 + manifold3d |
 
 Units are millimetres. The files use the **arm frame**: Z is up, and the origin is on the shoulder axis at the shoulder servo's mid-height. X points along the arm at zero pose. The carriage mount plate's top face is at **Z = -40**.
 
@@ -387,4 +388,4 @@ These came up when the parts were made real:
 
 ## About the STEP files
 
-The STEP files contain exact solid bodies, but they are faceted: curved surfaces are made of small flat facets about 0.6 mm wide. They import as solid bodies you can measure, combine with other parts, and mate. They are not feature-history CAD. To change a dimension, edit the parameter in `../mobile_manipulator_description/generator/` and rebuild: run `python3 export_all.py ../../SCARA_arm_CAD` there, which needs `manifold3d`. To get editable faces in Fusion 360, import the STL from `assembly_stl/` and use Mesh → Convert Mesh → Prismatic.
+The STEP files contain exact solid bodies, but they are faceted: curved surfaces are made of small flat facets about 0.6 mm wide. They import as solid bodies you can measure, combine with other parts, and mate. They are not feature-history CAD. To change a dimension, edit the parameter in `../../mobile_manipulator_description/generator/` and rebuild: run `python3 export_all.py ../../CAD/SCARA_arm` there, which needs `manifold3d`. To get editable faces in Fusion 360, import the STL from `assembly_stl/` and use Mesh → Convert Mesh → Prismatic.

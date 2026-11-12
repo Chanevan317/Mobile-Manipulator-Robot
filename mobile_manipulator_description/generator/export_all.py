@@ -4,7 +4,7 @@ from build import *
 from export import write_glb, write_3mf, write_obj, write_step
 from stlio import write_stl
 
-OUT = sys.argv[1] if len(sys.argv) > 1 else 'out/SCARA_arm_CAD'
+OUT = sys.argv[1] if len(sys.argv) > 1 else '../../CAD/SCARA_arm'
 for d in ('print_ready_stl', 'assembly_stl', 'assembly_stl/purchased', 'step'):
     os.makedirs(os.path.join(OUT, d), exist_ok=True)
 
