@@ -4,13 +4,13 @@ preview image. The README in the output folder is written by hand."""
 import os, csv, collections
 import numpy as np
 import mono_ring as R
-from lib import xf, mesh_arrays, union, T, Rz, box
+from lib import xf, print_mesh, union, T, Rz, box, ring
 from stlio import write_stl
 from joint import SERVO
 
 
 def _write(path, solid):
-    V, F = mesh_arrays(solid); write_stl(path, V, F)
+    V, F = print_mesh(solid); write_stl(path, V, F)
 
 
 def export(out):
@@ -49,7 +49,12 @@ def export(out):
 def render(path):
     import matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-    items = [(p['solid'], p['color']) for p in R.PARTS.values()]
+    COLLAR_C = (0.10, 0.62, 0.55)                                               # the arm's collar: teal, to see it
+    reg = ring(R.COLLAR['ri'] - 0.2, R.COLLAR['ro'] + 0.2, R.COLLAR['z0'] - 0.2, R.AZ + 0.2)
+    ab = R.PARTS['mono_upper_arm_bottom']
+    items = [(p['solid'], p['color']) for k, p in R.PARTS.items() if k != 'mono_upper_arm_bottom']
+    items += [(ab['solid'] - reg, ab['color']), (ab['solid'] ^ reg, COLLAR_C)]
+    arm = ('mono_upper_arm_top',)
     items += [(R.balls(), (0.75, 0.77, 0.80)), (xf(SERVO, R.servo_frame()), (0.12, 0.12, 0.14)),
               (R.forearm_at(0, 60), (0.33, 0.56, 0.86)), (R.CONTEXT['servo_board'], (0.10, 0.35, 0.20))]
     ctx = [(R.GANTRY, (0.80, 0.80, 0.82)), (R.WHEELS, (0.35, 0.35, 0.38)), (R.COLUMN ^ box(-30, 30, -50, 50, -110, 58), (0.70, 0.72, 0.76))]
@@ -69,14 +74,24 @@ def render(path):
         r = (hi - lo).max() / 2 / zoom
         ax.set_xlim(c[0] - r, c[0] + r); ax.set_ylim(c[1] - r, c[1] + r); ax.set_zlim(c[2] - r, c[2] + r)
         ax.view_init(el, az); ax.set_proj_type('ortho'); ax.set_axis_off(); ax.set_title(title, fontsize=13)
-    fig = plt.figure(figsize=(20, 13), facecolor='white')
-    draw(fig.add_subplot(2, 2, 1, projection='3d'), items + ctx, 25, -55, zoom=1.1,
-         title='DRAFT mono shoulder ring on the lift carriage (grey: lift parts, estimated)')
-    draw(fig.add_subplot(2, 2, 2, projection='3d'), items + ctx, 25, 125, zoom=1.1,
-         title='from behind: L bracket to the gantry plate, drive servo + pinion (front left)')
-    draw(fig.add_subplot(2, 2, 3, projection='3d'), items + ctx, 0, -90, cut=box(-200, 200, 0, 200, -200, 300), zoom=1.6,
-         center=(10, 0, 40), title='section (y = 0): hub = inner race, 2 ball rows, 3-ring rotor (outer race), top cap, lug under the tube')
+    # exploded: the arm (both halves + the forearm) lifted 70 mm off the rotor
+    up = lambda it: (it[0].translate((0, 0, 70)), it[1])
+    lifted = [(ab['solid'] - reg, ab['color']), (ab['solid'] ^ reg, COLLAR_C), (R.PARTS['mono_upper_arm_top']['solid'], R.PARTS['mono_upper_arm_top']['color']),
+              (R.forearm_at(0, 60), (0.33, 0.56, 0.86))]
+    rest = [(p['solid'], p['color']) for k, p in R.PARTS.items() if k not in ('mono_upper_arm_bottom', 'mono_upper_arm_top')]
+    rest += [(R.balls(), (0.75, 0.77, 0.80)), (xf(SERVO, R.servo_frame()), (0.12, 0.12, 0.14)), (R.CONTEXT['servo_board'], (0.10, 0.35, 0.20))]
+    fig = plt.figure(figsize=(24, 14), facecolor='white')
+    draw(fig.add_subplot(2, 3, 1, projection='3d'), items + ctx, 25, -55, zoom=1.1,
+         title='DRAFT mono shoulder ring on the lift carriage\n(teal: the arm\'s collar round the rotor; grey: lift parts, estimated)')
+    draw(fig.add_subplot(2, 3, 2, projection='3d'), items + ctx, 12, -35, zoom=2.4, center=(45, 0, 45),
+         title='the arm holds the ring with a COLLAR all the way round it\n(6 radial M3 into the rotor; the old lug + 4 screws are gone)')
+    draw(fig.add_subplot(2, 3, 3, projection='3d'), [up(it) for it in lifted] + rest + ctx, 22, -50, zoom=1.0,
+         title='exploded: the arm lifted off; its collar slides down over the rotor')
+    draw(fig.add_subplot(2, 3, 4, projection='3d'), items + ctx, 0, -90, cut=box(-200, 200, 0, 200, -200, 300), zoom=1.6,
+         center=(10, 0, 40), title='section (y = 0): hub = inner race, 2 ball rows, 3-ring rotor\n(outer race), top cap, the arm collar (teal) round the rotor')
+    draw(fig.add_subplot(2, 3, 5, projection='3d'), items + ctx, 25, 125, zoom=1.1,
+         title='from behind: L bracket to the gantry plate, drive servo + pinion')
     u = R.PIN_C
-    draw(fig.add_subplot(2, 2, 4, projection='3d'), items + ctx, 15, 80, zoom=2.2, center=(u[0], u[1] + 10, 5),
-         title='drive: STS3215 in the cradle (output up), 18 T pinion on the 72 T rotor gear, slotted for backlash')
-    plt.tight_layout(); plt.savefig(path, dpi=55); plt.close(fig)
+    draw(fig.add_subplot(2, 3, 6, projection='3d'), items + ctx, 15, 80, zoom=2.2, center=(u[0], u[1] + 10, 5),
+         title='drive: STS3215 in the cradle (output up), 18 T pinion\non the 72 T rotor gear, slotted for backlash')
+    plt.tight_layout(); plt.savefig(path, dpi=60); plt.close(fig)

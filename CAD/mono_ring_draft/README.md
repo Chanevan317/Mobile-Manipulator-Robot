@@ -14,7 +14,7 @@ shoulder fork. Everything from the elbow outward (forearm, wrist, pitch, roll, g
 ```
         top cap (fixed) ──────────────┐   camera post socket, inner wall of the cable channel
    ┌── rotor top ring ────┐ ● row B   │   57 steel balls (6 mm) in grooves of the hub and the rotor
-   │   rotor middle ring  │           ├── the rotor turns with the arm; the upper arm sits on the middle ring's lug
+   │   rotor middle ring  │           ├── the rotor turns with the arm; the upper arm's COLLAR wraps all three rings
    └── rotor bottom ring ─┘ ● row A   │   57 more balls; the bottom ring carries the 72 T gear
         hub (fixed) = inner race ─────┘   part of the ring base; the beam passes through its 44 x 84 hole
         ring base disc (fixed) ── rests on the gantry plate's top edge, held by the L bracket behind it
@@ -46,9 +46,16 @@ shoulder fork. Everything from the elbow outward (forearm, wrist, pitch, roll, g
    the ring base, 1 mm away. With the 4 : 1 gear the servo needs several turns for the full range, and after power-up
    it only knows its angle within one turn; one pass over the magnet tells which turn it's on. Home = arm pointing
    forward.
-7. **The upper arm** is the prototype's upper arm with its shoulder fork cut off (from 70 mm out). Its tube sits in a
-   saddle on the rotor's lug, with 4 × M3 from inside the tube. A new bolt pair at 76 mm holds the two halves together
-   at that end, where the fork's bolts used to be.
+7. **The upper arm** is the prototype's upper arm with its shoulder fork cut off (from 70 mm out). Its bottom half has
+   a **collar that wraps all the way round the rotor** (5.6 mm wall, from just above the gear up to the arm's split line),
+   screwed to the rotor's middle ring with **6 radial M3** around the ring. A bolt pair at 76 mm holds the two halves
+   together at that end, where the fork's bolts used to be.
+
+   **Why the collar (2026-11-12):** the first draft held the arm on a small lug under the tube with 4 × M3 in one row,
+   only 6.5 mm from the edge the arm tips over. The arm (1.76 kg, its centre of mass 266 mm out) plus a 0.25 kg product
+   puts about **4.3 N·m** on that joint at rest, roughly twice that while moving: about 650 N of pull on those four
+   screws, enough to tear them out of the 3 mm tube floor. The collar spreads the same load round the ring's
+   140 mm diameter and its 34 mm height: about 130 N of contact at rest, shared by the whole collar.
 
 **Why everything is so low:** the forearm's lower fork prong hangs 33.6 mm under the arm, and when the elbow passes
 over a spot it sweeps everything between 92 and 168 mm from the column. So everything fixed out there stays under the
@@ -58,12 +65,12 @@ pinion's top (30.5 mm on the carriage scale; the prong is at 31.9).
 
 | # | File | What | Turns? | Print |
 |---|---|---|---|---|
-| M01 | `M01_mono_upper_arm_bottom.stl` | Upper arm bottom half, fork cut off | yes | split face down (as the prototype) |
+| M01 | `M01_mono_upper_arm_bottom.stl` | Upper arm bottom half, fork cut off, **collar round the rotor** | yes | split face down (as the prototype); the collar stands on the bed too |
 | M02 | `M02_mono_upper_arm_top.stl` | Upper arm top half, fork cut off | yes | split face down |
 | M03 | `M03_ring_base.stl` | Disc + hub = inner race (2 ball grooves) | no | disc down |
 | M04 | `M04_clamp_ring.stl` | Top cap: camera-post socket, inner wall of the cable channel | no | flat |
 | M05 | `M05_rotor_bottom.stl` | Outer race (lower half of row A) + 72 T gear + homing magnet | yes | gear down |
-| M06 | `M06_rotor_middle.stl` | Outer race (rows A / B) + lug under the upper arm | yes | upside down; **supports under the lug only** |
+| M06 | `M06_rotor_middle.stl` | Outer race (rows A / B) + inserts for the collar (6) and the cable tray (3) | yes | upside down, no supports |
 | M07 | `M07_rotor_top.stl` | Outer race (upper half of row B) | yes | upside down (groove up) |
 | M08 | `M08_cable_tray.stl` | Moving outer wall + floor of the cable channel | yes | floor down |
 | M09 | `M09_drive_mount.stl` | Ear + cradle for the drive servo | no | ear down |
@@ -112,30 +119,37 @@ Everything electrical stays on the **carriage** except the arm itself:
 
 ## Assembly (draft)
 
-1. Heat-set the inserts (M03 hub top and disc underside, M05 top face, M06 lug top and tray holes, M09 ear,
+1. Heat-set the inserts (M03 hub top and disc underside, M05 top face, M06's 9 side holes (collar + tray), M09 ear,
    M02 at the 76 mm bolts). Glue the magnet into M05's inner wall and the hall sensor into the ring base rim (front).
 2. Grease both hub grooves. Slide the **bottom rotor ring** (M05) down over the hub, hold it about 1 mm above the
    disc (two 1 mm shims), and drop **57 balls** into row A, all the way round. They sit in the hub groove and the ring's
    half-groove.
-3. Put the **middle ring** (M06) on, lug toward the arm's heading. Drop **57 balls** into row B. Put the **top ring**
+3. Put the **middle ring** (M06) on (any way round). Drop **57 balls** into row B. Put the **top ring**
    (M07) on.
 4. Insert the 8 × M3 × 25 stack bolts and tighten them a little at a time, crosswise, turning the rotor as you go.
    **Stop as soon as the tilt play is gone and it still turns smoothly** (the 0.15 mm gaps may not fully close).
    Pull out the shims. Screw on the top cap (4 × M3).
 5. Lay the two cables: up through the hub hole, out through the slot in the clamp ring's wall, along the inner wall,
    U-turn, and back along the outer wall to the exit facing the arm (bus at the bottom, USB on top). Check the loop
-   with the arm at both ends of its range (±180°) before closing anything. Screw on the cable tray (3 × M3, from the side).
+   with the arm at both ends of its range (±180°) before closing anything. Set the cable tray on top, its 3 tabs down
+   the rotor's side, **but don't screw it yet** (the collar slides down over the tabs).
 6. Put the servo in the cradle from below, close it with the strap, and screw the pinion onto the horn (4 × M3).
 7. Screw the drive mount under the disc (2 × M3 in radial slots). **Set the gear backlash:** slide the mount in until
    the teeth just touch, then back it off about 0.2 mm before tightening.
 8. Fit the ring base onto the gantry plate with the L bracket (positions to be checked on the real plate).
-9. Bolt the upper arm's bottom half onto the rotor lug, then fit the elbow servo and the top half as on the prototype.
+9. Slide the upper arm's bottom half down over the rotor (its collar round the rotor, the tray tabs in the collar's
+   pockets, the tube at the cable exit) **before the camera post goes in**. Screw the collar on (6 × M3 × 10, radial),
+   then the cable tray through the collar's three small holes (3 × M3 × 8). Fit the elbow servo and the top half as on
+   the prototype; the camera post last.
 
 ## Checked (`generator/mono_ring.py`)
 
 - No clashes between the fixed parts, or with the estimated gantry plate, V-wheels and beam.
 - The rotor and upper arm turn all the way round (every 10°) without touching anything fixed.
 - The forearm folded at −117 … +117° clears the drive, the ring base and the clamp at every shoulder angle.
+- The upper arm's collar clears the three rotor rings, the balls, the cable tray and the arm's top half; the forearm
+  folds over it to ±117° (first contact at ±124°); all 6 collar screws land in their rotor inserts; the tube's
+  bolt pair at 76 mm can still be reached from below.
 - Gear: centre distance 90.00 mm = ideal (module 2, 72 + 18 teeth).
 - The balls touch nothing but their grooves (0.1 mm clearance each side before preload); the three rotor rings
   don't overlap (0.15 mm preload gap at each split).

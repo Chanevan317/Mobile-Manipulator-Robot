@@ -11,7 +11,7 @@ Frame: mm, z up from the case bottom, x = toward the tip (= push = up), y to the
 import math, os, sys, csv
 import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from lib import box, cyl, union, xf, T, Rx, Ry, Rz, mesh_arrays
+from lib import box, cyl, union, xf, T, Rx, Ry, Rz, print_mesh
 
 # CONTROLLER GRIP (user, 2026-11-12: "ergonomic shape, easy to hold like a controller", two front buttons for the index
 # and middle finger as placeholders, the Pico removable to solder wires and slid back in; replaces the 2026-11-11 wedge).
@@ -397,12 +397,12 @@ def export(out):
     rows = []
     for i, (nm, p) in enumerate(PARTS.items(), 1):
         num = f'S{i}_{nm}'
-        V, F = mesh_arrays(caps_placed() if nm == 'button_cap' else p['solid']); write_stl(os.path.join(out, 'assembly_stl', num + '.stl'), V, F)
+        V, F = print_mesh(caps_placed() if nm == 'button_cap' else p['solid']); write_stl(os.path.join(out, 'assembly_stl', num + '.stl'), V, F)
         s = xf(p['solid'], p['print_rot']); bb = s.bounding_box(); s = s.translate((-(bb[0] + bb[3]) / 2, -(bb[1] + bb[4]) / 2, -bb[2]))
-        bb = s.bounding_box(); V, F = mesh_arrays(s); write_stl(os.path.join(out, 'print_ready_stl', num + '.stl'), V, F)
+        bb = s.bounding_box(); V, F = print_mesh(s); write_stl(os.path.join(out, 'print_ready_stl', num + '.stl'), V, F)
         rows.append(dict(file=num + '.stl', qty=p.get('qty', 1), size_mm=f'{bb[3]-bb[0]:.1f} x {bb[4]-bb[1]:.1f} x {bb[5]-bb[2]:.1f}',
                          volume_cm3=round(p['solid'].volume() / 1000, 1), note=p['note']))
-    V, F = mesh_arrays(boards()); write_stl(os.path.join(out, 'assembly_stl', 'boards_assumed.stl'), V, F)
+    V, F = print_mesh(boards()); write_stl(os.path.join(out, 'assembly_stl', 'boards_assumed.stl'), V, F)
     with open(os.path.join(out, 'parts.csv'), 'w', newline='') as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0])); w.writeheader(); w.writerows(rows)
     return rows

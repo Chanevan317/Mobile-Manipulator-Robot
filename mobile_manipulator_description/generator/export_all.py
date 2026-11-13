@@ -3,6 +3,7 @@ sys.path.insert(0, '.')
 from build import *
 from export import write_glb, write_3mf, write_obj, write_step
 from stlio import write_stl
+from lib import print_mesh
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else '../../CAD/SCARA_arm'
 for d in ('print_ready_stl', 'assembly_stl', 'assembly_stl/purchased', 'step'):
@@ -26,7 +27,7 @@ asm_items = []; print_rows = []
 for i, (nm, p) in enumerate(arm.PARTS.items(), 1):
     num = f'{i:02d}_{nm}'
     sw = xf(p['solid'], p['frame'])
-    V, Fc = mesh_arrays(sw)
+    V, Fc = print_mesh(sw)
     write_stl(os.path.join(OUT, 'assembly_stl', num + '.stl'), V, Fc)
     asm_items.append(dict(name=num, V=V, F=Fc, color=p['color']))
     if nm == 'camera_cradle':
@@ -37,7 +38,7 @@ for i, (nm, p) in enumerate(arm.PARTS.items(), 1):
     s = xf(loc, PRINT_ROT.get(nm, np.eye(4)))
     bb = s.bounding_box()
     s = s.translate((-(bb[0] + bb[3]) / 2, -(bb[1] + bb[4]) / 2, -bb[2]))
-    V2, F2 = mesh_arrays(s); bb = s.bounding_box()
+    V2, F2 = print_mesh(s); bb = s.bounding_box()
     write_stl(os.path.join(OUT, 'print_ready_stl', num + '.stl'), V2, F2)
     print_rows.append(dict(file=num + '.stl', part=nm, qty_per_arm=1, qty_two_arms=2,
                            size_mm=f'{bb[3]-bb[0]:.1f} x {bb[4]-bb[1]:.1f} x {bb[5]-bb[2]:.1f}',
@@ -46,9 +47,9 @@ for i, (nm, p) in enumerate(arm.PARTS.items(), 1):
 # calibration plate (not part of the robot): clamp on a table edge for calibration / bench tests
 from test_stand import stand
 _cp = stand(); _num = f'{len(arm.PARTS) + 1:02d}_calibration_plate'
-V, Fc = mesh_arrays(_cp); write_stl(os.path.join(OUT, 'assembly_stl', _num + '.stl'), V, Fc)
+V, Fc = print_mesh(_cp); write_stl(os.path.join(OUT, 'assembly_stl', _num + '.stl'), V, Fc)
 _bb = _cp.bounding_box(); _cpp = _cp.translate((-(_bb[0] + _bb[3]) / 2, -(_bb[1] + _bb[4]) / 2, -_bb[2]))
-V2, F2 = mesh_arrays(_cpp); write_stl(os.path.join(OUT, 'print_ready_stl', _num + '.stl'), V2, F2)
+V2, F2 = print_mesh(_cpp); write_stl(os.path.join(OUT, 'print_ready_stl', _num + '.stl'), V2, F2)
 print_rows.append(dict(file=_num + '.stl', part='calibration_plate', qty_per_arm=1, qty_two_arms=1,
                        size_mm=f'{_bb[3]-_bb[0]:.1f} x {_bb[4]-_bb[1]:.1f} x {_bb[5]-_bb[2]:.1f}', volume_cm3=round(_cp.volume() / 1000, 1),
                        note='optional: bench / calibration plate, C-clamp on a table edge; 4 x M5 x 12 from below into the base inserts'))
@@ -56,13 +57,13 @@ print_rows.append(dict(file=_num + '.stl', part='calibration_plate', qty_per_arm
 from insert_test import block as _insert_block
 _ib = _insert_block(); _num = f'{len(arm.PARTS) + 2:02d}_insert_test_block'
 _bb = _ib.bounding_box(); _ib = _ib.translate((-(_bb[0] + _bb[3]) / 2, -(_bb[1] + _bb[4]) / 2, -_bb[2]))
-V2, F2 = mesh_arrays(_ib); write_stl(os.path.join(OUT, 'print_ready_stl', _num + '.stl'), V2, F2)
+V2, F2 = print_mesh(_ib); write_stl(os.path.join(OUT, 'print_ready_stl', _num + '.stl'), V2, F2)
 print_rows.append(dict(file=_num + '.stl', part='insert_test_block', qty_per_arm=1, qty_two_arms=1,
                        size_mm=f'{_bb[3]-_bb[0]:.1f} x {_bb[4]-_bb[1]:.1f} x {_bb[5]-_bb[2]:.1f}', volume_cm3=round(_ib.volume() / 1000, 1),
                        note='print first: M3 holes 4.1-4.5 and M5 holes 6.2-6.6 (small end at the notch) to pick the insert hole size'))
 pur_items = []
 for b in B:
-    V, Fc = mesh_arrays(b['solid'])
+    V, Fc = print_mesh(b['solid'])
     fn = b['name'].split(' ')[0]
     write_stl(os.path.join(OUT, 'assembly_stl', 'purchased', fn + '.stl'), V, Fc)
     pur_items.append(dict(name=b['name'], V=V, F=Fc, color=b['color'], metal=b.get('metal', 0)))
@@ -74,7 +75,7 @@ for f in FS:
     groups[key].append(fastener_solid(f))
 fast_items = []
 for key, sols in sorted(groups.items()):
-    V, Fc = mesh_arrays(union(sols))
+    V, Fc = print_mesh(union(sols))
     col = (0.85, 0.65, 0.20) if key.startswith('insert') else (0.55, 0.57, 0.60) if key.startswith('nut') else (0.08, 0.08, 0.09)
     write_stl(os.path.join(OUT, 'assembly_stl', 'purchased', 'fasteners_' + key + '.stl'), V, Fc)
     fast_items.append(dict(name='fasteners_' + key, V=V, F=Fc, color=col, metal=0.6))

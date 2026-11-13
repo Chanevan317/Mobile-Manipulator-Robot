@@ -3,7 +3,7 @@ SHCS,M2,6,2,strap to cradle
 insert,M2,4,2,strap
 self-tap,M2,6,2,servo case (output face)
 self-tap,M2,6,2,servo case (idler face)
-SHCS,M3,10,4,upper arm to rotor (from inside the tube)
+SHCS,M3,10,6,upper arm collar to rotor (radial)
 SHCS,M3,10,4,pinion to servo horn
 SHCS,M3,10,3,board mount to ring base
 SHCS,M3,12,2,drive mount (slotted: slide it to set the gear backlash)
@@ -16,7 +16,7 @@ insert,M3,4,8,rotor stack
 insert,M3,4,3,cable tray
 insert,M3,6,4,clamp ring
 insert,M3,6,3,board mount
-insert,M3,6,4,upper arm to rotor
+insert,M3,6,6,upper arm collar
 insert,M3,6,2,drive mount to ring base
 insert,M3,8,2,upper arm halves (rotor end)
 SHCS,M5,12,2,bracket to ring base

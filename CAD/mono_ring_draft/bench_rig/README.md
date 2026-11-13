@@ -18,7 +18,7 @@ takes their place.
 | # | File | What | Print |
 |---|---|---|---|
 | R01 | `R01_rig_foot.stl` | Lift stand-in: base plate, a stand-in for the gantry plate (the disc sits on its top edge, the L bracket bolts to it) and a hollow 40 × 80 beam stub | flat; 185 × 180 × 188 mm, 350 cm³ |
-| R02 | `R02_test_lever.stl` | Stands in for the upper arm: bolts to the rotor lug with the arm's 4 × M3; weight holes at 150 / 200 / 250 / 290 mm | flat (floor down) |
+| R02 | `R02_test_lever.stl` | Stands in for the upper arm: the same collar round the rotor as the arm (6 radial M3); weight holes at 150 / 200 / 250 / 290 mm | upside down (top face on the bed) |
 
 From the ring: M03 ring base, M04 top cap, M05–M07 rotor rings, M08 cable tray, M09–M11 drive mount, strap, pinion,
 M12 L bracket, M13 board mount (optional, for the real cable path). Plus the 114 steel balls, the drive STS3215,
@@ -29,7 +29,8 @@ the magnet and the hall sensor.
 1. Assemble the ring as in `../README.md` (Assembly, steps 1–7): balls, rotor rings, stack bolts, top cap, drive.
 2. Lower the ring base over the beam stub until the disc sits on the stand-in's top edge. Bolt the L bracket (M12) to
    the disc (2 × M5) and to the stand-in (4 × M5 + nyloc nuts on the front face). This also checks the bracket.
-3. Bolt the test lever onto the rotor lug (4 × M3 × 12).
+3. Slide the test lever's collar down over the rotor (the cable tray's tabs in its pockets) and screw it on
+   (6 × M3 × 10, radial); then the cable tray through the collar's small holes (3 × M3 × 8).
 4. C-clamp the foot's rear corners to a sturdy table with the lever's side (**+x**) over the edge, so weights can
    hang free.
 5. Plug the drive servo into the Waveshare board (on M13, or loose on the table), board power 7.4 V, USB to the PC.

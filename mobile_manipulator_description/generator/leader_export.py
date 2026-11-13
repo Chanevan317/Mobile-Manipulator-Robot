@@ -4,7 +4,7 @@ import sys, os, csv, collections
 sys.path.insert(0, '.')
 import numpy as np
 import leader as LD
-from lib import xf, Rx, Ry, mesh_arrays
+from lib import xf, Rx, Ry, print_mesh
 from stlio import write_stl
 OUT = sys.argv[1] if len(sys.argv) > 1 else '../../CAD/leader_arm'
 for d in ('print_ready_stl', 'assembly_stl', 'assembly_stl/mono', 'assembly_stl/proto'):
@@ -20,7 +20,7 @@ for nm, p in list(LD.PARTS.items()) + list(LD.BASE_PARTS.items()):
     i += 1; num = f'{i:02d}_{nm}'
     s = xf(p['solid'], PRINT_ROT.get(nm, np.eye(4)))
     bb = s.bounding_box(); s = s.translate((-(bb[0] + bb[3]) / 2, -(bb[1] + bb[4]) / 2, -bb[2])); bb = s.bounding_box()
-    V, Fc = mesh_arrays(s); write_stl(os.path.join(OUT, 'print_ready_stl', num + '.stl'), V, Fc)
+    V, Fc = print_mesh(s); write_stl(os.path.join(OUT, 'print_ready_stl', num + '.stl'), V, Fc)
     arm = nm in LD.PARTS
     rows.append(dict(file=num + '.stl', part=nm, group='arm module' if arm else 'base',
                      qty_mono=1 if arm else p['qty_mono'], qty_proto=2 if arm else p['qty_proto'],
@@ -28,7 +28,7 @@ for nm, p in list(LD.PARTS.items()) + list(LD.BASE_PARTS.items()):
                      volume_cm3=round(p['solid'].volume() / 1000, 1), note=p['note']))
 for variant in ('mono', 'proto'):                                       # assemblies (zero pose), incl. the servos
     for nm, s, c, body in LD.world((0, 0, 0, 0, 0), variant=variant):
-        V, Fc = mesh_arrays(s); write_stl(os.path.join(OUT, 'assembly_stl', variant, nm + '.stl'), V, Fc)
+        V, Fc = print_mesh(s); write_stl(os.path.join(OUT, 'assembly_stl', variant, nm + '.stl'), V, Fc)
 with open(os.path.join(OUT, 'printed_parts.csv'), 'w', newline='') as fh:
     w = csv.DictWriter(fh, fieldnames=list(rows[0])); w.writeheader(); w.writerows(rows)
 for r in rows: print(r['file'], r['qty_mono'], r['qty_proto'], r['size_mm'], r['volume_cm3'])

@@ -47,9 +47,14 @@ PIN_A = math.radians(60.0)                  # drive position (front-left): clear
 PIN_C = (90.0 * math.cos(PIN_A), 90.0 * math.sin(PIN_A))
 ROT_IN_LOW = 65.0                           # rotor inner radius below the races (clears the disc r 64)
 ROT_OUT = 69.0                              # rotor body outer radius above the gear
-LUG = dict(x1=81.0, y=25.0, z=(31.5, 46.0))  # rotor lug: a saddle under the tube (shaped by subtracting the arm), stops before
-                                            # the elbow housing's underside screws
-BOLTS = [(74.5, y) for y in (-18.0, -8.0, 8.0, 18.0)]   # tube floor -> lug (flat strip x 72..77)
+# ARM ROOT COLLAR (2026-11-12, user: "the arm is bound to fall"): the draft held the arm on a small lug under the tube
+# with 4 x M3 in ONE row 6.5 mm from the edge it tips over: the arm (1.76 kg, COM 266 mm out) + a 0.25 kg product put
+# ~4.3 N m on it at rest (~650 N pull on those screws; about twice that moving). Now the upper arm's bottom half has a
+# COLLAR all the way round the rotor (r 69.4..75, from just above the gear to the arm's split line), screwed radially into
+# the rotor's middle ring at 6 places: the tipping load spreads over the ring's 140 mm diameter.
+COLLAR = dict(ri=ROT_OUT + 0.4, ro=75.0, z0=31.6, screw_z=43.0, screw_a=(45.0, 90.0, 135.0, 225.0, 270.0, 315.0))
+TAB_Z = 52.0                                # cable-tray tab screws (radial, into the middle ring); the draft had the
+                                            # screw at z 55 and the insert at z 49 (they missed)
 TUBE_X0 = 70.0                              # the mono upper arm starts here (the prototype's shoulder fork is cut off)
 TUBE_Z = AZ - 22.0                          # tube underside (carriage z 43.5)
 SDIR = -1                                   # servo body: -1 inward (toward the column, under the disc), +1 outward
@@ -65,6 +70,7 @@ CH = dict(ri=56.0, ro=66.0, floor=(60.0, 62.0), top=76.0)
 CABLE_HOLE_XY = (27.0, -27.0)               # fixed cable: up through the hub wall from under the disc (front right of the beam)
 CABLE_A = math.atan2(CABLE_HOLE_XY[1], CABLE_HOLE_XY[0])
 TRAY_TABS = (90.0, 180.0, 270.0)             # tray tabs, away from the arm tube (+-20 deg at the rotor)
+ROT_OUT = 69.0                              # (also set below) rotor body outer radius above the gear
 HOME_A = 0.0                                # homing: magnet in the rotor's inner wall at the arm heading, hall sensor in the disc rim
 
 # ---- estimated lift hardware (carriage frame) for clearance checks ----
@@ -162,22 +168,20 @@ def rotor(arm_bottom):
     teeth = gear2d(ZR, MOD).extrude(GEAR_Z[1] - GEAR_Z[0]).translate((0, 0, GEAR_Z[0]))
     body = union([teeth, cyl(ROT_OUT, GEAR_Z[1] - 0.01, HUB_TOP)])
     s = body - cyl(ROT_IN_LOW, GEAR_Z[0] - 1, DISC_Z[1] + 1.0, hole=True) - cyl(ROT_IN, DISC_Z[1] + 0.99, HUB_TOP + 1, hole=True) - grooves()
-    z0, z1 = LUG['z']
-    lug = box(ROT_OUT - 4.0, LUG['x1'], -LUG['y'], LUG['y'], z0, z1) - cyl(ROT_IN, z0 - 1, z1 + 1, hole=True) - arm_bottom
     za, zb = BALL['rows']; g = PRELOAD / 2
-    lug_low = lug ^ box(ROT_OUT + 0.6, 200, -100, 100, z0, za)                      # the lug's part below the split: on the middle ring
-    bot = (s ^ box(-200, 200, -200, 200, 0, za - g)) - box(ROT_OUT + 0.6, 200, -LUG['y'] - 1, LUG['y'] + 1, z0 - 0.01, za)
-    mid = union([s ^ box(-200, 200, -200, 200, za + g, zb - g), lug ^ box(-200, 200, -200, 200, za + g, z1), lug_low])
+    bot = s ^ box(-200, 200, -200, 200, 0, za - g)
+    mid = s ^ box(-200, 200, -200, 200, za + g, zb - g)
     top = s ^ box(-200, 200, -200, 200, zb + g, 100)
     rb, rm, rt = Reg(), Reg(), Reg(); cb, cm, ct = [], [], []
-    for (x, y) in BOLTS:                     # upper arm tube floor bolts down into the lug
-        p = (x, y, TUBE_Z)
-        cm.append(insert_cut(p, (0, 0, -1), 'M3', length=6)); rm.add('insert', 'M3', p, (0, 0, -1), 6, 'upper arm to rotor')
+    for a in COLLAR['screw_a']:              # the upper arm's collar screws radially into the middle ring
+        u = np.array([math.cos(math.radians(a)), math.sin(math.radians(a)), 0.0])
+        p = tuple(u * ROT_OUT + np.array([0, 0, COLLAR['screw_z']]))
+        cm.append(insert_cut(p, -u, 'M3', length=6)); rm.add('insert', 'M3', p, tuple(-u), 6, 'upper arm collar')
     cb.append(xf(along(cyl(2.6, -0.1, 3.2, hole=True), 'x'), T(ROT_IN_LOW * math.cos(HOME_A), ROT_IN_LOW * math.sin(HOME_A), 25.5) @ Rz(math.degrees(HOME_A))))
     rb.add('part', 'magnet 5 x 3', (ROT_IN_LOW, 0, 25.5), (1, 0, 0), None, 'homing magnet (glue in)')
     for a in TRAY_TABS:                      # cable tray: radial M3 into the middle ring
         u = np.array([math.cos(math.radians(a)), math.sin(math.radians(a)), 0.0])
-        p = tuple(u * ROT_OUT + np.array([0, 0, 49.0]))
+        p = tuple(u * ROT_OUT + np.array([0, 0, TAB_Z]))
         cm.append(insert_cut(p, -u, 'M3', length=4)); rm.add('insert', 'M3', p, tuple(-u), 4, 'cable tray')
     for a in STACK['angles']:                # stack bolts: top + middle -> inserts in the bottom ring (preload)
         u = np.array([math.cos(math.radians(a)), math.sin(math.radians(a)), 0.0]) * STACK['r']
@@ -190,10 +194,28 @@ def rotor(arm_bottom):
     add('rotor_bottom', bot - union(cb), True, (0.85, 0.45, 0.15), rb,
         f'outer race (lower half of row A) + {ZR} T m{MOD:g} gear + homing magnet; prints gear down, 6 walls', np.eye(4))
     add('rotor_middle', mid - union(cm), True, (0.90, 0.52, 0.20), rm,
-        'outer race (upper half of row A, lower half of row B) + lug under the upper arm; prints upside down (its top '
-        'face on the bed), SUPPORTS under the lug only, 6 walls', Rx(180))
+        'outer race (upper half of row A, lower half of row B) + inserts for the upper arm collar and the cable tray; '
+        'prints upside down (its top face on the bed), 6 walls', Rx(180))
     add('rotor_top', top - union(ct), True, (0.85, 0.45, 0.15), rt, 'outer race (upper half of row B); prints upside down '
         '(groove up), 6 walls', Rx(180))
+
+
+def collar(reg, note):
+    """The arm-root collar round the rotor (r COLLAR ri..ro, from just above the gear to the arm's split line) and its
+    cuts: 6 radial M3 into the rotor's middle ring, pockets + screwdriver holes for the cable tray's 3 tabs."""
+    C = COLLAR
+    col = ring(C['ri'], C['ro'], C['z0'], AZ)
+    cut = []
+    for a in TRAY_TABS:
+        u = np.array([math.cos(math.radians(a)), math.sin(math.radians(a)), 0.0])
+        cut.append(xf(box(C['ri'] - 1.0, ROT_OUT + 3.6, -6.6, 6.6, TAB_Z - 4.6, AZ + 1), Rz(a)))    # tab pocket
+        cut.append(xf(along(cyl(3.3, 0, 20.0), 'x'), T(u[0] * (ROT_OUT + 2.0), u[1] * (ROT_OUT + 2.0), TAB_Z) @ Rz(a)))        # driver access
+    for a in C['screw_a']:
+        u = np.array([math.cos(math.radians(a)), math.sin(math.radians(a)), 0.0])
+        p = tuple(u * (C['ro'] - 2.0) + np.array([0, 0, C['screw_z']]))
+        cut.append(screw_cut(p, -u, 'M3', (C['ro'] - 2.0 - ROT_OUT) + 6.0, cb=3.0))
+        reg.add('SHCS', 'M3', p, tuple(-u), int(round(C['ro'] - 2.0 - ROT_OUT + 6.0)), note)   # M3 x 10
+    return col, cut
 
 
 def mono_upper_arm():
@@ -221,12 +243,11 @@ def mono_upper_arm():
         cut.append(screw_cut((xb, sy * yb, seat), (0, 0, 1), 'M3', AZ - seat + 0.2, cb=3.2))
         r.add('SHCS', 'M3', (xb, sy * yb, seat), (0, 0, 1), 25, 'upper arm halves (rotor end)')
     out['upper_arm_top'] = out['upper_arm_top'] - union(ct)
-    for (x, y) in BOLTS:
-        seat = TUBE_Z + 3.0                                      # on the tube floor (3 mm), heads inside the tube
-        cut.append(screw_cut((x, y, seat), (0, 0, -1), 'M3', 3.0 + 6.0, cb=0.0))
-        r.add('SHCS', 'M3', (x, y, seat), (0, 0, -1), 10, 'upper arm to rotor (from inside the tube)')
+    tube_in = box(TUBE_X0 - 8.0, TUBE_X0 + 20.0, -22.0, 22.0, TUBE_Z + 3.0, AZ + 1)               # the tube's inside
+    col, ccut = collar(r, 'upper arm collar to rotor (radial)')
+    out['upper_arm_bottom'] = union([out['upper_arm_bottom'], col]) - union(ccut + [tube_in])
     add('mono_upper_arm_bottom', out['upper_arm_bottom'] - union(cut), True, (0.33, 0.56, 0.86), r,
-        'prototype upper_arm_bottom without its shoulder fork (x >= 70); bolts onto the rotor lug; prints split face down', Rx(180))
+        'prototype upper_arm_bottom without its shoulder fork (x >= 70) + a collar round the rotor (6 radial M3); prints split face down', Rx(180))
     add('mono_upper_arm_top', out['upper_arm_top'], True, (0.25, 0.48, 0.80), rt,
         'prototype upper_arm_top without its shoulder fork (x >= 70); prints split face down', np.eye(4))
     return out['upper_arm_bottom']
@@ -243,9 +264,9 @@ def cable_tray():
     tabs, cut = [], []
     for a in TRAY_TABS:
         R_ = Rz(a)
-        tabs.append(xf(box(ROT_OUT - 0.01, ROT_OUT + 3.0, -6.0, 6.0, 49.0, f1), R_))
+        tabs.append(xf(box(ROT_OUT - 0.01, ROT_OUT + 3.0, -6.0, 6.0, TAB_Z - 4.0, f1), R_))
         u = np.array([math.cos(math.radians(a)), math.sin(math.radians(a)), 0.0])
-        p = tuple(u * (ROT_OUT + 3.0) + np.array([0, 0, 55.0]))
+        p = tuple(u * (ROT_OUT + 3.0) + np.array([0, 0, TAB_Z]))
         cut.append(screw_cut(p, -u, 'M3', 3.0 + 4.0)); r.add('SHCS', 'M3', p, tuple(-u), 8, 'cable tray to rotor')
     s = union([s] + tabs) - union(cut)
     add('cable_tray', s, True, (0.85, 0.45, 0.15), r,
@@ -439,6 +460,21 @@ def check():
     res_ch = f'cable channel {ch_w:.0f} mm wide x {ch_h:.0f} mm tall, reversing-loop range +-{rng:.0f} deg, cable in the loop ~{(CH["ro"] * math.pi + 40) / 1000:.2f} m each'
     print(res_ch)
     if hits: res.append(f'forearm hits the fixed ring parts at {dict(list(hits.items())[:8])} ({len(hits)} poses)')
+    # 7) the arm's collar: clear of the rotor rings, the tray, the balls and the top half; the forearm folding back
+    #    over it; each radial collar screw lands in its rotor insert
+    ab = PARTS['mono_upper_arm_bottom']['solid']
+    for k in ('rotor_bottom', 'rotor_middle', 'rotor_top', 'cable_tray', 'mono_upper_arm_top', 'clamp_ring', 'ring_base'):
+        v = (ab ^ PARTS[k]['solid']).volume()
+        if v > 0.5: res.append(f'upper arm collar x {k}: {v:.1f} mm3')
+    v = (ab ^ brg).volume()
+    if v > 0.5: res.append(f'upper arm collar x balls: {v:.1f} mm3')
+    fh = [el for el in range(-117, 118, 9) if (forearm_at(0, el) ^ ab).volume() > 0.5]
+    if fh: res.append(f'forearm hits the upper arm / collar at elbow {fh}')
+    mid = PARTS['rotor_middle']['solid']
+    for a in COLLAR['screw_a']:
+        u = np.array([math.cos(math.radians(a)), math.sin(math.radians(a))]) * (ROT_OUT - 3.0)
+        if (cyl(0.5, COLLAR['screw_z'] - 0.1, COLLAR['screw_z'] + 0.1, u[0], u[1]) ^ mid).volume() > 0.01:
+            res.append(f'collar screw at {a} deg misses its insert')
     # 4) the balls sit in their grooves (no overlap with the hub / rotor / cap)
     for k in ('ring_base', 'rotor_bottom', 'rotor_middle', 'rotor_top', 'clamp_ring'):
         v = (PARTS[k]['solid'] ^ brg).volume()
@@ -457,7 +493,7 @@ if __name__ == '__main__':
     import mono_ring as MR                     # one module instance (the export imports it too)
     out = sys.argv[1] if len(sys.argv) > 1 else os.path.join('..', '..', 'CAD', 'mono_ring_draft')
     tz = MR.build_all()
-    print(f'upper-arm tube underside (lug top) at carriage z {tz:.2f}')
+    print(f'upper-arm tube underside at carriage z {tz:.2f}')
     res, g, pin_out = MR.check()
     print(g); print(f'pinion reaches r {pin_out:.1f}; forearm prong sweeps r 92..168 above z {AZ - 33.6:.1f}; pinion top {GEAR_Z[1]}')
     print('problems:', res if res else 'none')

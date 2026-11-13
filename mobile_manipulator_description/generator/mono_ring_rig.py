@@ -5,7 +5,7 @@ the cable loop over +-180 deg, and the arm's tipping load.
 Two new prints; every ring part (M03..M13 except the upper arm halves) is used as it is:
   rig_foot     base plate (C-clamped to a table edge) + a stand-in for the gantry plate (top edge at carriage z 20, with
                the same ESTIMATED M5 holes as the L bracket M12) + a hollow 40 x 80 beam stub through the hub
-  test_lever   bolts to the rotor lug with the arm's 4 x M3; holes at 150 / 200 / 250 / 290 mm for weights.
+  test_lever   the arm's collar round the rotor (6 radial M3), as the upper arm; holes at 150 / 200 / 250 / 290 mm for weights.
                ~2.4 kg at 250 mm = the stretched arm + a 0.25 kg product (~6 N m)
 Frame: the ring's carriage frame (mm). The lever points along +x (shoulder 0): clamp the rig with +x over the edge.
 
@@ -14,14 +14,14 @@ Frame: the ring's carriage frame (mm). The lever points along +x (shoulder 0): c
 import math, os, sys
 import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from lib import box, cyl, union, xf, T, Rx, Ry, Rz, mesh_arrays
+from lib import box, cyl, union, xf, T, Rx, Ry, Rz, print_mesh
 from hw import screw_cut, insert_cut, Reg
 import mono_ring as MR
 
 FOOT_TOP = -62.0                 # below the lowest ring part (board mount -32, bracket leg -60)
 FOOT_T = 6.0
 BEAM_TOP = 120.0                 # beam stub top (through the hub and the top cap)
-LEVER = dict(x0=70.0, x1=300.0, w=20.0, h=20.0, holes=(150.0, 200.0, 250.0, 290.0))
+LEVER = dict(x0=70.0, x1=300.0, w=20.0, h=22.0, holes=(150.0, 200.0, 250.0, 290.0))   # top flush with the collar (z 65.5)
 PARTS = {}
 
 
@@ -53,18 +53,15 @@ def test_lever():
     L = LEVER; r = Reg(); zb = MR.TUBE_Z
     s = box(L['x0'], L['x1'], -L['w'], L['w'], zb, zb + L['h'])
     s = s - box(L['x0'] + 20.0, L['x1'] - 15.0, -L['w'] + 4.0, L['w'] - 4.0, zb + 4.0, zb + L['h'] + 1)   # open-top channel
-    cut = []
-    for (x, y) in MR.BOLTS:                 # same 4 x M3 as the upper arm, heads 6 mm above the lug
-        seat = zb + 6.0
-        cut.append(screw_cut((x, y, seat), (0, 0, -1), 'M3', 6.0 + 6.0, cb=L['h'] - 6.0 + 0.5))
-        r.add('SHCS', 'M3', (x, y, seat), (0, 0, -1), 12, 'lever to the rotor lug')
+    col, cut = MR.collar(r, 'lever collar to the rotor (radial), as the arm')   # the same collar as the upper arm
+    s = union([s, col])
     for x in L['holes']:                     # weight holes (string / S-hook) through the floor
         cut.append(cyl(3.0, zb - 1, zb + 5, x, 0.0, hole=True))
     cut.append(box(L['x1'] - 3.0, L['x1'] + 1, -1.0, 1.0, zb + L['h'] - 3.0, zb + L['h'] + 1))   # tip mark (measure sag here)
     cut.append(box(L['x0'] - 1, L['x0'] + 18.0, -4.0, 4.0, zb + L['h'] - 6.0, zb + L['h'] + 1))  # cable from the tray exit
-    PARTS['test_lever'] = dict(solid=s - union(cut), reg=r, color=(0.95, 0.75, 0.20), print_rot=np.eye(4),
-                               note='stands in for the upper arm on the rotor lug; weights at 150 / 200 / 250 / 290 mm; '
-                                    'prints flat (floor down)')
+    PARTS['test_lever'] = dict(solid=s - union(cut), reg=r, color=(0.95, 0.75, 0.20), print_rot=Rx(180),
+                               note='stands in for the upper arm: the same collar round the rotor (6 radial M3); weights at '
+                                    '150 / 200 / 250 / 290 mm; prints upside down (top face + collar top on the bed)')
 
 
 def build():
@@ -109,10 +106,10 @@ def export(out):
     rows = []
     for i, (nm, p) in enumerate(PARTS.items(), 1):
         num = f'R{i:02d}_{nm}'
-        V, F = mesh_arrays(p['solid']); write_stl(os.path.join(out, 'assembly_stl', num + '.stl'), V, F)
+        V, F = print_mesh(p['solid']); write_stl(os.path.join(out, 'assembly_stl', num + '.stl'), V, F)
         s = xf(p['solid'], p['print_rot']); bb = s.bounding_box()
         s = s.translate((-(bb[0] + bb[3]) / 2, -(bb[1] + bb[4]) / 2, -bb[2])); bb = s.bounding_box()
-        V, F = mesh_arrays(s); write_stl(os.path.join(out, 'print_ready_stl', num + '.stl'), V, F)
+        V, F = print_mesh(s); write_stl(os.path.join(out, 'print_ready_stl', num + '.stl'), V, F)
         rows.append(dict(file=num + '.stl', size_mm=f'{bb[3]-bb[0]:.1f} x {bb[4]-bb[1]:.1f} x {bb[5]-bb[2]:.1f}',
                          volume_cm3=round(p['solid'].volume() / 1000, 1), note=p['note']))
     with open(os.path.join(out, 'rig_parts.csv'), 'w', newline='') as f:
@@ -148,7 +145,7 @@ def render(path):
     draw(fig.add_subplot(1, 2, 1, projection='3d'), items, 25, -60, zoom=1.05,
          title='ring bench rig: foot (lift stand-in) + the ring parts + test lever (weights at 150..290 mm)')
     draw(fig.add_subplot(1, 2, 2, projection='3d'), items, 0, -90, cut=box(-300, 400, 0, 200, -200, 300), zoom=1.3,
-         center=(60, 0, 20), title='section (y = 0): foot, gantry stand-in + L bracket, ball races, lever on the lug')
+         center=(60, 0, 20), title='section (y = 0): foot, gantry stand-in + L bracket, ball races, lever collar round the rotor')
     plt.tight_layout(); plt.savefig(path, dpi=55); plt.close(fig)
 
 

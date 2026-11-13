@@ -76,3 +76,42 @@ def along(solid_z, axis):
 def mesh_arrays(solid):
     mm = solid.to_mesh()
     return np.asarray(mm.vert_properties)[:, :3].astype(np.float64), np.asarray(mm.tri_verts).astype(np.int64)
+
+
+PRINT_TOL = 0.005   # mm
+
+
+def print_mesh(solid, tol=PRINT_TOL):
+    """mesh_arrays for files people print or import (STL / 3MF / STEP / GLB / OBJ), cleaned so slicers see a closed,
+    2-manifold mesh. Booleans of shapes that nearly touch (e.g. the servo pocket's 0.1 mm sweep layers) leave points a
+    few microns apart; written as float32 they collapse into zero-area triangles and edges shared by 4 faces, which
+    slicers call non-manifold (2026-11-13: Bambu Studio on 14_roll_yoke_gripper_housing; 21 print files had them).
+    1) snap points to a `tol` grid, drop the collapsed triangles and back-to-back face pairs; keep it only if it
+       rebuilds as a valid solid (else the plain mesh); 2) where two surfaces still touch along a line (two points at
+       the same place), move each point 2 x tol toward its own faces, so the line opens by ~0.01 mm. Shape and volume
+       change by microns only."""
+    import collections
+    V0, F0 = mesh_arrays(solid.as_original())
+    U, inv = np.unique(np.round(V0 / tol) * tol, axis=0, return_inverse=True)
+    G = inv.ravel()[F0]
+    G = G[(G[:, 0] != G[:, 1]) & (G[:, 1] != G[:, 2]) & (G[:, 0] != G[:, 2])]
+    cnt = collections.Counter(tuple(sorted(f)) for f in G)
+    G = np.array([f for f in G if cnt[tuple(sorted(f))] == 1], dtype=np.int64)
+    try:
+        S = M(m.Mesh(vert_properties=U.astype(np.float32), tri_verts=G.astype(np.uint32)))
+        ok = S.status() == m.Error.NoError and abs(S.volume() - solid.volume()) < 1e-3 * max(1.0, abs(solid.volume()))
+    except Exception:
+        ok = False
+    V, F = mesh_arrays(S) if ok else (V0, F0)
+    from scipy.spatial import cKDTree                       # points (nearly) at the same place: within 0.001 mm
+    dup = np.array(sorted({i for pr in cKDTree(V).query_pairs(1e-3) for i in pr}), dtype=np.int64)
+    if len(dup):
+        cen = V[F].mean(axis=1)
+        acc = np.zeros_like(V); n = np.zeros(len(V))
+        for k in range(3):
+            np.add.at(acc, F[:, k], cen); np.add.at(n, F[:, k], 1)
+        V = V.copy()
+        for i in dup:
+            d = acc[i] / max(n[i], 1) - V[i]; L = np.linalg.norm(d)
+            if L > 0: V[i] = V[i] + d / L * 2 * tol
+    return V, F
