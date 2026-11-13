@@ -35,11 +35,11 @@
   <material name="mat_27"><color rgba="0.13 0.16 0.19 1"/></material>
   <material name="mat_28"><color rgba="0.3 0.33 0.37 1"/></material>
   <material name="mat_29"><color rgba="0.85 0.16 0.14 1"/></material>
-  <material name="mat_30"><color rgba="0.9 0.45 0.12 1"/></material>
-  <material name="mat_31"><color rgba="0.55 0.57 0.6 1"/></material>
-  <material name="mat_32"><color rgba="0.12 0.12 0.14 1"/></material>
-  <material name="mat_33"><color rgba="0.1 0.35 0.2 1"/></material>
-  <material name="mat_34"><color rgba="0.2 0.55 0.62 1"/></material>
+  <material name="mat_30"><color rgba="0.2 0.55 0.62 1"/></material>
+  <material name="mat_32"><color rgba="0.9 0.45 0.12 1"/></material>
+  <material name="mat_33"><color rgba="0.55 0.57 0.6 1"/></material>
+  <material name="mat_34"><color rgba="0.12 0.12 0.14 1"/></material>
+  <material name="mat_35"><color rgba="0.1 0.35 0.2 1"/></material>
   <link name="base_link">
     <inertial><origin xyz="0 0 0" rpy="0 0 0"/><mass value="0.001"/><inertia ixx="1e-08" ixy="0" ixz="0" iyy="1e-08" iyz="0" izz="1e-08"/></inertial>
   </link>
@@ -429,18 +429,18 @@
   <joint name="lift" type="prismatic"><parent link="base_link"/><child link="carriage"/><origin xyz="0.18 0 0.42" rpy="0 0 0"/><axis xyz="0 0 1"/><limit lower="0" upper="0.81" effort="300" velocity="0.1"/><dynamics damping="50" friction="5"/></joint>
   <link name="left_base">
     <inertial><origin xyz="0.00357164 0.00512138 -0.0633279" rpy="0 0 0"/><mass value="0.657785"/><inertia ixx="0.00175486" ixy="-9.99245e-05" ixz="-3.8502e-05" iyy="0.00166007" iyz="5.42062e-05" izz="0.00194107"/></inertial>
-    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_ring_base.stl"/></geometry><material name="mat_31"/></visual>
-    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_inner_spacer.stl"/></geometry><material name="mat_31"/></visual>
-    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_clamp_ring.stl"/></geometry><material name="mat_31"/></visual>
-    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_gantry_bracket.stl"/></geometry><material name="mat_31"/></visual>
-    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_drive_mount.stl"/></geometry><material name="mat_31"/></visual>
-    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_drive_strap.stl"/></geometry><material name="mat_31"/></visual>
+    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_ring_base.stl"/></geometry><material name="mat_33"/></visual>
+    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_inner_spacer.stl"/></geometry><material name="mat_33"/></visual>
+    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_clamp_ring.stl"/></geometry><material name="mat_33"/></visual>
+    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_gantry_bracket.stl"/></geometry><material name="mat_33"/></visual>
+    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_drive_mount.stl"/></geometry><material name="mat_33"/></visual>
+    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_drive_strap.stl"/></geometry><material name="mat_33"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_ring_pinion.stl"/></geometry><material name="mat_18"/></visual>
-    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_board_mount.stl"/></geometry><material name="mat_31"/></visual>
+    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_board_mount.stl"/></geometry><material name="mat_33"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_bearing_1_inner.stl"/></geometry><material name="mat_04"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_bearing_2_inner.stl"/></geometry><material name="mat_04"/></visual>
-    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_ring_drive_STS3215.stl"/></geometry><material name="mat_32"/></visual>
-    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_servo_board.stl"/></geometry><material name="mat_33"/></visual>
+    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_ring_drive_STS3215.stl"/></geometry><material name="mat_34"/></visual>
+    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_servo_board.stl"/></geometry><material name="mat_35"/></visual>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/mono_ring_base_c00.stl"/></geometry></collision>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/mono_ring_base_c01.stl"/></geometry></collision>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/mono_ring_base_c02.stl"/></geometry></collision>
@@ -588,8 +588,8 @@
   </link>
   <link name="left_upper_arm">
     <inertial><origin xyz="0.0213757 -1.91108e-11 -0.0407767" rpy="0 0 0"/><mass value="0.527397"/><inertia ixx="0.000928012" ixy="-2.31872e-13" ixz="4.41813e-05" iyy="0.00226358" iyz="2.26736e-13" izz="0.00304382"/></inertial>
-    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_rotor.stl"/></geometry><material name="mat_34"/></visual>
-    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_cable_tray.stl"/></geometry><material name="mat_34"/></visual>
+    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_rotor.stl"/></geometry><material name="mat_30"/></visual>
+    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_cable_tray.stl"/></geometry><material name="mat_30"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_bearing_1_outer.stl"/></geometry><material name="mat_04"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mono_bearing_2_outer.stl"/></geometry><material name="mat_04"/></visual>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/mono_rotor_c00.stl"/></geometry></collision>
@@ -1036,7 +1036,7 @@
   <joint name="camera_mast_fixed" type="fixed"><parent link="carriage"/><child link="camera_mast"/><origin xyz="0 0 0" rpy="0 0 0"/></joint>
   <link name="scene_camera">
     <inertial><origin xyz="0 0 0" rpy="0 0 0"/><mass value="0.07"/><inertia ixx="5.97917e-05" ixy="0" ixz="0" iyy="1.01558e-05" iyz="0" izz="6.01358e-05"/></inertial>
-    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><box size="0.03 0.097 0.029"/></geometry><material name="mat_30"/></visual>
+    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><box size="0.03 0.097 0.029"/></geometry><material name="mat_32"/></visual>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><box size="0.03 0.097 0.029"/></geometry></collision>
   </link>
   <joint name="scene_camera_fixed" type="fixed"><parent link="camera_mast"/><child link="scene_camera"/><origin xyz="0.14 0 0.19" rpy="0 0.95 0"/></joint>

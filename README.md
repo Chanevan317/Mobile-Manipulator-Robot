@@ -11,6 +11,7 @@ the robot is tested in simulation (Isaac Sim, ROS 2).
 | Folder | What |
 |---|---|
 | `CAD/SCARA_arm/` | the follower arm: print files, STEP, assembly, fastener lists |
+| `CAD/dual_holder/` | two-arm robot: printed holder for both arm bases on the C-Beam carriage (and the scene camera post) |
 | `CAD/mono_ring/` | shoulder ring for the one-arm version: the arm's own base on a shelf on the ring, 2 bought 6820-2RS bearings |
 | `CAD/leader_arm/` | the leader arm for teleoperation |
 | `CAD/lift_stick/` | one-hand controller for the lift: thumbstick, dead-man and stored-position buttons |

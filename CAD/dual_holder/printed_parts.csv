@@ -1,0 +1,3 @@
+file,part,material,size_mm,volume_cm3,note
+D01_holder_left.stl,holder_left,PETG,120.3 x 117.5 x 210.0,287.6,"left half (y >= 0): pad, cheek, leg, upper layer of both laps, camera post socket; prints on its outer side face (cheek down)"
+D02_holder_right.stl,holder_right,PETG,120.3 x 105.5 x 210.0,285.2,"right half (y <= 0): pad, cheek, leg, lower layer of both laps; prints on its outer side face (cheek down)"

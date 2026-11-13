@@ -1,0 +1,6 @@
+kind,size,length_mm,qty,where
+insert,M3,4,1,camera post set screw
+SHCS,M5,20,8,"arm base (01 + 02) to its pad, from below into its M5 x 8 inserts"
+SHCS+nyloc,M5,25,4,legs to the gantry plate (its 5.2 mm holes at y +-50)
+SHCS+nyloc,M5,30,4,lap joint between the halves (nyloc underneath)
+SHCS+nyloc,M5,35,2,lap joint between the halves (nyloc underneath)

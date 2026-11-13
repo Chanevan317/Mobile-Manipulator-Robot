@@ -24,6 +24,7 @@ The arm links use the real CAD parts from `../CAD/SCARA_arm/`, with their real m
 | `scripts/isaac_mono_task.py`, `isaac_mono_table_task.py`, `isaac_mono_shelf_task.py` | Mono-arm experiment: table → tote → table without driving, and the table and shelf tasks above done with one arm. |
 | `scripts/mono_poses.py` | Mono-arm experiment: the planned poses and moves for those tasks. |
 | `scripts/smooth_path.py` | Mono-arm experiment: blends the planned moves into smooth, time-optimal motions (TOPP-RA; `pip install toppra`). On by default in the stationary and shelf tasks (`--no_smooth` turns it off); off in the table task since 2026-11-13 (`--smooth` turns it on). |
+| `scripts/isaac_dual_load_test.py` | Two-arm robot: the forces and torques both arm bases put on the dual-arm holder (for `generator/dual_holder_strength.py`). |
 | `scripts/isaac_mono_load_test.py` | Mono arm: the forces and torques through the ring while the arm works with a payload (for `generator/mono_ring_strength.py`). |
 | `scripts/proto_task.py`, `scripts/proto_poses.py` | Prototype task helpers (time-synchronised moves, IK lines, reporting) and the planned poses and routes. |
 | `scripts/scara_ik.py` | Inverse kinematics for one arm plus the lift (gripper position, heading and tilt to joint angles). |
@@ -44,9 +45,9 @@ The scripts still accept `--layout prototype` (the only choice).
 | Lift column | 0.18 m in front of the base centre, on the **working face** (the robot's front, +x) |
 | Arms | right beside the column at y = ±0.15; zero pose 45° toward the rear tote (±135°) |
 | Lift | OpenBuilds C-Beam XLarge kit, 1000 mm beam (80 mm open face to the rear), NEMA 23 at the bottom, **0–0.871 m** |
-| Carriage | the kit's XLarge gantry plate (125 × 125 × 6 mm, 1.5 mm behind the beam) with its 4 V-wheels + two 8 mm arm brackets beside it, 0.90 kg |
+| Carriage | the kit's XLarge gantry plate (125 × 125 × 6 mm, 1.5 mm behind the beam) with its 4 V-wheels + the printed **dual-arm holder** (`../CAD/dual_holder/`, PETG, two halves around the beam) carrying both arm bases and the scene camera post |
 | Tote | behind the column, 0.35 × 0.48 m |
-| Scene camera | on a carriage bracket in front of the column (moves with the lift), looking at the working face; a pan mount is a planned upgrade |
+| Scene camera | on a post in the dual-arm holder's socket, in front of the column (moves with the lift), looking at the working face; a pan mount is a planned upgrade |
 | Lift moment, arms parked / both reaching with 0.25 kg | **0.1 / 14.2 N·m** |
 | Tote floor reached, either arm / both | 0.094 / 0.049 m² |
 | Arms colliding when each works its own half of the tote | **8 %** of target pairs |

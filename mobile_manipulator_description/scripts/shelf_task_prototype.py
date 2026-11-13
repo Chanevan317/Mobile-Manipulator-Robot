@@ -7,7 +7,7 @@ pick it from the tote and place it on shelf B. Differences for the prototype:
   - every joint-space move follows a route planned offline (proto_poses.py) and is time-synchronised
   - the item sits 0.68 m ahead of the base centre, straight ahead of the left arm; 0.08 m straight approach
 """
-import math
+import math, os
 import numpy as np
 from isaacsim.core.api.objects import DynamicCuboid, FixedCuboid
 from proto_task import Task
@@ -23,6 +23,8 @@ ITEM_A = np.array([SHELF_A['edge_x'] + 0.04, SHELF_A['y'], SHELF_A['board'] + IT
 ITEM_B = np.array([SHELF_B['x'], SHELF_B['edge_y'] - 0.06, SHELF_B['board'] + ITEM[2] / 2])   # 6 cm in: at 4 cm an
 # item that sat ~2 cm deep in the gripper landed on the board edge and tipped off as the hand backed out (2026-11-09)
 GRASP_DZ = -0.003
+SLIDE_DZ = 0.035        # slide onto shelf B this high, then lower (was 0.02: the wrist sags ~10 mm with the item, which then
+                        # passed only 6-7 mm over the board edge and caught it in some runs, 2026-11-13)
 APPROACH = PP.SHELF_APPROACH
 E = PP.SHELF_ELBOW
 JAW_OPEN, JAW_CLOSED = 0.03, 0.0
@@ -57,6 +59,22 @@ def run(app, args):
     shelf('shelfB_back', (SHELF_B['x'], -1.805, 0.50), (0.84, 0.01, 1.00))
     item = w.scene.add(DynamicCuboid(prim_path='/World/product', name='product', position=ITEM_A, scale=ITEM, mass=ITEM_MASS,
                                      color=np.array([0.85, 0.15, 0.15])))
+    CONTACTS = None
+    if os.environ.get('PROTO_DEBUG'):        # PhysX contact report on every robot link + the product (debug only)
+        from pxr import PhysxSchema, UsdPhysics, PhysicsSchemaTools
+        from omni.physx import get_physx_simulation_interface
+        for prim in w.stage.Traverse():
+            if prim.HasAPI(UsdPhysics.RigidBodyAPI) and ('/mobile_manipulator/' in str(prim.GetPath()) or 'product' in str(prim.GetPath())) \
+                    and 'roller' not in str(prim.GetPath()):
+                PhysxSchema.PhysxContactReportAPI.Apply(prim).CreateThresholdAttr().Set(0.0)
+        CONTACTS = {}
+
+        def _on_contacts(headers, data):
+            for h in headers:
+                a_ = str(PhysicsSchemaTools.intToSdfPath(h.actor0)).split('/')[-1]; b_ = str(PhysicsSchemaTools.intToSdfPath(h.actor1)).split('/')[-1]
+                imp = sum(float(np.linalg.norm([d.impulse[0], d.impulse[1], d.impulse[2]])) for d in data[h.contact_data_offset:h.contact_data_offset + h.num_contact_data])
+                k = tuple(sorted((a_, b_))); CONTACTS[k] = CONTACTS.get(k, 0.0) + imp
+        _sub = get_physx_simulation_interface().subscribe_contact_report_events(_on_contacts)
     task.start()
     if not args.headless:
         from isaacsim.core.utils.viewports import set_camera_view
@@ -118,15 +136,24 @@ def run(app, args):
         task.report('pick from tote', f'item lifted {rise:.0f} mm (gripper {PP.TOTE_UP*1000:.0f} mm)', ok=rise > PP.TOTE_UP * 1000 - 30)
         return rise > PP.TOTE_UP * 1000 - 30
 
+    def dbg(label):
+        if os.environ.get('PROTO_DEBUG'):
+            c, up = item_state(); cb = task.to_base(c); tc = task.to_base(task.tcp['left'].get_world_pose()[0])
+            print(f'      [debug] {label:24s} item base ({cb[0]:+.3f}, {cb[1]:+.3f}, {cb[2]:.3f}) up z {up[2]:+.2f}   TCP ({tc[0]:+.3f}, {tc[1]:+.3f}, {tc[2]:.3f})', flush=True)
+            if CONTACTS is not None:
+                big = {k: round(v, 3) for k, v in CONTACTS.items() if v > 0.01 and not any('wheel' in x or 'ground' in x.lower() for x in k)}
+                print(f'              contacts since the last step (impulse N s): {big}', flush=True); CONTACTS.clear()
+
     def place_on_shelf_b():
         t = task.to_base(ITEM_B)
-        g = np.array([t[0], t[1], t[2] + GRASP_DZ, 0.0, 0.0]); hi = g + np.array([0, 0, 0.02, 0, 0])
+        g = np.array([t[0], t[1], t[2] + GRASP_DZ, 0.0, 0.0]); hi = g + np.array([0, 0, SLIDE_DZ, 0, 0])
         pre = hi - np.array([APPROACH, 0, 0, 0, 0])
-        task.route('left', PP.ROUTE['left']['tote_to_shelf'], task.ik('left', pre, E))
-        task.cart_move('left', pre, hi, E)
-        task.cart_move('left', hi, g, E)
-        task.jaw('left', JAW_RELEASE, 1.0)
-        out = g - np.array([APPROACH, 0, 0, 0, 0]); task.cart_move('left', g, out, E)
+        dbg('start')
+        task.route('left', PP.ROUTE['left']['tote_to_shelf'], task.ik('left', pre, E)); dbg('in front of shelf B')
+        task.cart_move('left', pre, hi, E); dbg('in, above the board')
+        task.cart_move('left', hi, g, E); dbg('down onto the board')
+        task.jaw('left', JAW_RELEASE, 1.0); dbg('released')
+        out = g - np.array([APPROACH, 0, 0, 0, 0]); task.cart_move('left', g, out, E); dbg('out')
         task.jaw('left', JAW_CLOSED, 0.6)
         task.route('left', PP.ROUTE['left']['shelf_to_ready'], PP.READY['left'])
         task.route('left', PP.ROUTE['left']['ready_to_stow'], PP.STOW['left'])

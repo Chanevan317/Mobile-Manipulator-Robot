@@ -230,13 +230,13 @@ def _mono_links():
     m_add('base', 'mono_servo_board', xf(MRB.CONTEXT['servo_board'], toarm), (0.10, 0.35, 0.20), mass=0.045)   # plate + Waveshare board
 
 
-def mono_mast_xml():
+def mono_mast_xml(z0=0.066):
     """Scene camera on the CARRIAGE, always facing forward (user, 2026-11-10: it moves with the lift and sees the front by
     default). The arm sweeps all the way round the column at the carriage, so the post stands in the socket on the
     (fixed) clamp ring, inside the cable channel, in front of the beam: x 0.031..0.045 (outside the column's top cap,
     |x| <= 0.030). Above the arm (nothing of it rises past
     carriage z ~0.11) a bar carries the camera forward to the prototype's spot: (0.14, 0, 0.19), pitched 0.95 rad down."""
-    z0 = 66.0 / 1000                                               # bottom of the clamp ring's post socket (mono_ring.py)
+    # z0: bottom of the post socket (mono_ring.py clamp: 0.066; dual_holder.py front bridge: 0.0275)
     parts = [((0.014, 0.016, 0.20 - z0), (0.038, 0.0, (z0 + 0.20) / 2)), ((0.119, 0.02, 0.02), (0.0905, 0.0, 0.19))]
     v = ''.join(vprim(f3(c), bx(*sz), ALU) for sz, c in parts); c_ = ''.join(cprim(f3(c), bx(*sz)) for sz, c in parts)
     o = '  <link name="camera_mast">\n' + inertial(*combine([box_props(0.06, sz, c) for sz, c in parts])) + v + c_ + '  </link>\n'
@@ -478,44 +478,46 @@ def lift_prototype(mono=False):
     o += '  <link name="estop">\n' + inertial(*cyl_props(0.03, 0.022, 0.02)) + vprim('0 0 0', cy(0.022, 0.02), RED) + '  </link>\n'
     o += joint('estop_fixed', 'fixed', 'top_beam', 'estop', '-0.005 0 0.022')
     # carriage (origin on the column axis): the kit's gantry plate (125 x 125 x 6, 1.5 mm behind the beam's open face) with
-    # its 4 V-wheels in the beam's V-grooves and the lead-screw nut block, + two 8 mm aluminium arm brackets beside the
-    # column (each carries one arm base: its 4 M5 inserts land at x 0.01..0.08, y 0.07..0.14). The plate's top is at
-    # carriage z 0.02: the arms sweep 0.032 m above it, and an upper arm pointing back over the column would hit a taller one.
+    # its 4 V-wheels in the beam's V-grooves and the lead-screw nut block, + (two-arm robot) the printed dual-arm holder
+    # (dual_holder.py, since 2026-11-13; was two estimated 8 mm aluminium brackets). The plate's top is at carriage
+    # z 0.02: the arms sweep 0.032 m above it, and an upper arm pointing back over the column would hit a taller one.
     cv = ''.join(vis_mesh(f, c) for f, c in CB_VIS['carriage'])
     cc_ = cprim(f'{CB_PX:.6g} 0 {CB_PZ:.6g}', bx(0.006, 0.125, 0.125))
     for sy in (1, -1):                                                               # V-wheels (beside the beam's sides)
         cc_ += cprim(f'{CB_WX:.6g} {sy*CB_WY:.6g} {CB_PZ:.6g}', bx(CB_WDX, CB_WDY, 0.125))
     props = list(CB_PROPS['carriage'])
-    for sy in (1, -1):
-        if mono: continue                                                            # mono arm: no side brackets (ring instead)
-        cv += vprim(f'0.015 {sy*0.1025} 0.0215', bx(0.15, 0.085, 0.008), ALU)            # bracket, top at 0.0255
-        cc_ += cprim(f'0.015 {sy*0.1025} 0.0215', bx(0.15, 0.085, 0.008))
-        props.append(box_props(0.28, (0.15, 0.085, 0.008), (0.015, sy * 0.1025, 0.0215)))
+    if not mono:                  # the printed dual-arm holder (dual_holder.py): both halves on the carriage
+        cv += ''.join(vis_mesh(f, c) for f, c in HOLDER['vis']); cc_ += ''.join(col_mesh(f) for f in HOLDER['col'])
+        props += HOLDER['props']
     o += '  <link name="carriage">\n' + inertial(*combine(props)) + cv + cc_ + '  </link>\n'
     o += joint('lift', 'prismatic', 'base_link', 'carriage', f'{CX} 0 0.42', axis='0 0 1',
                lim=(0.0, MONO_LIFT_MAX if mono else CB_TRAVEL, 300.0, LIFT_SPEED, 50.0, 5.0))
-    if mono:                      # the scene camera rides on the shoulder ring instead (mono_mast_xml)
+    if mono:                      # mono: mono_mast_xml() from the ring's clamp socket (added with the arm)
         return o
-    # scene camera on the carriage (moves with the lift): a post on the gantry plate behind the column, a bar
-    # forward beside the column (y 0.022..0.042) at carriage z 0.18..0.20, the camera in front of the column looking
-    # forward and down. Higher than anything the arms sweep (their top is ~0.11), and 30 mm under the top beam at
-    # full lift. A pan mount (front / back) is a planned upgrade.
-    # The post stands on the gantry plate's back face (x -0.0435..-0.0275) outboard of the top end mount (|y| <= 0.04).
-    mv = (vprim('-0.0355 0.055 0.11', bx(0.016, 0.02, 0.18), ALU) + vprim('0.04325 0.07 0.19', bx(0.1735, 0.02, 0.02), ALU)
-          + vprim('-0.0355 0.0675 0.19', bx(0.016, 0.025, 0.02), ALU) + vprim('0.12 0.0 0.19', bx(0.02, 0.16, 0.02), ALU))
-    mc = (cprim('-0.0355 0.055 0.11', bx(0.016, 0.02, 0.18)) + cprim('0.04325 0.07 0.19', bx(0.1735, 0.02, 0.02))
-          + cprim('-0.0355 0.0675 0.19', bx(0.016, 0.025, 0.02)) + cprim('0.12 0.0 0.19', bx(0.02, 0.16, 0.02)))
-    o += '  <link name="camera_mast">\n' + inertial(*combine([box_props(0.10, (0.016, 0.02, 0.18), (-0.0355, 0.055, 0.11)),
-                                                             box_props(0.10, (0.1735, 0.02, 0.02), (0.04325, 0.07, 0.19))])) + mv + mc + '  </link>\n'
-    o += joint('camera_mast_fixed', 'fixed', 'carriage', 'camera_mast', '0 0 0')
-    o += '  <link name="scene_camera">\n' + inertial(*box_props(0.07, (0.03, 0.097, 0.029))) + vprim('0 0 0', bx(0.03, 0.097, 0.029), ORANGE) + \
-         cprim('0 0 0', bx(0.03, 0.097, 0.029)) + '  </link>\n'
-    o += joint('scene_camera_fixed', 'fixed', 'camera_mast', 'scene_camera', '0.14 0 0.19', '0 0.95 0')
-    o += frame_link('scene_camera_optical')
-    o += joint('scene_camera_optical_fixed', 'fixed', 'scene_camera', 'scene_camera_optical', '0.016 0 0', '-1.5708 0 -1.5708')
+    # scene camera on the carriage: the same post + bar as the mono arm, standing in the dual holder's socket on its
+    # front bridge (in front of the beam; dual_holder.py). Until 2026-11-13 the post stood behind the gantry plate,
+    # where the holder's left leg now bolts on.
+    o += mono_mast_xml(DH.SOCKET['z0'] / 1000)
     return o
 
 
+import dual_holder as DH
+HOLDER = dict(vis=[], col=[], props=[])
+
+
+def _holder_links():
+    """dual_holder.py's two printed halves (PETG) as carriage meshes (carriage frame mm = carriage link frame)."""
+    DH.build_all()
+    for nm, p in DH.PARTS.items():
+        fname = 'dual_' + nm
+        V, F = mesh_m(p['solid']); write_stl(os.path.join(VIS, fname + '.stl'), V, F)
+        HOLDER['vis'].append((fname, p['color'])); HOLDER['props'].append(mass_props(V / MM, F, rho=RHO_PETG))
+        for k, h in enumerate(convex_pieces(p['solid'])):
+            Vc, Fc = mesh_arrays(h); fn = f'{fname}_c{k:02d}'
+            write_stl(os.path.join(COL, fn + '.stl'), Vc * MM, Fc); HOLDER['col'].append(fn)
+
+
+_holder_links()
 _mono_links()
 MINERTIA = {k: combine(v['props']) for k, v in MLINKS.items()}
 
