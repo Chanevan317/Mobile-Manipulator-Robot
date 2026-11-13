@@ -65,7 +65,7 @@ Measured from the CAD model:
 | 11 | `11_tilt_fork_horn.stl` | 140.0 x 156.0 x 49.6 | 100.4 | tilt fork half: hub/prong on the pitch servo + half of the roll-servo clamp; split plane is vertical |
 | 12 | `12_tilt_fork_idler.stl` | 140.0 x 156.0 x 33.6 | 94.9 | tilt fork half: hub/prong on the pitch servo + half of the roll-servo clamp; split plane is vertical |
 | 13 | `13_camera_cradle.stl` | 19.0 x 36.0 x 40.8 | 7.5 | holds the 32 x 32 OV camera board (4 x M2 on 28 x 28); tilts 0..60 deg on one M3 bolt |
-| 14 | `14_roll_yoke_gripper_housing.stl` | 61.4 x 44.0 x 48.3 | 41.1 | bolts to the roll servo horn, holds the gripper servo; servo slides in from the front |
+| 14 | `14_roll_yoke_gripper_housing.stl` | 61.4 x 44.0 x 48.3 | 40.7 | bolts to the roll servo horn, holds the gripper servo; servo slides in from the front (2026-11-13: plastic removed from the gripper servo's cable sockets, cable opening widened: reprint if you printed it before) |
 | 15 | `15_gripper_front_plate.stl` | 54.4 x 170.0 x 8.0 | 28.9 | closes the gripper housing and carries the 170 mm MGN9 rail |
 | 16 | `16_pinion_24T_m1.stl` | 26.0 x 26.0 x 14.8 | 4.6 | 24 T module 1 spur pinion on the gripper servo horn |
 | 17 | `17_finger_carrier_right.stl` | 62.2 x 93.5 x 17.5 | 14.8 | bolts to one MGN9H carriage; its rack meshes with the pinion |

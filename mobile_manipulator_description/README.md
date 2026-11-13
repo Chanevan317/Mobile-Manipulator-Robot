@@ -23,7 +23,8 @@ The arm links use the real CAD parts from `../CAD/SCARA_arm/`, with their real m
 | `scripts/reach_test.py` | No simulator: maps which spots on tables and shelf boards each arm can reach (IK + collision checks), writes a CSV and a PNG. |
 | `scripts/isaac_mono_task.py`, `isaac_mono_table_task.py`, `isaac_mono_shelf_task.py` | Mono-arm experiment: table → tote → table without driving, and the table and shelf tasks above done with one arm. |
 | `scripts/mono_poses.py` | Mono-arm experiment: the planned poses and moves for those tasks. |
-| `scripts/smooth_path.py` | Mono-arm experiment: blends the planned moves into smooth, time-optimal motions (TOPP-RA; `pip install toppra`). On by default; `--no_smooth` turns it off. |
+| `scripts/smooth_path.py` | Mono-arm experiment: blends the planned moves into smooth, time-optimal motions (TOPP-RA; `pip install toppra`). On by default in the stationary and shelf tasks (`--no_smooth` turns it off); off in the table task since 2026-11-13 (`--smooth` turns it on). |
+| `scripts/isaac_mono_load_test.py` | Mono arm: the forces and torques through the ring while the arm works with a payload (for `generator/mono_ring_strength.py`). |
 | `scripts/proto_task.py`, `scripts/proto_poses.py` | Prototype task helpers (time-synchronised moves, IK lines, reporting) and the planned poses and routes. |
 | `scripts/scara_ik.py` | Inverse kinematics for one arm plus the lift (gripper position, heading and tilt to joint angles). |
 | `scripts/self_collision.py` | Turns on self-collision (`--self_collision` in the other scripts). |
@@ -238,15 +239,27 @@ column**, so the arm can swing all the way round the robot (front, both sides, t
 | | Prototype | Mono arm |
 |---|---|---|
 | Arms | 2, beside the column, zero pose 45° toward the tote | 1, shoulder ring around the column, zero pose forward |
-| Shoulder | STS3215 in the arm base, ±115° | ring on a printed two-row ball bearing (2 × 57 steel balls, 6 mm) driven by an STS3215 through a 72 / 18 gear (4:1): 7.6 N·m, ±180° (cables in a reversing loop, no slip ring; needs the servo's multi-turn mode) |
-| Elbow | ±125° | ±117° (the forearm meets the ring at 121°) |
-| Lift travel | 0–0.871 m | 0–0.81 m (the ring's top cap meets the top end mount above 0.815 m) |
+| Shoulder | STS3215 in the arm base, ±115° | a **ring** around the column on 2 × 6820-2RS bearings, driven by an STS3215 through a 72 / 18 PETG gear (4:1), ±180° (cables in a reversing loop, no slip ring; needs the servo's multi-turn mode), torque limited to 60 % (4.6 N·m) for the gear teeth; **then the prototype's own arm base on a shelf on the ring, 161 mm out, with its shoulder servo (±115°)** |
+| Links | 130 + 130 mm | **one** 130 mm link, then the wrist (the forearm part is not used) |
+| Arm plane | carriage z 0.0655 | carriage z 0.084 |
+| Lift travel | 0–0.871 m | 0–0.81 m (the ring's clamp meets the lift's top end mount above 0.815 m) |
 | Scene camera | carriage bracket, faces forward | carriage, faces forward: a post in a socket on the fixed clamp ring, in front of the beam, and a bar over the arm |
 
 ![mono-arm robot](preview_prototype_mono.png)
 
-**The ring** is the **draft** printable design in `../CAD/mono_ring_draft/` (a printed two-row ball bearing with 6 mm steel balls, 4 : 1
-gear, drive servo under the disc at the front left, a reversing-loop cable channel, a homing magnet). The URDF uses
+**Joint names** stay those of the 3-pan arm, so every script and the IK work unchanged:
+
+| Joint | Mono arm (since 2026-11-13) |
+|---|---|
+| `left_shoulder_pan` | the **ring** (±180°) |
+| `left_elbow_pan` | the arm base's **shoulder** servo, 0.161 m from the column axis (±115°) |
+| `left_wrist_pan` | the wrist, 0.13 m further (±122°) |
+| `left_wrist_pitch`, `left_wrist_roll`, fingers | as on the prototype |
+
+Links: `left_base` = the fixed ring parts (on the carriage), `left_upper_arm` = the rotor + cable tray, `left_arm_base` =
+the prototype arm base (fixed to the rotor), `left_forearm` = the 130 mm link with the wrist-pan servo.
+
+**The ring** is the printable design in `../CAD/mono_ring/` (README there: parts, assembly, strength). The URDF uses
 those parts directly; the L bracket bolts through four of the real gantry plate's holes.
 
 **Reach** (`reach_test.py --layout prototype_mono_arm`, hand down on tables / level into shelves):
@@ -270,15 +283,16 @@ python scripts/reach_test.py --layout prototype_mono_arm
 ```
 Add `--headless` for no window. In RViz: `ros2 launch mobile_manipulator_description display.launch.py layout:=prototype_mono_arm`.
 
-**Isaac Sim results (2026-11-10, headless):**
+**Isaac Sim results (2026-11-13, ring layout B, headless):**
 
 | Test | Result |
 |---|---|
-| Joint sweep | 7/7 OK (the geared shoulder lags 1.6° at most) |
+| Joint sweep | 7/7 OK; ring ±180° (lags 1.6° at most), lift 0–809.7 of 810 mm |
 | Hold, 3 poses × 30 s | 18/18 OK, no drift |
-| Stationary table → tote → table | 7/7 OK, **49 s** (2026-11-12; product 0.2 mm from target). Was 4/5: with the table edge at 0.30 m the scene camera went under the table top when the lift dropped for the tote and tipped the robot back 4°. The table now stands at 0.36 m like the other table task |
-| Table-to-table, 2 products | 6/6 OK, **121 s** (products 0 mm from target). Prototype: 76 s with both arms at once |
-| Shelf, 1 product | 6/6 OK, **71 s** (0 mm from target). Prototype: 66 s |
+| Load test (`isaac_mono_load_test.py`, 0 / 0.25 / 0.5 kg) | all moves done; worst: ring tipping 9.5 N·m, ring drive 3.5 N·m, arm-base shoulder 5.1 N·m; the strength check of the printed ring parts is in `../CAD/mono_ring/README.md` |
+| Stationary table → tote → table | 7/7 OK, **51 s** (product 0.2 mm from target) |
+| Table-to-table, 2 products | 6/6 OK, **125 s** (products 1 / 2 mm from target), step-by-step moves: the blended (TOPP-RA) swing tipped product 1 at the tote with this arm and saved only 2 s, so it is off in this task (`--smooth` turns it on) |
+| Shelf, 1 product | 6/6 OK, **79 s** (1 mm from target); the grasp spot moved from 0.64 to 0.69 m out (`mono_poses.SHELF`): with the shoulder 161 mm out, the hand can't start its straight-in move closer than ~0.60 m |
 
 The mono tasks use a faster move profile (full allowed speed after a 0.3 s ramp) and move the lift during the swings;
 the two-arm tasks use the same profile since 2026-11-11. A move also counts as finished once the joints have stopped:

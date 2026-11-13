@@ -802,7 +802,7 @@
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_wrist_cam_OV_32x32_c.stl"/></geometry></collision>
   </link>
   <link name="left_hand">
-    <inertial><origin xyz="0.0614706 -3.59068e-10 0.0201429" rpy="0 0 0"/><mass value="0.20058"/><inertia ixx="0.000285017" ixy="-1.33151e-12" ixz="-2.60117e-05" iyy="0.000104696" iyz="-1.4363e-12" izz="0.000293397"/></inertial>
+    <inertial><origin xyz="0.0615196 -3.59642e-10 0.0201532" rpy="0 0 0"/><mass value="0.200257"/><inertia ixx="0.000284989" ixy="-1.33499e-12" ixz="-2.5949e-05" iyy="0.00010438" iyz="-1.43706e-12" izz="0.000293086"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_roll_yoke_gripper_housing.stl"/></geometry><material name="mat_16"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_gripper_front_plate.stl"/></geometry><material name="mat_17"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_pinion_24T_m1.stl"/></geometry><material name="mat_18"/></visual>
@@ -817,6 +817,7 @@
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_roll_yoke_gripper_housing_c05.stl"/></geometry></collision>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_roll_yoke_gripper_housing_c06.stl"/></geometry></collision>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_roll_yoke_gripper_housing_c07.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_roll_yoke_gripper_housing_c08.stl"/></geometry></collision>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_gripper_front_plate_c00.stl"/></geometry></collision>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_gripper_front_plate_c01.stl"/></geometry></collision>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_gripper_front_plate_c02.stl"/></geometry></collision>
@@ -1230,7 +1231,7 @@
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_wrist_cam_OV_32x32_c.stl"/></geometry></collision>
   </link>
   <link name="right_hand">
-    <inertial><origin xyz="0.0614706 -3.59068e-10 0.0201429" rpy="0 0 0"/><mass value="0.20058"/><inertia ixx="0.000285017" ixy="-1.33151e-12" ixz="-2.60117e-05" iyy="0.000104696" iyz="-1.4363e-12" izz="0.000293397"/></inertial>
+    <inertial><origin xyz="0.0615196 -3.59642e-10 0.0201532" rpy="0 0 0"/><mass value="0.200257"/><inertia ixx="0.000284989" ixy="-1.33499e-12" ixz="-2.5949e-05" iyy="0.00010438" iyz="-1.43706e-12" izz="0.000293086"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_roll_yoke_gripper_housing.stl"/></geometry><material name="mat_16"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_gripper_front_plate.stl"/></geometry><material name="mat_17"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_pinion_24T_m1.stl"/></geometry><material name="mat_18"/></visual>
@@ -1245,6 +1246,7 @@
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_roll_yoke_gripper_housing_c05.stl"/></geometry></collision>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_roll_yoke_gripper_housing_c06.stl"/></geometry></collision>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_roll_yoke_gripper_housing_c07.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_roll_yoke_gripper_housing_c08.stl"/></geometry></collision>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_gripper_front_plate_c00.stl"/></geometry></collision>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_gripper_front_plate_c01.stl"/></geometry></collision>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_gripper_front_plate_c02.stl"/></geometry></collision>

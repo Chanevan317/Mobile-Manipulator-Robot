@@ -1,0 +1,24 @@
+kind,size,length_mm,qty,where
+bearing,6820-2RS = 61820-2RS (100 x 125 x 13),,2,"ring: 2 (chosen: BM3 chrome steel 6820 2RS, pack of 5, Moglix)"
+SHCS,M2,6,2,strap to cradle
+insert,M2,4,2,strap
+self-tap,M2,6,2,servo case (output face)
+self-tap,M2,6,2,servo case (idler face)
+SHCS,M3,10,4,clamp to hub (squeezes the inner rings)
+SHCS,M3,10,4,pinion to servo horn
+SHCS,M3,10,3,board mount to ring base
+SHCS,M3,6,3,cable tray to rotor
+SHCS,M3,8,2,drive mount (slotted: slide it to set the gear backlash)
+insert,M3,4,3,board mount
+insert,M3,4,1,camera post set screw
+insert,M3,4,3,cable tray
+insert,M3,6,4,clamp
+insert,M3,6,2,drive mount to ring base
+SHCS,M5,10,2,bracket to disc (from below)
+SHCS,M5,14,4,arm base (01 + 02) to the shelf
+SHCS,M5,40,2,hub + disc to the L bracket (from the hub top)
+SHCS+nyloc,M5,25,4,bracket to gantry plate (its 5.2 mm holes at y +-50)
+insert,M5,4,2,L bracket
+insert,M5,8,2,hub bolts
+part,hall sensor,,1,homing: SS49E / A3144 in the disc rim
+part,magnet 5 x 3,,1,homing magnet (glue in)

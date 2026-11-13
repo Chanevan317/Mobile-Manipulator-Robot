@@ -186,15 +186,19 @@ for lk, fs in fast_groups.items():
 
 INERTIA = {k: combine(v['props']) for k, v in LINKS.items()}
 
-# ---------------------------------------------------------------- mono-arm experiment (user, 2026-11-10)
-# One arm; its shoulder is a ring bearing around the C-Beam (shoulder axis = column axis = carriage origin). The rest of
-# the arm (elbow .. gripper) is the real CAD. Arm frame = carriage (0, 0, ARM_Z), zero pose pointing forward (+x).
-# Since 2026-11-11 the ring is the DRAFT printable design in mono_ring.py (2 x 61820 bearings, 72 / 18 T gear, drive
-# STS3215 at r 90 / 60 deg under the disc, reversing-loop cable channel, homing magnet): fixed parts -> left_base,
-# turning parts (rotor, cable tray, upper arm cut at x 70) -> left_upper_arm.
-MONO = dict(ratio=4.0, az=65.5)             # gear ratio (mono_ring: 72 / 18), az = ARM_Z in mm
+# ---------------------------------------------------------------- mono arm (user 2026-11-10; layout B since 2026-11-13)
+# One arm whose shoulder is a ring around the C-Beam (ring axis = column axis = carriage origin), mono_ring.py: 2 x 6820-2RS
+# bearings, PETG rotor + 72 / 18 T gear, drive STS3215 under the disc. The prototype's own arm base (01 + 02 + its
+# shoulder servo) bolts onto the rotor's shelf, 161 mm out; then one 130 mm link (the forearm part) and the wrist.
+# Joint names stay those of the 3-pan arm: left_shoulder_pan = the RING, left_elbow_pan = the base's SHOULDER servo
+# (0.161 m out), left_wrist_pan 0.13 m further. Links: left_base = fixed ring parts (carriage), left_upper_arm = rotor +
+# tray, left_arm_base = the prototype base (fixed to the rotor), left_forearm = the 130 mm link + wrist-pan servo.
+import mono_ring as MRB
+MONO = dict(ratio=MRB.ZR / MRB.ZP, az=MRB.AZ, l1=MRB.L1)   # gear ratio 4, arm plane (carriage mm), shoulder offset (mm)
+RING_TORQUE = round(0.6 * 1.9 * MRB.ZR / MRB.ZP, 2)   # ring drive servo at a 60 % torque limit (4.56 N m): the PETG gear teeth (mono_ring_strength.py)
 MLINKS = {k: dict(vis=list(v['vis']), col=list(v['col']), props=list(v['props'])) for k, v in LINKS.items()}
 MLINKS['base'] = dict(vis=[], col=[], props=[]); MLINKS['upper_arm'] = dict(vis=[], col=[], props=[])
+RHO_PETG = 0.80e-3                          # same fill assumption as RHO_PRINT
 
 
 def m_add(lk, fname, loc, color, mass=None, rho=None, col=True):
@@ -208,39 +212,22 @@ def m_add(lk, fname, loc, color, mass=None, rho=None, col=True):
 
 
 def _mono_links():
-    """The DRAFT printable ring (mono_ring.py, exported to CAD/mono_ring_draft): fixed parts -> left_base,
-    turning parts -> left_upper_arm, plus the elbow servo / bearings / fasteners of the prototype upper arm (x >= 70)."""
-    import mono_ring as MR
-    from joint import SERVO
-    MR.build_all()
+    """mono_ring.py: fixed parts -> left_base, turning parts (rotor, tray) -> left_upper_arm, bearings split."""
+    for f in os.listdir(VIS):                          # old ring meshes (earlier designs) go
+        if f.startswith('mono_'): os.remove(os.path.join(VIS, f))
+    for f in os.listdir(COL):
+        if f.startswith('mono_'): os.remove(os.path.join(COL, f))
+    MRB.build_all()
     toarm = T(0, 0, -MONO['az'])                       # carriage frame (mm) -> arm frame (z 0 = arm plane)
-    for nm, p in MR.PARTS.items():
+    for nm, p in MRB.PARTS.items():
         lk = 'upper_arm' if p['moving'] else 'base'
-        m_add(lk, nm if nm.startswith('mono_') else 'mono_' + nm, xf(p['solid'], toarm), p['color'], rho=RHO_PRINT)
-    m_add('base', 'mono_ring_balls', xf(MR.balls(), toarm), (0.72, 0.74, 0.78), mass=2 * MR.BALL['n'] * 0.00088, col=False)   # 6 mm steel
-    m_add('base', 'mono_ring_drive_STS3215', xf(SERVO, toarm @ MR.servo_frame()), (0.12, 0.12, 0.14), mass=0.055)
-    m_add('base', 'mono_servo_board', xf(MR.CONTEXT['servo_board'], toarm), (0.10, 0.35, 0.20), mass=0.045)   # plate + Waveshare board
-    clip = box(MR.TUBE_X0, 500, -300, 300, -300, 300)
-    brg = []
-    for b in BOUGHT:                                  # elbow servo, elbow bearings (already exported for the prototype)
-        nm = b['name']
-        if bought_link(nm) != 'upper_arm': continue
-        key = next(k for k in BOUGHT_MASS if k in nm)
-        if key == 'bearing':
-            brg.append(b['solid']); continue
-        fname = 'arm_' + nm.split(' ')[0]
-        V, F = mesh_m(b['solid']); MLINKS['upper_arm']['vis'].append((fname, b['color']))
-        MLINKS['upper_arm']['props'].append(mass_props(V / MM, F, mass=BOUGHT_MASS[key]))
-        if os.path.exists(os.path.join(COL, fname + '_c.stl')): MLINKS['upper_arm']['col'].append(fname + '_c')
-    if brg:
-        V, F = mesh_m(union(brg) ^ clip); write_stl(os.path.join(VIS, 'mono_upper_arm_bearings.stl'), V, F)
-        MLINKS['upper_arm']['vis'].append(('mono_upper_arm_bearings', (0.72, 0.74, 0.78)))
-        for sb in brg:
-            Vb, Fb = mesh_arrays(sb); MLINKS['upper_arm']['props'].append(mass_props(Vb, Fb, mass=BOUGHT_MASS['bearing']))
-    fs = [fastener_solid(f) for f in FAST if part_link(f['part']) == 'upper_arm']
-    m_add('upper_arm', 'mono_upper_arm_fasteners', union(fs) ^ clip, (0.08, 0.08, 0.09), rho=RHO_STEEL, col=False)
-
-
+        m_add(lk, 'mono_' + nm, xf(p['solid'], toarm), p['color'], rho=RHO_PETG if p['material'] == 'PETG' else RHO_PRINT)
+    for k in ('bearing_1', 'bearing_2'):               # 6820-2RS ~0.25 kg: inner ring fixed, outer ring + balls turning
+        b = MRB.CONTEXT[k]
+        m_add('base', f'mono_{k}_inner', xf(b['inner'], toarm), (0.72, 0.74, 0.78), mass=0.10, col=False)
+        m_add('upper_arm', f'mono_{k}_outer', xf(union([b['outer'], b['band']]), toarm), (0.72, 0.74, 0.78), mass=0.15, col=False)
+    m_add('base', 'mono_ring_drive_STS3215', xf(MRB.CONTEXT['drive_servo'], toarm), (0.12, 0.12, 0.14), mass=0.055)
+    m_add('base', 'mono_servo_board', xf(MRB.CONTEXT['servo_board'], toarm), (0.10, 0.35, 0.20), mass=0.045)   # plate + Waveshare board
 
 
 def mono_mast_xml():
@@ -335,7 +322,7 @@ D = math.radians
 STS15 = (1.9, 4.7, 0.05, 0.02)          # effort N m, velocity rad/s, damping, friction (STS3215 7.4 V, the SO-100 version)
 
 
-def arm_xml(side, links=None, inertia=None, shoulder=None, elbow=D(125)):
+def arm_xml(side, links=None, inertia=None, shoulder=None, elbow=D(125), l1=None):
     """One arm. links / inertia / shoulder (limit tuple) override the default (prototype) ones: the mono-arm experiment."""
     links = links or LINKS; inertia = inertia or INERTIA; shoulder = shoulder or ((-D(115), D(115)) + STS15)
     p = side
@@ -345,7 +332,7 @@ def arm_xml(side, links=None, inertia=None, shoulder=None, elbow=D(125)):
         body = ''.join(vis_mesh(fn, c) for fn, c in links[lk]['vis']) + ''.join(col_mesh(fn) for fn in links[lk]['col'])
         o += f'  <link name="{p}_{lk}">\n' + inertial(m, com, I) + body + '  </link>\n'
     o += joint(f'{p}_shoulder_pan', 'revolute', f'{p}_base', f'{p}_upper_arm', '0 0 0', axis='0 0 1', lim=shoulder)
-    o += joint(f'{p}_elbow_pan', 'revolute', f'{p}_upper_arm', f'{p}_forearm', f'{L1*MM:.6g} 0 0', axis='0 0 1', lim=(-elbow, elbow) + STS15)
+    o += joint(f'{p}_elbow_pan', 'revolute', f'{p}_upper_arm', f'{p}_forearm', f'{(l1 or L1)*MM:.6g} 0 0', axis='0 0 1', lim=(-elbow, elbow) + STS15)
     o += joint(f'{p}_wrist_pan', 'revolute', f'{p}_forearm', f'{p}_wrist', f'{L2*MM:.6g} 0 0', axis='0 0 1', lim=(-D(122), D(122)) + STS15)
     o += joint(f'{p}_wrist_pitch', 'revolute', f'{p}_wrist', f'{p}_tilt', f'{40*MM:.6g} 0 {PZ*MM:.6g}', axis='0 1 0', lim=(-D(15), D(115)) + STS15)
     o += joint(f'{p}_wrist_roll', 'revolute', f'{p}_tilt', f'{p}_hand', f'{ROLL_X*MM:.6g} 0 0', axis='1 0 0', lim=(-D(120), D(120)) + STS15)   # +-120 (user, 2026-11-09): cable loop
@@ -405,7 +392,7 @@ CB_FOOT_BOX = (f'{CB_FOOT["x0"] + CB_FOOT["t"]/2:.6g} 0 {DECK_TOP - CB_Z0 + CB_F
 CB_FOOT_VIS = (vprim(CB_FOOT_BOX[0], CB_FOOT_BOX[1], ALU) +
                vprim(f'{CB_FOOT["x0"] + CB_FOOT["t"] + 0.02:.6g} 0 {DECK_TOP - CB_Z0 + CB_FOOT["t"]/2:.6g}', bx(0.04, CB_FOOT['w'], CB_FOOT['t']), ALU))
 CB_PROPS['column'].append(box_props(0.20, (CB_FOOT['t'], CB_FOOT['w'], CB_FOOT['h']), (CB_FOOT['x0'] + CB_FOOT['t'] / 2, 0, DECK_TOP - CB_Z0 + CB_FOOT['h'] / 2)))
-MONO_LIFT_MAX = 0.81                                  # mono ring: top cap meets the top end mount between 0.815 and 0.820 (was 0.77 under the estimated cap)
+MONO_LIFT_MAX = 0.81                                  # mono ring (layout B): its clamp meets the top end mount between 0.815 and 0.820
 
 
 def base_xml(mono=False):
@@ -541,9 +528,12 @@ for layout in ('prototype',):
         body += joint(f'{side}_arm_mount', 'fixed', 'carriage', f'{side}_base', f'0 {sy*PROTO_ARM_Y} {ARM_Z}', f'0 0 {sy*PROTO_YAW:.6g}')
     BODY[layout] = body
 # mono-arm experiment: one arm on the shoulder ring around the column (ring drive: STS3215 x 4:1 gear)
-BODY['prototype_mono_arm'] = (base_xml(mono=True) + arm_xml('left', MLINKS, MINERTIA, (-D(180), D(180), 1.9 * MONO['ratio'],
-                               4.7 / MONO['ratio'], 0.05, 0.02), elbow=D(117)) +   # forearm meets the ring at 122-123 deg
-                               joint('left_arm_mount', 'fixed', 'carriage', 'left_base', f'0 0 {ARM_Z}') + mono_mast_xml())
+_ab = ''.join(vis_mesh(fn, c) for fn, c in LINKS['base']['vis']) + ''.join(col_mesh(fn) for fn in LINKS['base']['col'])
+BODY['prototype_mono_arm'] = (base_xml(mono=True) + arm_xml('left', MLINKS, MINERTIA, (-D(180), D(180), RING_TORQUE,
+                               4.7 / MONO['ratio'], 0.05, 0.02), elbow=D(115), l1=MONO['l1']) +   # elbow = the base's shoulder servo: +-115 as on the prototype
+                               '  <link name="left_arm_base">\n' + inertial(*INERTIA['base']) + _ab + '  </link>\n' +
+                               joint('left_arm_base_fixed', 'fixed', 'left_upper_arm', 'left_arm_base', f"{MONO['l1']*MM:.6g} 0 0") +
+                               joint('left_arm_mount', 'fixed', 'carriage', 'left_base', f"0 0 {MONO['az']*MM:.6g}") + mono_mast_xml())
 
 mats = ''.join(f'  <material name="{n}"><color rgba="{f3(k)}"/></material>\n' for k, n in MATS.items())
 xml = ('<?xml version="1.0" encoding="utf-8"?>\n'

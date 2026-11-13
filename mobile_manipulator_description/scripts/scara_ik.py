@@ -25,7 +25,10 @@ LAYOUTS = {'prototype': {'left': (0.18, 0.15, D(135)), 'right': (0.18, -0.15, -D
            # experiment (2026-11-10): one arm, shoulder = a ring around the column (shoulder axis = column axis), zero pose forward
            'prototype_mono_arm': {'left': (0.18, 0.0, 0.0)}}
 SHOULDER_LIM = {'prototype': D(115), 'prototype_mono_arm': D(170)}   # mono: URDF +-180 (cable loop +-195, servo multi-turn: bench test pending); plans keep 10 deg margin
-ELBOW_LIM = {'prototype': D(125), 'prototype_mono_arm': D(117)}   # mono: forearm meets the ring at 122-123 deg
+ELBOW_LIM = {'prototype': D(125), 'prototype_mono_arm': D(115)}   # mono (layout B): the 'elbow' is the arm base's shoulder servo (+-115)
+# per layout: (L1, Z0). Mono layout B (2026-11-13): ring axis -> base shoulder 0.161 m; arm plane carriage z 0.084
+# (prototype 0.0655), so the TCP at lift 0, pitch 0 is 18.5 mm higher.
+ARM_GEOM = {'prototype': (0.13, 0.4109), 'prototype_mono_arm': (0.161, 0.4109 + 0.0185)}
 LAYOUT = 'prototype'
 ARM_Y = 0.15              # arm mount y (ARM_Y / SHOULDER / MOUNT_YAW are set by use(); see the end of this file)
 SHOULDER = {'left': (0.18, ARM_Y), 'right': (0.18, -ARM_Y)}
@@ -34,8 +37,9 @@ MOUNT_YAW = {'left': D(135), 'right': -D(135)}
 
 def use(layout):
     """Select the robot layout ('prototype' or the 'prototype_mono_arm' experiment) for fk / ik and ARM_Y, SHOULDER, MOUNT_YAW."""
-    global LAYOUT, ARM_Y, SHOULDER, MOUNT_YAW
+    global LAYOUT, ARM_Y, SHOULDER, MOUNT_YAW, L1, Z0
     L = LAYOUTS[layout]; LAYOUT = layout
+    L1, Z0 = ARM_GEOM[layout]
     SHOULDER = {s: (v[0], v[1]) for s, v in L.items()}; MOUNT_YAW = {s: v[2] for s, v in L.items()}
     ARM_Y = L['left'][1]
     LIMITS['lift'] = (0.0, LIFT_MAX[layout])

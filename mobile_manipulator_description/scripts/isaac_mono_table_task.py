@@ -10,7 +10,7 @@ table B; both products back out of the tote onto table B; stow.
 Plan: mono_poses.table_steps (checked offline: 320 samples, robot / table / tote products / carried product all clear),
 aimed at the products' measured positions.
 
-    python scripts/isaac_mono_table_task.py [--headless] [--table_h 0.75] [--no_smooth]
+    python scripts/isaac_mono_table_task.py [--headless] [--table_h 0.75] [--smooth]
 """
 import argparse, math, os, sys
 
@@ -20,7 +20,7 @@ ap.add_argument('--urdf', default=os.path.join(here, '..', 'urdf', 'mobile_manip
 ap.add_argument('--headless', action='store_true')
 ap.add_argument('--table_h', type=float, default=0.75)
 ap.add_argument('--no_self_collision', action='store_true')
-ap.add_argument('--no_smooth', action='store_true', help='step-by-step moves instead of the TOPP-RA blended ones (smooth_path.py)')
+ap.add_argument('--smooth', action='store_true', help='TOPP-RA blended moves (smooth_path.py). Off by default since 2026-11-13: with the layout B arm the blended swing tipped product 1 at the tote (step moves 6/6, 124 s vs 122 s)')
 args = ap.parse_args()
 
 from isaacsim import SimulationApp
@@ -92,11 +92,11 @@ def note(label):
 try:
     task.drive_to(GOAL_A, 'drive to table A')
     src = [tuple(task.to_base(task.obj_state(items[k])[0])[:2]) for k in range(2)]      # where the products are
-    MP.run(task, MP.table_steps(H, order=(0, 1), to_tote=True, src=src), on_jaw=note, smooth=not args.no_smooth)
+    MP.run(task, MP.table_steps(H, order=(0, 1), to_tote=True, src=src), on_jaw=note, smooth=args.smooth)
     task.drive_to(GOAL_B, 'drive to table B')
     src = [tuple(task.to_base(task.obj_state(items[k])[0])[:2]) for k in range(2)]
     dst = [tuple(task.to_base(np.array([*TARGET[k], 0.0]))[:2]) for k in range(2)]
-    MP.run(task, MP.table_steps(H, order=(1, 0), to_tote=False, src=src, dst=dst), on_jaw=note, smooth=not args.no_smooth)
+    MP.run(task, MP.table_steps(H, order=(1, 0), to_tote=False, src=src, dst=dst), on_jaw=note, smooth=args.smooth)
 except RuntimeError as e:
     task.report('aborted', str(e), ok=False)
 print(f'task time {task.t:.0f} s')

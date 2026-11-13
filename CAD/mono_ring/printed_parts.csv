@@ -1,0 +1,11 @@
+file,part,material,turns_with_arm,size_mm,volume_cm3,note
+M01_ring_base.stl,ring_base,PLA,no,122.0 x 122.0 x 39.8,189.9,disc on the gantry plate + hub (seat of both 61820 inner rings) + shoulder under bearing 1; prints disc down
+M02_inner_spacer.stl,inner_spacer,PLA,no,107.0 x 107.0 x 8.0,8.8,between the two inner rings (same height as the rotor lip); prints flat
+M03_clamp_ring.stl,clamp_ring,PLA,no,118.0 x 118.0 x 16.0,47.4,clamps both inner rings + spacer; fixed inner wall of the cable channel; camera post socket; prints flat
+M04_gantry_bracket.stl,gantry_bracket,PLA,no,33.0 x 100.0 x 112.0,150.0,"L bracket: the gantry plate (rear face, kit holes at y +-50 / z -12.5, -72.5) to the disc + hub; 12 mm leg; prints on its side"
+M05_drive_mount.stl,drive_mount,PLA,no,60.2 x 68.2 x 41.6,25.8,ear under the ring base + cradle for the ring-drive STS3215 (output up); servo goes in from below; prints ear down
+M06_drive_strap.stl,drive_strap,PLA,no,41.4 x 29.7 x 3.0,1.2,holds the servo in the cradle; prints flat
+M07_ring_pinion.stl,ring_pinion,PETG,no,40.0 x 39.6 x 17.5,9.5,PETG: 18 T m2 pinion on the drive servo horn; prints gear down
+M08_board_mount.stl,board_mount,PLA,no,52.0 x 54.0 x 34.0,25.2,"hangs under the ring base (front right): dovetail socket for the SO-101 Waveshare plate (slides in from the right side), cable-tie slots for the power + USB from the lift; prints on its back (wall face down)"
+M09_rotor.stl,rotor,PETG,yes,275.0 x 148.0 x 59.0,249.1,"PETG: both 61820 outer rings (lip between them) + 72 T m2 gear + shelf with ribs for the arm base; prints upright (gear down), tree supports under the shelf, 5 walls"
+M10_cable_tray.stl,cable_tray,PLA,yes,140.0 x 140.0 x 15.5,36.0,moving outer wall + floor of the cable channel (reversing loop); prints floor down

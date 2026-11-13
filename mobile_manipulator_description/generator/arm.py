@@ -273,7 +273,12 @@ def yoke_part(frame):
     s = union(parts)
     cut = []
     cut.append(xdisc(CTR_D / 2, 17.6, 17.7 + (OUT_CTR - OUT_FACE), hole=True))       # roll output nub + centre screw head
-    cut.append(box(27.0, SOCK_GRIP + 0.1, -8.8, 8.8, 11.5, 17.0))                   # gripper cable channel through the back wall
+    cut.append(box(27.0, SOCK_GRIP + 0.1, -9.5, 9.5, 10.0, 18.5))                   # gripper cable channel through the back wall
+    # (2026-11-13, user: the printed housing had plastic in the servo's connector sockets: the pocket copied the servo
+    # model, whose socket recess is hollow. Cut it clear, as tongue() does for the pan joints; channel widened from
+    # z 11.5..17 / y +-8.8 so a plug fits straight in; it stays clear of the roll horn screws (|z| <= 7.7) and the
+    # gripper case screws (z 32.8).)
+    cut.append(xf(box(-20.2, -7.8, -11.2, 11.2, 13.8, 15.9), GRIP_J))
     # gripper servo pocket: servo slides out forward
     sw = sweep(xf(GRIP_SERVO_R, Ry(-90)), +1, 28.5, 70.0)
     cut.append(xf(sw, Ry(90)))

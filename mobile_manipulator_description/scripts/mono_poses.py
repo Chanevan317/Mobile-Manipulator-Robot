@@ -118,7 +118,7 @@ def table_steps(table_h=0.75, lift_max=0.77, order=(0, 1), to_tote=True, src=Non
     return steps
 
 
-SHELF = dict(reach=(0.64, 0.10), approach=0.08, grasp_dz=-0.003, release=0.04, open=0.04)   # product relative to the parked base
+SHELF = dict(reach=(0.69, 0.10), approach=0.08, grasp_dz=-0.003, release=0.04, open=0.04)   # product relative to the parked base
 SLOW_IN = 2.5     # s for the 80 mm straight moves into / out of a shelf: at the default ~0.6 s the elbow / wrist servos lag
                   # ~8 mm sideways and an open fingertip (40 mm jaws) hits the 45 mm product's corner (Isaac contact report)
 TOTE_FLAT = (-0.043, 0.0)              # the shelf product is laid flat here (hand down)
