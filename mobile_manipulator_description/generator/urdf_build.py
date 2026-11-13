@@ -10,7 +10,7 @@ import sys, os, math, collections, json
 import numpy as np
 sys.path.insert(0, '.')
 from build import *
-from stlio import write_stl
+from stlio import write_stl, read_stl
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else 'out/mobile_manipulator_description'
 VIS = os.path.join(OUT, 'meshes', 'visual'); COL = os.path.join(OUT, 'meshes', 'collision')
@@ -372,6 +372,42 @@ SHELL = (0.94, 0.95, 0.96, 1); TRIM = (0.18, 0.21, 0.25, 1); ANOD = (0.30, 0.33,
 ORANGE = (0.90, 0.45, 0.12, 1); BLUE = (0.29, 0.55, 0.80, 1); RED = (0.85, 0.16, 0.14, 1); RUBBER = (0.10, 0.11, 0.12, 1)
 
 
+# ---------------------------------------------------------------- real C-Beam XLarge actuator (cbeam_import.py)
+CB_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'cbeam')
+CB = json.load(open(os.path.join(CB_DIR, 'cbeam.json')))
+CB_L = CB['_frame']['beam_len'] * MM                  # 1.000
+CB_PH = CB['_frame']['plate_h'] * MM                  # 0.125
+LIFT_STOP = 0.002                                     # lift ends: the plate stops 2 mm before each end mount
+CB_TRAVEL = round(CB_L - CB_PH - 2 * LIFT_STOP, 4)    # 0.871
+CB_PZ = 0.02 - CB_PH / 2                              # plate centre, carriage frame
+CB_Z0 = 0.42 + CB_PZ - CB_PH / 2 - LIFT_STOP          # beam bottom (bottom end mount's inner face), base frame: 0.313
+CB_PX = (CB['_frame']['plate_back_x'] + CB['_frame']['plate_front_x']) / 2 * MM
+DECK_TOP = 0.246
+CB_VIS, CB_PROPS = {'column': [], 'top_beam': [], 'carriage': []}, {'column': [], 'top_beam': [], 'carriage': []}
+for g, link, dz, color in (('beam', 'column', 0.0, ANOD),
+                           ('column_hw', 'column', 0.0, (0.78, 0.80, 0.83, 1)), ('motor', 'column', 0.0, (0.10, 0.11, 0.12, 1)),
+                           ('top', 'top_beam', -CB_L / MM, (0.78, 0.80, 0.83, 1)), ('carriage', 'carriage', CB_PZ / MM, (0.30, 0.33, 0.37, 1))):
+    T3 = read_stl(os.path.join(CB_DIR, g + '.stl')).astype(float) + np.array([0, 0, dz])   # (n, 3, 3) mm in the link frame
+    V, F = T3.reshape(-1, 3), np.arange(len(T3) * 3).reshape(-1, 3)
+    write_stl(os.path.join(VIS, 'cbeam_' + g + '.stl'), V * MM, F)
+    CB_VIS[link].append(('cbeam_' + g, color[:3]))
+    CB_PROPS[link].append(mass_props(V, F, mass=CB[g]['mass']))
+    if g == 'carriage':                               # V-wheel envelope (beside the beam's 80 mm sides)
+        w = V[(np.abs(V[:, 1]) > 37.0) & (V[:, 0] > -20.0)]
+        CB_WX, CB_WY = (w[:, 0].min() + w[:, 0].max()) / 2 * MM, (np.abs(w[:, 1]).min() + np.abs(w[:, 1]).max()) / 2 * MM
+        CB_WDX, CB_WDY = (w[:, 0].max() - w[:, 0].min()) * MM, (np.abs(w[:, 1]).max() - np.abs(w[:, 1]).min()) * MM
+_hw = read_stl(os.path.join(CB_DIR, 'column_hw.stl')).reshape(-1, 3); _mo = read_stl(os.path.join(CB_DIR, 'motor.stl')).reshape(-1, 3)
+_lo = np.vstack([_hw[_hw[:, 2] < 0], _mo]) * MM       # bottom end mount + spacers + coupler + motor
+CB_BOTTOM_BOX = (f3((_lo.min(0) + _lo.max(0)) / 2), bx(*(_lo.max(0) - _lo.min(0))))
+# ESTIMATE (ours, not the kit): a 6 mm aluminium angle on the beam's closed front face, its foot bolted to the deck
+CB_FOOT = dict(x0=0.020, t=0.006, w=0.080, h=0.12, foot=0.08)
+CB_FOOT_BOX = (f'{CB_FOOT["x0"] + CB_FOOT["t"]/2:.6g} 0 {DECK_TOP - CB_Z0 + CB_FOOT["h"]/2:.6g}', bx(CB_FOOT['t'], CB_FOOT['w'], CB_FOOT['h']))
+CB_FOOT_VIS = (vprim(CB_FOOT_BOX[0], CB_FOOT_BOX[1], ALU) +
+               vprim(f'{CB_FOOT["x0"] + CB_FOOT["t"] + 0.02:.6g} 0 {DECK_TOP - CB_Z0 + CB_FOOT["t"]/2:.6g}', bx(0.04, CB_FOOT['w'], CB_FOOT['t']), ALU))
+CB_PROPS['column'].append(box_props(0.20, (CB_FOOT['t'], CB_FOOT['w'], CB_FOOT['h']), (CB_FOOT['x0'] + CB_FOOT['t'] / 2, 0, DECK_TOP - CB_Z0 + CB_FOOT['h'] / 2)))
+MONO_LIFT_MAX = 0.81                                  # mono ring: top cap meets the top end mount between 0.815 and 0.820 (was 0.77 under the estimated cap)
+
+
 def base_xml(mono=False):
     o = frame_link('base_link')
     B = 0.50
@@ -440,52 +476,50 @@ def lift_prototype(mono=False):
          ''.join(cprim(f'0 {sy*(Wt/2-t/2)} {H/2}', bx(L - 2 * t, t, H)) for sy in (1, -1))
     o += '  <link name="tote">\n' + inertial(*box_props(1.05, (L, Wt, H), (0, 0, 0.04))) + tv + tc + '  </link>\n'
     o += joint('tote_fixed', 'fixed', 'base_link', 'tote', f'{TX} 0 0.256')
-    # Lift (user's hardware, 2026-11-09): OpenBuilds C-Beam XLarge actuator, 1000 mm beam (40 x 80), 885 mm travel,
-    # 125 x 125 x 6 mm XLarge gantry plate, 8 mm-lead screw, NEMA 23 on top. The gantry rides on the beam's open
-    # 80 mm face, which faces the rear (tote): the beam is 40 mm along x and 80 mm along y. It stands on a 70 mm riser on
-    # the deck (z 0.24 .. 0.31) so the carriage's lowest position stays at 0.42 (arm / IK heights unchanged).
-    col = vprim('0 0 0.035', bx(0.06, 0.10, 0.07), TRIM) + vprim('0 0 0.57', bx(0.04, 0.08, 1.0), ANOD)
-    o += '  <link name="column">\n' + inertial(*combine([box_props(0.4, (0.06, 0.10, 0.07), (0, 0, 0.035)), box_props(2.2, (0.04, 0.08, 1.0), (0, 0, 0.57))])) + col + \
-         cprim('0 0 0.035', bx(0.06, 0.10, 0.07)) + cprim('0 0 0.57', bx(0.04, 0.08, 1.0)) + '  </link>\n'
-    o += joint('column_fixed', 'fixed', 'base_link', 'column', f'{CX} 0 0.24')
-    top = vprim('0 0 0', bx(0.06, 0.10, 0.012), ANOD) + vprim('0 0 0.035', bx(0.057, 0.057, 0.056), TRIM) + vprim('0 0 0.069', cy(0.02, 0.012), ALU)
-    o += '  <link name="top_beam">\n' + inertial(*box_props(1.3, (0.06, 0.10, 0.08), (0, 0, 0.03))) + top + cprim('0 0 0.03', bx(0.06, 0.10, 0.08)) + '  </link>\n'
-    o += joint('top_beam_fixed', 'fixed', 'base_link', 'top_beam', f'{CX} 0 1.316')
+    # Lift (user's hardware): OpenBuilds C-Beam XLarge actuator, 1000 mm, from the kit's STEP (cbeam_import.py ->
+    # cbeam/*.stl, every part as in the kit; the 500 mm beam and lead screw stretched to 1000). NEMA 23 at the BOTTOM,
+    # on 40 mm spacers under the bottom end mount: it goes through a hole in the deck (motor bottom at base z 0.205).
+    # The beam's open 80 mm face (gantry plate, V-wheels) faces the rear (tote): 40 mm along x, 80 along y.
+    # Heights are set by the carriage: carriage origin at base z 0.42 at lift 0 (arm / IK heights unchanged), plate top at
+    # carriage z 0.02, lift 0 = plate LIFT_STOP above the bottom end mount -> beam bottom at base z CB_Z0.
+    o += '  <link name="column">\n' + inertial(*combine(CB_PROPS['column'])) + ''.join(vis_mesh(f, c) for f, c in CB_VIS['column']) + CB_FOOT_VIS + \
+         cprim(f'0 0 {CB_L/2:.6g}', bx(0.04, 0.08, CB_L)) + cprim(*CB_BOTTOM_BOX) + cprim(*CB_FOOT_BOX) + '  </link>\n'
+    o += joint('column_fixed', 'fixed', 'base_link', 'column', f'{CX} 0 {CB_Z0:.6g}')
+    o += '  <link name="top_beam">\n' + inertial(*combine(CB_PROPS['top_beam'])) + ''.join(vis_mesh(f, c) for f, c in CB_VIS['top_beam']) + \
+         cprim('-0.005 0 0.006', bx(0.05, 0.08, 0.012)) + '  </link>\n'
+    o += joint('top_beam_fixed', 'fixed', 'base_link', 'top_beam', f'{CX} 0 {CB_Z0 + CB_L:.6g}')
     o += '  <link name="estop">\n' + inertial(*cyl_props(0.03, 0.022, 0.02)) + vprim('0 0 0', cy(0.022, 0.02), RED) + '  </link>\n'
-    o += joint('estop_fixed', 'fixed', 'top_beam', 'estop', '-0.055 0 0.02')
-    # carriage (origin on the column axis): gantry plate on the rear face, two 8 mm aluminium arm brackets beside the column.
-    # Each bracket carries one arm base (its 4 M5 inserts land at x 0.01..0.08, y 0.07..0.14) and clears the column by 10 mm.
-    # The gantry plate's top is level with the arm brackets (carriage z 0.02): the arms sweep 0.032 m above it,
-    # and an upper arm pointing back over the column would hit a taller plate. 0.18 m tall (V-wheel spacing).
-    # XLarge gantry plate (125 x 125 x 6) behind the beam's rear face (x -0.02) on its V-wheels, top at carriage z 0.02;
-    # the wheels ride on the beam's two side lips (y +-0.04 .. +-0.055). Each arm bracket bolts to a plate edge and
-    # runs forward beside the beam (y 0.06 .. 0.145).
-    cv = vprim('-0.038 0 -0.0425', bx(0.006, 0.125, 0.125), ALU)
-    cc_ = cprim('-0.038 0 -0.0425', bx(0.006, 0.125, 0.125))
-    props = [box_props(0.30, (0.006, 0.125, 0.125), (-0.038, 0, -0.0425))]
+    o += joint('estop_fixed', 'fixed', 'top_beam', 'estop', '-0.005 0 0.022')
+    # carriage (origin on the column axis): the kit's gantry plate (125 x 125 x 6, 1.5 mm behind the beam's open face) with
+    # its 4 V-wheels in the beam's V-grooves and the lead-screw nut block, + two 8 mm aluminium arm brackets beside the
+    # column (each carries one arm base: its 4 M5 inserts land at x 0.01..0.08, y 0.07..0.14). The plate's top is at
+    # carriage z 0.02: the arms sweep 0.032 m above it, and an upper arm pointing back over the column would hit a taller one.
+    cv = ''.join(vis_mesh(f, c) for f, c in CB_VIS['carriage'])
+    cc_ = cprim(f'{CB_PX:.6g} 0 {CB_PZ:.6g}', bx(0.006, 0.125, 0.125))
+    for sy in (1, -1):                                                               # V-wheels (beside the beam's sides)
+        cc_ += cprim(f'{CB_WX:.6g} {sy*CB_WY:.6g} {CB_PZ:.6g}', bx(CB_WDX, CB_WDY, 0.125))
+    props = list(CB_PROPS['carriage'])
     for sy in (1, -1):
-        cv += vprim(f'-0.016 {sy*0.0505} -0.0425', bx(0.038, 0.019, 0.11), TRIM)       # V-wheels + spacers
-        cc_ += cprim(f'-0.016 {sy*0.0505} -0.0425', bx(0.038, 0.019, 0.11))
-        props.append(box_props(0.06, (0.038, 0.019, 0.11), (-0.016, sy * 0.0505, -0.0425)))
         if mono: continue                                                            # mono arm: no side brackets (ring instead)
         cv += vprim(f'0.015 {sy*0.1025} 0.0215', bx(0.15, 0.085, 0.008), ALU)            # bracket, top at 0.0255
         cc_ += cprim(f'0.015 {sy*0.1025} 0.0215', bx(0.15, 0.085, 0.008))
         props.append(box_props(0.28, (0.15, 0.085, 0.008), (0.015, sy * 0.1025, 0.0215)))
     o += '  <link name="carriage">\n' + inertial(*combine(props)) + cv + cc_ + '  </link>\n'
-    # mono arm: the ring around the column meets the column's top cap from lift ~0.80 (clear at 0.775): 0.77
-    o += joint('lift', 'prismatic', 'base_link', 'carriage', f'{CX} 0 0.42', axis='0 0 1', lim=(0.0, 0.77 if mono else 0.885, 300.0, LIFT_SPEED, 50.0, 5.0))
+    o += joint('lift', 'prismatic', 'base_link', 'carriage', f'{CX} 0 0.42', axis='0 0 1',
+               lim=(0.0, MONO_LIFT_MAX if mono else CB_TRAVEL, 300.0, LIFT_SPEED, 50.0, 5.0))
     if mono:                      # the scene camera rides on the shoulder ring instead (mono_mast_xml)
         return o
     # scene camera on the carriage (moves with the lift): a post on the gantry plate behind the column, a bar
     # forward beside the column (y 0.022..0.042) at carriage z 0.18..0.20, the camera in front of the column looking
     # forward and down. Higher than anything the arms sweep (their top is ~0.11), and 30 mm under the top beam at
     # full lift. A pan mount (front / back) is a planned upgrade.
-    mv = (vprim('-0.049 0.05 0.11', bx(0.016, 0.02, 0.18), ALU) + vprim('0.035 0.07 0.19', bx(0.19, 0.02, 0.02), ALU)
-          + vprim('-0.049 0.06 0.19', bx(0.016, 0.04, 0.02), ALU) + vprim('0.12 0.0 0.19', bx(0.02, 0.16, 0.02), ALU))
-    mc = (cprim('-0.049 0.05 0.11', bx(0.016, 0.02, 0.18)) + cprim('0.035 0.07 0.19', bx(0.19, 0.02, 0.02))
-          + cprim('-0.049 0.06 0.19', bx(0.016, 0.04, 0.02)) + cprim('0.12 0.0 0.19', bx(0.02, 0.16, 0.02)))
-    o += '  <link name="camera_mast">\n' + inertial(*combine([box_props(0.10, (0.016, 0.02, 0.18), (-0.049, 0.05, 0.11)),
-                                                             box_props(0.10, (0.19, 0.02, 0.02), (0.035, 0.07, 0.19))])) + mv + mc + '  </link>\n'
+    # The post stands on the gantry plate's back face (x -0.0435..-0.0275) outboard of the top end mount (|y| <= 0.04).
+    mv = (vprim('-0.0355 0.055 0.11', bx(0.016, 0.02, 0.18), ALU) + vprim('0.04325 0.07 0.19', bx(0.1735, 0.02, 0.02), ALU)
+          + vprim('-0.0355 0.0675 0.19', bx(0.016, 0.025, 0.02), ALU) + vprim('0.12 0.0 0.19', bx(0.02, 0.16, 0.02), ALU))
+    mc = (cprim('-0.0355 0.055 0.11', bx(0.016, 0.02, 0.18)) + cprim('0.04325 0.07 0.19', bx(0.1735, 0.02, 0.02))
+          + cprim('-0.0355 0.0675 0.19', bx(0.016, 0.025, 0.02)) + cprim('0.12 0.0 0.19', bx(0.02, 0.16, 0.02)))
+    o += '  <link name="camera_mast">\n' + inertial(*combine([box_props(0.10, (0.016, 0.02, 0.18), (-0.0355, 0.055, 0.11)),
+                                                             box_props(0.10, (0.1735, 0.02, 0.02), (0.04325, 0.07, 0.19))])) + mv + mc + '  </link>\n'
     o += joint('camera_mast_fixed', 'fixed', 'carriage', 'camera_mast', '0 0 0')
     o += '  <link name="scene_camera">\n' + inertial(*box_props(0.07, (0.03, 0.097, 0.029))) + vprim('0 0 0', bx(0.03, 0.097, 0.029), ORANGE) + \
          cprim('0 0 0', bx(0.03, 0.097, 0.029)) + '  </link>\n'

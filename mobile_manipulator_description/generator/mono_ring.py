@@ -4,9 +4,10 @@ mechanism matters most"). The arm's shoulder turns around the C-Beam lift column
 driven by an STS3215 through a 72 / 18 tooth gear (4:1). Units mm. Frame = CARRIAGE: origin on the column axis,
 x forward (working face), z = carriage z (the arm plane is at z AZ = 65.5, as in the mono URDF).
 
-ESTIMATES (refine when the real lift is here): the gantry plate (125 x 125 x 6 behind the beam, x -41..-35, top at
-z 20), its V-wheels and the M5 hole positions used by the bracket; the lead-screw nut block is assumed to stay below
-z 20 between the gantry plate and the beam.
+Lift = the real C-Beam XLarge kit (2026-11-13, from its STEP: cbeam_import.py): gantry plate 125 x 125 x 6, 1.5 mm
+behind the beam's open face (x -27.5..-21.5), top at z 20; V-wheels x -16..0.5, |y| 38..62; the lead-screw nut block
+between plate and beam (z -62.5..-42.5). The bracket uses 4 of the plate's own 5.2 mm holes (y +-50, z -12.5 / -72.5:
+beside the beam and between the wheels, so the nylocs fit in front of the plate).
 
 Stack (carriage z):
     20 .. 28   ring base disc (rests on the gantry plate's top edge), hub up to 60 = inner race (r 54.5)
@@ -74,8 +75,9 @@ ROT_OUT = 69.0                              # (also set below) rotor body outer 
 HOME_A = 0.0                                # homing: magnet in the rotor's inner wall at the arm heading, hall sensor in the disc rim
 
 # ---- estimated lift hardware (carriage frame) for clearance checks ----
-GANTRY = box(-41.0, -35.0, -62.5, 62.5, -105.0, 20.0)
-WHEELS = union([box(-35.0, 3.0, 41.0, 60.0, -97.5, 12.5), box(-35.0, 3.0, -60.0, -41.0, -97.5, 12.5)])
+GANTRY = box(-27.5, -21.5, -62.5, 62.5, -105.0, 20.0)       # the kit's plate (cbeam/carriage.stl)
+WHEELS = union([box(-16.0, 0.5, 38.0, 62.0, -105.0, 20.0), box(-16.0, 0.5, -62.0, -38.0, -105.0, 20.0)])   # wheels + their nuts
+GANTRY_HOLES = [(sy * 50.0, z) for sy in (-1, 1) for z in (-12.5, -72.5)]   # plate holes (y, z) the bracket bolts through
 COLUMN = box(-20.0, 20.0, -40.0, 40.0, -300.0, 600.0)
 
 PARTS = {}                                  # name -> dict(solid (carriage frame), moving, color, reg, note, print_rot)
@@ -380,19 +382,19 @@ def board_mount():
 # ------------------------------------------------------------------ fixed: bracket to the gantry plate ----------
 def gantry_bracket():
     r = Reg()
-    top = box(-64.0, -41.5, -30.0, 30.0, 12.0, DISC_Z[0])
-    leg = box(-49.0, -41.5, -30.0, 30.0, -60.0, DISC_Z[0])
-    gus = union([xf(_tri(-64.0, -49.0, -40.0, 12.0, t=3.0), T(0, y, 0)) for y in (-30.0, 27.0)])   # at the ends: one on the bed
+    top = box(-64.0, -28.0, -30.0, 30.0, 12.0, DISC_Z[0])
+    leg = box(-35.5, -28.0, -56.0, 56.0, -80.0, DISC_Z[0])          # on the plate's back face (-27.5): 0.5 mm, clear of the wheel bolt heads (-27.7)
+    gus = union([xf(_tri(-64.0, -35.5, -40.0, 12.0, t=3.0), T(0, y, 0)) for y in (-30.0, 27.0)])   # at the ends: one on the bed
     s = union([top, leg, gus])
     cut = []
     for sy in (-1, 1):
         p = (-55.0, sy * 20.0, 12.0)
         cut.append(screw_cut(p, (0, 0, 1), 'M5', 8.0 + 6.0, cb=6.0)); r.add('SHCS', 'M5', p, (0, 0, 1), 12, 'bracket to ring base')
-        for z in (-8.0, -45.0):                                   # ESTIMATED gantry plate hole positions
-            p = (-49.0, sy * 20.0, z)
-            cut.append(screw_cut(p, (1, 0, 0), 'M5', 7.5 + 6.0 + 4.0)); r.add('SHCS+nyloc', 'M5', p, (1, 0, 0), 20, 'bracket to gantry plate (hole positions ESTIMATED)')
+    for (y, z) in GANTRY_HOLES:                                       # the plate's own 5.2 mm holes, nyloc in front of the plate
+        p = (-35.5, y, z)
+        cut.append(screw_cut(p, (1, 0, 0), 'M5', 7.5 + 6.0 + 4.0)); r.add('SHCS+nyloc', 'M5', p, (1, 0, 0), 20, 'bracket to gantry plate (its 5.2 mm holes at y +-50)')
     add('gantry_bracket', s - union(cut), False, (0.55, 0.57, 0.60), r,
-        'L bracket from the gantry plate (rear face) to the ring base; gantry holes are an ESTIMATE; prints on its side', Rx(90))
+        'L bracket from the gantry plate (rear face, the kit plate holes at y +-50 / z -12.5, -72.5) to the ring base; prints on its side', Rx(90))
 
 
 def _tri(x0, x1, z0, z1, t=2.0):
@@ -422,7 +424,7 @@ def check():
     nopin = {k: v for k, v in fixed.items() if k != 'ring_pinion'}     # its teeth mesh with the ring by design
     moving = union([p['solid'] for p in PARTS.values() if p['moving']])
     brg = balls()
-    env = {'gantry plate (est.)': GANTRY, 'V-wheels (est.)': WHEELS, 'beam': COLUMN}
+    env = {'gantry plate': GANTRY, 'V-wheels': WHEELS, 'beam': COLUMN}
     res = []
     # 1) parts against each other at rest
     names = list(fixed)

@@ -47,8 +47,8 @@ def urdf_name(layout=None, ros=False):
     """File name of a layout's URDF in ../urdf."""
     return f"mobile_manipulator_{layout or LAYOUT}{'_ros' if ros else ''}.urdf"
 LIMITS = {'shoulder_pan': (-D(115), D(115)), 'elbow_pan': (-D(125), D(125)), 'wrist_pan': (-D(122), D(122)),
-          'wrist_pitch': (-D(15), D(115)), 'wrist_roll': (-D(120), D(120)), 'lift': (0.0, 0.885)}
-LIFT_MAX = {'prototype': 0.885, 'prototype_mono_arm': 0.77}   # mono: the shoulder ring meets the column's top cap above ~0.78     # prototype: C-Beam XLarge, 1000 mm beam, 885 mm travel
+          'wrist_pitch': (-D(15), D(115)), 'wrist_roll': (-D(120), D(120)), 'lift': (0.0, 0.871)}
+LIFT_MAX = {'prototype': 0.871, 'prototype_mono_arm': 0.81}   # real C-Beam XLarge 1000 mm: 875 mm plate travel - 2 mm stops each end; mono: ring top cap meets the top end mount above 0.815
 
 
 def wrap(a):

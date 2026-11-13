@@ -58,7 +58,7 @@ def check(label, ok, detail):
 
 D = math.radians
 print('--- limits from /robot_description vs CLAUDE.md section 7')
-table = {'lift': (0, 0.885), 'shoulder_pan': (-D(115), D(115)), 'elbow_pan': (-D(125), D(125)), 'wrist_pan': (-D(122), D(122)),
+table = {'lift': (0, 0.871), 'shoulder_pan': (-D(115), D(115)), 'elbow_pan': (-D(125), D(125)), 'wrist_pan': (-D(122), D(122)),
          'wrist_pitch': (-D(15), D(115)), 'wrist_roll': (-D(120), D(120)), 'finger_right': (0, 0.045), 'finger_left': (0, 0.045)}
 for side in ('left_', 'right_', ''):
     for k, (lo, hi) in table.items():

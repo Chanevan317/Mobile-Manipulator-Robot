@@ -2,7 +2,7 @@
 
 This package is the full robot: a mecanum mobile base, the lift, the carriage, and two SCARA arms. Every joint moves.
 
-The arm links use the real CAD parts from `../CAD/SCARA_arm/`, with their real masses. The base, column and carriage are simple shapes with estimated masses, the same as in the earlier concept model.
+The arm links use the real CAD parts from `../CAD/SCARA_arm/`, with their real masses. The lift is the real OpenBuilds C-Beam XLarge kit (1000 mm), its parts taken from the kit's STEP file (see [Lift](#lift-real-c-beam-xlarge-kit)). The base, the tote and the arm brackets are simple shapes with estimated masses.
 
 ## Files
 
@@ -42,8 +42,8 @@ The scripts still accept `--layout prototype` (the only choice).
 |---|---|---|
 | Lift column | 0.18 m in front of the base centre, on the **working face** (the robot's front, +x) |
 | Arms | right beside the column at y = ±0.15; zero pose 45° toward the rear tote (±135°) |
-| Lift | OpenBuilds C-Beam XLarge, 1000 mm beam (80 mm open face to the rear) on a 70 mm riser, **0–0.885 m** |
-| Carriage | XLarge gantry plate (125 × 125 mm) behind the beam + two 8 mm arm brackets beside it, about 1.0 kg |
+| Lift | OpenBuilds C-Beam XLarge kit, 1000 mm beam (80 mm open face to the rear), NEMA 23 at the bottom, **0–0.871 m** |
+| Carriage | the kit's XLarge gantry plate (125 × 125 × 6 mm, 1.5 mm behind the beam) with its 4 V-wheels + two 8 mm arm brackets beside it, 0.90 kg |
 | Tote | behind the column, 0.35 × 0.48 m |
 | Scene camera | on a carriage bracket in front of the column (moves with the lift), looking at the working face; a pan mount is a planned upgrade |
 | Lift moment, arms parked / both reaching with 0.25 kg | **0.1 / 14.2 N·m** |
@@ -109,6 +109,28 @@ while the base is free, it crawls at about 5 mm/s instead (found with the demo; 
 <isaac-sim>/python.sh scripts/isaac_table_task.py                           # prototype: table A -> tote -> table B, both arms
 python scripts/reach_test.py                                                # no Isaac: reach maps for tables and shelves
 ```
+
+### Lift (real C-Beam XLarge kit)
+
+The column, the carriage plate and the top end mount are the **parts of the user's kit** (OpenBuilds C-Beam XLarge
+linear actuator, 1000 mm, from 3DPrintronics), taken from the kit's STEP file by `generator/cbeam_import.py` (run once
+with FreeCAD; its meshes and part list are in `generator/cbeam/`). The STEP is the 500 mm version: the beam and the
+8 mm lead screw are stretched to 1000 mm, everything else is as in the kit (end mounts, 625 bearings, collars,
+coupler, 40 mm spacers, NEMA 23, gantry plate, 4 V-wheels on eccentric / 6 mm spacers, the lead-screw nut block, all
+the bolts). Masses: aluminium / steel / POM from the part volumes, motor 0.7 kg (catalogue).
+
+| | |
+|---|---|
+| Beam | 40 × 80 × 1000 mm, open 80 mm face to the rear; bottom end at base z 0.313, top end mount up to 1.325 |
+| Motor | NEMA 23 at the **bottom**, under the bottom end mount on 40 mm spacers: its bottom is at base z 0.205, so it goes through a ~60 × 60 mm hole in the deck |
+| Gantry plate | 125 × 125 × 6 mm, 1.5 mm behind the beam's open face (x −0.0275 … −0.0215 from the beam axis), top at carriage z 0.02 |
+| Travel | 1000 − 125 = 875 mm between the end mounts; the URDF keeps 2 mm from each: **0–0.871 m** (was 0.885 with the estimated lift) |
+| Column foot | **estimate (ours):** a 6 mm aluminium angle on the beam's closed front face, its foot bolted to the deck |
+| Masses | column 3.66 kg (beam 2.16, motor 0.70, hardware + lead screw 0.60, foot 0.20), top end mount 0.15 kg, carriage 0.90 kg (kit 0.34 + brackets) |
+
+Collisions use boxes (beam, bottom stack, foot, top end mount, plate, wheels); the visuals are the kit meshes.
+The scene camera's post now stands on the real plate's back face (x −0.0435 … −0.0275), outboard of the top end mount;
+the camera itself didn't move.
 
 ### Prototype tasks (2026-11-09, arm links 130 / 130, C-Beam XLarge lift)
 
@@ -218,14 +240,14 @@ column**, so the arm can swing all the way round the robot (front, both sides, t
 | Arms | 2, beside the column, zero pose 45° toward the tote | 1, shoulder ring around the column, zero pose forward |
 | Shoulder | STS3215 in the arm base, ±115° | ring on a printed two-row ball bearing (2 × 57 steel balls, 6 mm) driven by an STS3215 through a 72 / 18 gear (4:1): 7.6 N·m, ±180° (cables in a reversing loop, no slip ring; needs the servo's multi-turn mode) |
 | Elbow | ±125° | ±117° (the forearm meets the ring at 121°) |
-| Lift travel | 0–0.885 m | 0–0.77 m (the ring can't pass the column's top cap) |
+| Lift travel | 0–0.871 m | 0–0.81 m (the ring's top cap meets the top end mount above 0.815 m) |
 | Scene camera | carriage bracket, faces forward | carriage, faces forward: a post in a socket on the fixed clamp ring, in front of the beam, and a bar over the arm |
 
 ![mono-arm robot](preview_prototype_mono.png)
 
 **The ring** is the **draft** printable design in `../CAD/mono_ring_draft/` (a printed two-row ball bearing with 6 mm steel balls, 4 : 1
 gear, drive servo under the disc at the front left, a reversing-loop cable channel, a homing magnet). The URDF uses
-those parts directly; only the lift's gantry plate it bolts to is estimated.
+those parts directly; the L bracket bolts through four of the real gantry plate's holes.
 
 **Reach** (`reach_test.py --layout prototype_mono_arm`, hand down on tables / level into shelves):
 

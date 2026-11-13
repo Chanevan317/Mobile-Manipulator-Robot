@@ -1,7 +1,8 @@
 # Mono-arm shoulder ring: DRAFT
 
-**Status: draft, not ready to print as a set.** The mechanism is worked out and checked for clashes. The lift's real
-mounting plate hasn't been measured yet, so everything that touches it is an estimate (see [Estimates](#estimates)).
+**Status: draft, not ready to print as a set.** The mechanism is worked out and checked for clashes. Since
+2026-11-13 the lift is the real C-Beam XLarge kit (from its STEP file): the L bracket bolts through the gantry plate's
+own holes (see [Estimates](#estimates) for what is still assumed).
 
 This is the shoulder for the **mono-arm experiment**: one arm whose shoulder turns *around* the C-Beam lift column
 instead of beside it. It replaces the prototype's base parts (`01_base_top`, `02_base_bottom`) and the upper arm's
@@ -136,7 +137,9 @@ Everything electrical stays on the **carriage** except the arm itself:
 6. Put the servo in the cradle from below, close it with the strap, and screw the pinion onto the horn (4 × M3).
 7. Screw the drive mount under the disc (2 × M3 in radial slots). **Set the gear backlash:** slide the mount in until
    the teeth just touch, then back it off about 0.2 mm before tightening.
-8. Fit the ring base onto the gantry plate with the L bracket (positions to be checked on the real plate).
+8. Fit the ring base onto the gantry plate with the L bracket: 4 × M5 × 20 through the plate's 5.2 mm holes at 50 mm
+   each side of the centre line (beside the beam, between the wheels), 12.5 and 72.5 mm below the plate's top; the nylocs go
+   on the plate's front face.
 9. Slide the upper arm's bottom half down over the rotor (its collar round the rotor, the tray tabs in the collar's
    pockets, the tube at the cable exit) **before the camera post goes in**. Screw the collar on (6 × M3 × 10, radial),
    then the cable tray through the collar's three small holes (3 × M3 × 8). Fit the elbow servo and the top half as on
@@ -144,7 +147,7 @@ Everything electrical stays on the **carriage** except the arm itself:
 
 ## Checked (`generator/mono_ring.py`)
 
-- No clashes between the fixed parts, or with the estimated gantry plate, V-wheels and beam.
+- No clashes between the fixed parts, or with the kit's gantry plate, V-wheels and beam.
 - The rotor and upper arm turn all the way round (every 10°) without touching anything fixed.
 - The forearm folded at −117 … +117° clears the drive, the ring base and the clamp at every shoulder angle.
 - The upper arm's collar clears the three rotor rings, the balls, the cable tray and the arm's top half; the forearm
@@ -158,10 +161,12 @@ Everything electrical stays on the **carriage** except the arm itself:
 
 ## Estimates
 
-- **Gantry plate:** 125 × 125 × 6 behind the beam, top level with the disc's underside, V-wheels between it and the
-  beam. The L bracket's 4 × M5 holes into it are **guessed** (y ±20 mm, 8 and 45 mm below the top): drill or move them
-  to match the real plate.
-- **Lead-screw nut block:** assumed to stay below the gantry plate's top.
+- **Gantry plate:** now the kit's (from its STEP): 125 × 125 × 6, 1.5 mm behind the beam's open face, top level with
+  the disc's underside. Only 1.5 mm behind the plate means no nut fits in front of it over the beam, so the L bracket
+  uses the plate holes **beside** the beam (y ±50, z −12.5 / −72.5); its leg is 112 mm wide and reaches 80 mm below the
+  disc. Check the hole positions on the real plate before printing.
+- **Lead-screw nut block:** from the STEP, between the plate and the beam, 22.5 … 42.5 mm below the plate's top
+  (well below the disc).
 - **Gear strength:** at full stall (7.6 N·m) the teeth see about 25 MPa, which PLA takes but not for long. Limit the
   servo's torque in its settings; swinging the arm needs far less.
 

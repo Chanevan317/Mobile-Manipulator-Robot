@@ -18,7 +18,7 @@ from lib import box, cyl, union, xf, T, Rx, Ry, Rz, print_mesh
 from hw import screw_cut, insert_cut, Reg
 import mono_ring as MR
 
-FOOT_TOP = -62.0                 # below the lowest ring part (board mount -32, bracket leg -60)
+FOOT_TOP = -85.0                 # below the lowest ring part (board mount -32, bracket leg -80)
 FOOT_T = 6.0
 BEAM_TOP = 120.0                 # beam stub top (through the hub and the top cap)
 LEVER = dict(x0=70.0, x1=300.0, w=20.0, h=22.0, holes=(150.0, 200.0, 250.0, 290.0))   # top flush with the collar (z 65.5)
@@ -29,14 +29,13 @@ def rig_foot():
     r = Reg(); z0 = FOOT_TOP - FOOT_T
     foot = box(-95.0, 90.0, -90.0, 90.0, z0, FOOT_TOP)
     ribs = [box(-95.0, 90.0, y - 2.0, y + 2.0, FOOT_TOP - 0.01, FOOT_TOP + 8.0) for y in (-75.0, 75.0)]
-    gantry = box(-41.0, -35.0, -62.5, 62.5, FOOT_TOP - 0.01, MR.DISC_Z[0])            # the disc sits on its top edge
+    gantry = box(-27.5, -21.5, -62.5, 62.5, FOOT_TOP - 0.01, MR.DISC_Z[0])            # the kit plate's position; the disc sits on its top edge
     beam = box(-20.0, 20.0, -40.0, 40.0, FOOT_TOP - 0.01, BEAM_TOP) - box(-17.0, 17.0, -37.0, 37.0, FOOT_TOP + 3.0, BEAM_TOP + 1)
     s = union([foot, gantry, beam] + ribs)
     cut = []
-    for sy in (-1, 1):                      # the L bracket's (estimated) gantry holes: M5 through, nyloc on the front face
-        for z in (-8.0, -45.0):
-            cut.append(xf(cyl(2.75, -1, 8, hole=True), T(-42.0, sy * 20.0, z) @ Ry(90)))
-            r.add('SHCS+nyloc', 'M5', (-49.0, sy * 20.0, z), (1, 0, 0), 20, 'L bracket to the gantry stand-in')
+    for (y, z) in MR.GANTRY_HOLES:          # the kit plate's holes the L bracket uses: M5 through, nyloc on the front face
+        cut.append(xf(cyl(2.75, -1, 8, hole=True), T(-28.5, y, z) @ Ry(90)))
+        r.add('SHCS+nyloc', 'M5', (-35.5, y, z), (1, 0, 0), 20, 'L bracket to the gantry stand-in')
     for (x, y) in ((-80.0, -60.0), (-80.0, 60.0), (75.0, -60.0), (75.0, 60.0)):      # optional screws into a board
         cut.append(cyl(2.75, z0 - 1, FOOT_TOP + 1, x, y, hole=True))
     cut.append(cyl(5.0, z0 - 1, FOOT_TOP + 1, 27.0, -45.0, hole=True))                 # cable exit under the board

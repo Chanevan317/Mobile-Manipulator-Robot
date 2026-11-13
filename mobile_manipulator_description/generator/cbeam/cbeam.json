@@ -1,0 +1,140 @@
+{
+ "column_hw": {
+  "mass": 0.6012,
+  "n_tris": 20778,
+  "parts": [
+   "40mm spacer v002",
+   "40mm spacer v1",
+   "Bearing 625 2RS_2pcs v002",
+   "C beam linear actuator v1",
+   "C-Beam End Mount_2pcs v2",
+   "M5 Shim v002",
+   "M5x20 LP_8pcs v005",
+   "M5x20 LP_8pcs v006",
+   "M5x20 LP_8pcs v007",
+   "M5x20 LP_8pcs v008",
+   "M5x55 LP_2pcs v002",
+   "M5x55 LP_2pcs v1",
+   "Shaft_540mm v1",
+   "coupler v1"
+  ],
+  "bbox": [
+   -30.0,
+   20.0,
+   -40.0,
+   40.0,
+   -58.3,
+   1012.0
+  ]
+ },
+ "top": {
+  "mass": 0.1456,
+  "n_tris": 8692,
+  "parts": [
+   "Bearing 625 2RS_2pcs v1",
+   "C beam linear actuator v002",
+   "C-Beam End Mount_2pcs v003",
+   "M5 Shim v1",
+   "M5x20 LP_8pcs v002",
+   "M5x20 LP_8pcs v003",
+   "M5x20 LP_8pcs v004",
+   "M5x20 LP_8pcs v1"
+  ],
+  "bbox": [
+   -30.0,
+   20.0,
+   -40.0,
+   40.0,
+   990.4,
+   1011.95
+  ]
+ },
+ "motor": {
+  "mass": 0.7,
+  "n_tris": 2588,
+  "parts": [
+   "Nema 23 Motor v1"
+  ],
+  "bbox": [
+   -40.67,
+   15.73,
+   -28.2,
+   28.2,
+   -108.0,
+   -31.4
+  ]
+ },
+ "carriage": {
+  "mass": 0.3398,
+  "n_tris": 35516,
+  "parts": [
+   "125.125.6 v3",
+   "1mm 5mm shim v002",
+   "1mm 5mm shim v003",
+   "1mm 5mm shim v004",
+   "1mm 5mm shim v1",
+   "3mm spacer v002",
+   "3mm spacer v1",
+   "6mm Spacer v002",
+   "6mm Spacer v1",
+   "Bearing 625 2RS_2pcs v003",
+   "Bearing 625 2RS_2pcs v004",
+   "Bearing 625 2RS_2pcs v005",
+   "Bearing 625 2RS_2pcs v006",
+   "Bearing 625 2RS_2pcs v007",
+   "Bearing 625 2RS_2pcs v008",
+   "Bearing 625 2RS_2pcs v009",
+   "Bearing 625 2RS_2pcs v010",
+   "Eccentric Spacer v002",
+   "Eccentric Spacer v1",
+   "M5 Nylock Nut_2pcs v002",
+   "M5 Nylock Nut_2pcs v003",
+   "M5 Nylock Nut_2pcs v004",
+   "M5 Nylock Nut_2pcs v1",
+   "M5 Nylock v002",
+   "M5 Nylock v1",
+   "M5x25 LP_6pcs v002",
+   "M5x25 LP_6pcs v003",
+   "M5x25 LP_6pcs v004",
+   "M5x25 LP_6pcs v005",
+   "M5x25 LP_6pcs v006",
+   "M5x25 LP_6pcs v1",
+   "Plates Block v1",
+   "Solid V-Wheel on bearing (-23.6, 133.1)",
+   "Solid V-Wheel on bearing (-23.6, 234.1)",
+   "Solid V-Wheel on bearing (76.4, 133.1)",
+   "Solid V-Wheel on bearing (76.4, 234.1)"
+  ],
+  "bbox": [
+   -27.6,
+   0.5,
+   -62.5,
+   62.5,
+   -62.5,
+   62.5
+  ]
+ },
+ "beam": {
+  "mass": 2.1576,
+  "n_tris": 2216,
+  "parts": [
+   "SOLID"
+  ],
+  "bbox": [
+   -20.0,
+   20.0,
+   -40.0,
+   40.0,
+   -0.0,
+   1000.0
+  ]
+ },
+ "_frame": {
+  "beam_len": 1000.0,
+  "plate_back_x": -27.5,
+  "plate_front_x": -21.5,
+  "plate_h": 125.0,
+  "source": "C Beam X Large Linear Actuator.step",
+  "note": "lift frame in mm, see cbeam_import.py"
+ }
+}

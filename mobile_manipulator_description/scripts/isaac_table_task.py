@@ -47,7 +47,7 @@ D = math.radians
 P = math.pi / 2
 ITEM = np.array([0.045, 0.045, 0.070]); ITEM_MASS = 0.15
 EDGE, H = PP.TABLE_EDGE, args.table_h
-UP_T = min(0.12, 0.88 + 0.4109 - 0.215 - (H + 0.035 + 0.005))    # vertical approach the 0.885 m lift travel allows
+UP_T = min(0.12, 0.871 + 0.4109 - 0.215 - (H + 0.035 + 0.005))   # vertical approach the 0.871 m lift travel allows
 UP_TOTE = PP.TOTE_UP
 JAW_OPEN, JAW_CLOSED = 0.035, 0.0
 SIDES = (('left', 1), ('right', -1))

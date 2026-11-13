@@ -7,10 +7,10 @@ Right-arm poses are the left ones with the three pan angles negated (checked sep
 are not mirror images).
 
 Lessons from planning:
-  - Re-planned 2026-11-09 for the 130 / 130 links and the C-Beam XLarge lift (0.885 m): the stow pose is hand level
+  - Re-planned 2026-11-09 for the 130 / 130 links and the C-Beam XLarge lift (0.885 m then; 0.871 m with the real kit since 2026-11-13): the stow pose is hand level
     and clear at any lift. The only way in or out is still the elbow alone: STOW <-> ELBOW_OPEN.
   - The arm that waits during work parks straight out to its side with the hand level (PARK).
-  - On a 0.75 m table the vertical approach is 0.12 m (lift travel 0.885 m).
+  - On a 0.75 m table the vertical approach is 0.12 m (lift travel 0.871 m).
   - Don't flip the elbow while carrying a lying item: the fast swing slides it down the jaws (TOTE_SHELF).
   - Both arms at once: unfold one at a time (left, then right) and fold the other way round (right, then left);
     unfolding together crosses the forearms. At the tote use TOTE2 (spots 0.26 m apart).

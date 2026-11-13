@@ -17,7 +17,7 @@ takes their place.
 
 | # | File | What | Print |
 |---|---|---|---|
-| R01 | `R01_rig_foot.stl` | Lift stand-in: base plate, a stand-in for the gantry plate (the disc sits on its top edge, the L bracket bolts to it) and a hollow 40 × 80 beam stub | flat; 185 × 180 × 188 mm, 350 cm³ |
+| R01 | `R01_rig_foot.stl` | Lift stand-in: base plate, a stand-in for the kit's gantry plate, at its real place 1.5 mm behind the beam (the disc sits on its top edge, the L bracket bolts through its 4 holes beside the beam) and a hollow 40 × 80 beam stub | flat; 185 × 180 × 211 mm, 383 cm³ |
 | R02 | `R02_test_lever.stl` | Stands in for the upper arm: the same collar round the rotor as the arm (6 radial M3); weight holes at 150 / 200 / 250 / 290 mm | upside down (top face on the bed) |
 
 From the ring: M03 ring base, M04 top cap, M05–M07 rotor rings, M08 cable tray, M09–M11 drive mount, strap, pinion,

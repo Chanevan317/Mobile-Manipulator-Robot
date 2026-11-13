@@ -20,7 +20,7 @@ insert,M3,6,6,upper arm collar
 insert,M3,6,2,drive mount to ring base
 insert,M3,8,2,upper arm halves (rotor end)
 SHCS,M5,12,2,bracket to ring base
-SHCS+nyloc,M5,20,4,bracket to gantry plate (hole positions ESTIMATED)
+SHCS+nyloc,M5,20,4,bracket to gantry plate (its 5.2 mm holes at y +-50)
 insert,M5,6,2,gantry bracket
 part,hall sensor,,1,homing: SS49E / A3144 in the disc rim
 part,magnet 5 x 3,,1,homing magnet (glue in)

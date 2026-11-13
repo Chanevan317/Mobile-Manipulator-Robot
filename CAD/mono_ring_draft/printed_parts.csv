@@ -10,5 +10,5 @@ M08_cable_tray.stl,cable_tray,1,yes,141.0 x 144.0 x 28.0,30.5,"moving outer wall
 M09_drive_mount.stl,drive_mount,1,no,60.2 x 68.2 x 41.6,25.8,ear under the ring base + cradle for the ring-drive STS3215 (output up); servo goes in from below; prints ear down
 M10_drive_strap.stl,drive_strap,1,no,41.4 x 29.7 x 3.0,1.2,holds the servo in the cradle; prints flat
 M11_ring_pinion.stl,ring_pinion,1,no,40.0 x 39.6 x 17.5,9.5,18 T m2 pinion on the drive servo horn; prints gear down
-M12_gantry_bracket.stl,gantry_bracket,1,no,22.5 x 80.0 x 60.0,44.4,L bracket from the gantry plate (rear face) to the ring base; gantry holes are an ESTIMATE; prints on its side
+M12_gantry_bracket.stl,gantry_bracket,1,no,36.0 x 100.0 x 112.0,101.0,"L bracket from the gantry plate (rear face, the kit plate holes at y +-50 / z -12.5, -72.5) to the ring base; prints on its side"
 M13_board_mount.stl,board_mount,1,no,52.0 x 54.0 x 34.0,25.2,"hangs under the ring base (front right): dovetail socket for the SO-101 Waveshare plate (slides in from the right side), cable-tie slots for the power + USB from the lift; prints on its back (wall face down)"
