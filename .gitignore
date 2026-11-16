@@ -8,3 +8,7 @@ __pycache__/
 *.usd
 *.usda
 *.usdc
+# NVIDIA SimReady assets (downloaded by scenes/scene_v0/fetch_assets.py, CC-BY-4.0)
+scenes/assets/
+# saved scenes ARE kept (small text files that reference those assets)
+!scenes/*/*.usda

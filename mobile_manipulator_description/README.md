@@ -16,6 +16,7 @@ The arm links use the real CAD parts from `../CAD/SCARA_arm/`, with their real m
 | `scripts/drives.py` | The motor gains, in one place. Both Isaac scripts use it. |
 | `scripts/isaac_view.py` | Opens Isaac Sim with both robots side by side (two-arm and one-arm, `--layout` for one of them) and nothing else: no motion, every joint holds its zero pose (`--paused`, `--fix_base`, `--self_collision`). |
 | `scripts/isaac_arm_view.py` | One arm alone on a fixed stand (no base or lift), opening and closing its gripper slowly (`--period S`, default 20 s per cycle; `--layout prototype_mono_arm` for the one-arm robot's arm with its ring). |
+| `../scenes/scene_v0/` | The store scene (outside this robot package, in the repository's `scenes/` folder) for the one-arm (mono) prototype, from free NVIDIA SimReady assets: a room with three walls and store lighting, a table, two racks, two shelves, 15 task products the arm can reach and random filler products. Its own README: download the assets, look at it, check it, save it as `scene_v0.usda`. |
 | `scripts/isaac_import_and_test.py` | Imports the robot into Isaac Sim, sets the motor drives, adds a floor, and plays a looping motion demo (`--duration S` stops it, `--save` writes a USD). |
 | `scripts/isaac_joint_test.py` | Tests every joint one at a time, or holds poses under gravity (`--hold`). |
 | `scripts/isaac_base_test.py` | Drives the mecanum base forward, sideways and turning, and measures how well it moves. |
