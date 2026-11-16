@@ -10,10 +10,10 @@ SHCS,M3,10,3,board mount to ring base
 SHCS,M3,6,3,cable tray to rotor
 SHCS,M3,8,2,drive mount (slotted: slide it to set the gear backlash)
 insert,M3,4,3,board mount
-insert,M3,4,1,camera post set screw
 insert,M3,4,3,cable tray
 insert,M3,6,4,clamp
 insert,M3,6,2,drive mount to ring base
+insert,M3,8,4,scene camera mast flange
 SHCS,M5,10,2,bracket to disc (from below)
 SHCS,M5,14,4,arm base (01 + 02) to the shelf
 SHCS,M5,40,2,hub + disc to the L bracket (from the hub top)

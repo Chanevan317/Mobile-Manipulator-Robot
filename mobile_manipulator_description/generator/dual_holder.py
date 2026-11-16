@@ -8,7 +8,7 @@ The arm bases stay where they were: shoulder axes at (0, +-150), mount yaw +-135
     pads        12 mm under each arm base (its footprint + 4 mm), z 13.5..25.5; 4 x M5 x 20 from below into the
                 base's own M5 x 8 inserts
     front bridge  in front of the beam (x 21..60, 1 mm clear of its front face), joins both pads; carries the scene
-                camera's post socket (x 31..45, as on the mono arm)
+                scene camera mast's 4 M3 inserts (scene_cam.py)
     cheeks      beside the gantry plate and its wheels (|y| 63..75), x -40..60, z -40..25.5
     legs        behind the plate (x -40..-28), bolted through the plate's own 5.2 mm holes at y +-50 / z -12.5, -72.5
                 (nylocs on the plate's front face, as the mono ring's bracket); a lip rests on the plate's top edge
@@ -29,14 +29,24 @@ ARM_Y, YAW, AZ = 150.0, 135.0, 65.5          # urdf_build PROTO_ARM_Y, PROTO_YAW
 BASE_Z = AZ - 40.0                            # base underside (its mount face is 40 mm under the servo mid-plane)
 PAD = (BASE_Z - 12.0, BASE_Z)                 # pad z
 BASE_M5 = [(-80.0, 13.5), (-80.0, -13.5), (-54.0, 13.5), (-54.0, -13.5)]
-FRONT = dict(x=(21.0, 60.0), y=95.0, z=(1.5, BASE_Z), zm=13.5)   # 24 mm deep: 12 mm lap layers (strength check: 8 mm gave SF 2.6 in bolt bearing)
+FRONT = dict(x=(21.0, 60.0), y=95.0, z=(1.5, BASE_Z), zm=12.5)   # 24 mm deep; lap face 12.5 (2026-11-16, was 13.5): 11 mm layers under the mast pocket (strength check: 10 mm gave SF 2.8, 8 mm 2.6 in bolt bearing)
 REAR = dict(x=(-40.0, -31.0), y=75.0, z=(0.0, BASE_Z), zm=12.75)
 CHEEK = dict(x=(-40.0, 60.0), y=(63.0, 75.0), z=(-40.0, BASE_Z))
 LEG = dict(x=(-40.0, -28.0), y=(44.0, 75.0), z=(-80.0, BASE_Z))
 LIP = dict(x=(-28.01, -21.0), y=(41.0, 62.5), z=(20.0, BASE_Z))
 LAP_Y = 20.0
-SOCKET = dict(post=(31.0, 45.0, -8.0, 8.0), boss=(28.5, 47.5, -10.5, 10.5), z0=BASE_Z + 2.0, top=BASE_Z + 12.0)
-SPLICE = [(40.0, 16.0), (40.0, -16.0), (55.0, 14.0), (55.0, -14.0), (-35.5, 12.0), (-35.5, -12.0)]
+# scene camera mast (scene_cam.py, 2026-11-13): 4 x M3 x 8 inserts in the front bridge top for its flange (x 22..62, |y| <= 22)
+CAM_INSERTS = [(42.0 + sx * 14.0, sy * 17.0) for sx in (-1, 1) for sy in (-1, 1)]
+# the mast's bottom flange sits in a 2 mm pocket (2026-11-16): its screw heads are then 2 mm lower, so the arms' fork
+# prongs pass > 2 mm over the flange (they passed 0.4 mm over it). A channel across the whole bridge (the flange is
+# x 22..62, the bridge x 21..60: a closed back wall would be a 0.8 mm sliver); its side walls locate the mast in y.
+CAM_POCKET = dict(depth=2.0, gap=0.2, hy=22.0)
+CAM_Z = FRONT['z'][1] - CAM_POCKET['depth']     # 23.5: the mast's mount face (scene_cam.MOUNT)
+LAP_INS = 6                                     # front lap inserts M5 x 6 (an M5 x 8 would leave 2.5 mm under the pocket floor; now 4.5)
+LAP_CB = 0.0                                    # front lap screw heads flat on the underside: M5 x 16 goes 5 mm into the insert
+# lap joints: front pair = M5 from below into M5 x 8 inserts in the upper layer (the camera flange covers the bridge top);
+# rear pair = M5 through + nyloc underneath
+SPLICE = [(35.0, 12.0), (35.0, -12.0), (50.0, 12.0), (50.0, -12.0), (-35.5, 12.0), (-35.5, -12.0)]
 GANTRY_HOLES = [(sy * 50.0, z) for sy in (-1, 1) for z in (-12.5, -72.5)]
 
 # the kit's lift parts (carriage frame), as in mono_ring.py
@@ -84,18 +94,23 @@ def holder():
         parts.append(box(*LIP['x'], y0, y1, *LIP['z']))
     parts.append(box(*FRONT['x'], -FRONT['y'], FRONT['y'], *FRONT['z']))
     parts.append(box(*REAR['x'], -REAR['y'], REAR['y'], *REAR['z']))
-    bx_ = SOCKET['boss']
-    parts.append(box(bx_[0], bx_[1], bx_[2], bx_[3], BASE_Z - 0.01, SOCKET['top']))
     s = union(parts)
-    px = SOCKET['post']
-    cut.append(box(px[0] - 0.2, px[1] + 0.2, px[2] - 0.2, px[3] + 0.2, SOCKET['z0'], SOCKET['top'] + 1))       # post socket
-    cut.append(insert_cut((bx_[1], 0.0, SOCKET['top'] - 5.0), (-1, 0, 0), 'M3', length=4))
-    r.add('insert', 'M3', (bx_[1], 0.0, SOCKET['top'] - 5.0), (-1, 0, 0), 4, 'camera post set screw')
+    hy = CAM_POCKET['hy'] + CAM_POCKET['gap']
+    cut.append(box(FRONT['x'][0] - 1, FRONT['x'][1] + 1, -hy, hy, CAM_Z, FRONT['z'][1] + 1))      # mast flange pocket
+    for (x, y) in CAM_INSERTS:                                    # scene camera mast flange
+        cut.append(insert_cut((x, y, CAM_Z), (0, 0, -1), 'M3', length=8)); r.add('insert', 'M3', (x, y, CAM_Z), (0, 0, -1), 8, 'scene camera mast flange (pocket floor)')
     for (y, z) in GANTRY_HOLES:                                   # through the plate's own holes, nyloc in front of it
         p = (LEG['x'][0], y, z)
         cut.append(screw_cut(p, (1, 0, 0), 'M5', (LEG['x'][1] - LEG['x'][0]) + 6.0 + 4.0)); r.add('SHCS+nyloc', 'M5', p, (1, 0, 0), 25, 'legs to the gantry plate (its 5.2 mm holes at y +-50)')
     for (x, y) in SPLICE:                                         # the two halves' lap joints
-        z0, z1 = (FRONT['z'] if x > 0 else REAR['z'])
+        if x > 0:                                                 # front: from below into an insert in the upper layer
+            z0, zm = FRONT['z'][0], FRONT['zm']
+            cut.append(screw_cut((x, y, z0 + LAP_CB), (0, 0, 1), 'M5', zm - z0 - LAP_CB, cb=LAP_CB + 1.0 if LAP_CB else 0.0))
+            cut.append(insert_cut((x, y, zm), (0, 0, 1), 'M5', length=LAP_INS))
+            r.add('SHCS', 'M5', (x, y, z0 + LAP_CB), (0, 0, 1), 16, 'front lap joint, from below into the insert')
+            r.add('insert', 'M5', (x, y, zm), (0, 0, 1), LAP_INS, 'front lap joint (upper layer, from the lap face)')
+            continue
+        z0, z1 = REAR['z']
         p = (x, y, z1)
         cut.append(screw_cut(p, (0, 0, -1), 'M5', z1 - z0, cb=0.0))
         r.add('SHCS+nyloc', 'M5', p, (0, 0, -1), int(math.ceil((z1 - z0 + 6.0) / 5.0) * 5), 'lap joint between the halves (nyloc underneath)')
@@ -112,15 +127,15 @@ def holder():
     for it in r.items:
         (rl if it['p'][1] >= 0 else rr).items.append(it)
     PARTS['holder_left'] = dict(solid=left, color=(0.20, 0.55, 0.62), reg=rl, material='PETG', print_rot=Rx(-90),
-                                note='left half (y >= 0): pad, cheek, leg, upper layer of both laps, camera post socket; prints on its outer side face (cheek down)')
+                                note='left half (y >= 0): pad, cheek, leg, upper layer of both laps, scene camera mast inserts; prints on its outer side face (cheek down)')
     PARTS['holder_right'] = dict(solid=right, color=(0.18, 0.50, 0.58), reg=rr, material='PETG', print_rot=Rx(90),
                                  note='right half (y <= 0): pad, cheek, leg, lower layer of both laps; prints on its outer side face (cheek down)')
 
 
 def mast_post():
-    """The scene camera's post (stand-in, as urdf_build's mast): 14 x 16 mm from the socket floor up to z 200."""
-    px = SOCKET['post']
-    return box(px[0], px[1], px[2], px[3], SOCKET['z0'], 200.0)
+    """The scene camera mast (scene_cam.py, two-arm version) as a stand-in: its flange in the pocket + its box (x 26..62,
+    |y| <= 13) up to z 300."""
+    return union([box(22.0, 62.0, -22.0, 22.0, CAM_Z, CAM_Z + 6.0), box(26.0, 62.0, -13.0, 13.0, CAM_Z, 300.0)])
 
 
 def build_all():
@@ -241,7 +256,7 @@ def render(path):
     fig = plt.figure(figsize=(21, 13), facecolor=BG)
     draw(fig.add_subplot(2, 2, 1, projection='3d'), halves + bases + lift, 26, -55, 'dual-arm holder with both arm bases (01 + 02) on the C-Beam carriage', 1.2)
     draw(fig.add_subplot(2, 2, 2, projection='3d'), halves + lift, 30, 125, 'from behind: legs on the gantry plate, rear bridge', 1.2)
-    draw(fig.add_subplot(2, 2, 3, projection='3d'), halves + lift, 70, -90, 'from above: pads, front bridge (camera post socket), cheeks', 1.1)
+    draw(fig.add_subplot(2, 2, 3, projection='3d'), halves + lift, 70, -90, 'from above: pads, front bridge (camera mast inserts), cheeks', 1.1)
     expl = [(xf(PARTS['holder_left']['solid'], T(0, 40, 0)), PARTS['holder_left']['color']),
             (xf(PARTS['holder_right']['solid'], T(0, -40, 0)), PARTS['holder_right']['color'])]
     draw(fig.add_subplot(2, 2, 4, projection='3d'), expl, 28, -55, 'the two printed halves and their lap joints', 1.2)

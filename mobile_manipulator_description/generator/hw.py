@@ -9,6 +9,7 @@ SPEC = {
     # M3 hole 4.3 is an estimate for the 5.0 OD (was 4.0 for 4.6 OD Ruthex): measure the inserts / print a test coupon.
     'M2': dict(clear=2.4, head=3.8, head_h=1.6, cb=4.4, ins=3.2, ins_d=4.5, od=3.6),
     'M3': dict(clear=3.4, head=5.5, head_h=3.0, cb=6.2, ins=4.3, ins_d=6.5, od=5.0),
+    'M4': dict(clear=4.5, head=7.0, head_h=4.0, cb=7.6, ins=5.6, ins_d=8.5, od=6.0),     # scene camera (clearance holes only; no M4 inserts in the kit)
     'M5': dict(clear=5.5, head=8.5, head_h=5.0, cb=9.2, ins=6.4, ins_d=10.5, od=7.0),
 }
 

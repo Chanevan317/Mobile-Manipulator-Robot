@@ -48,6 +48,7 @@ L1 = 161.0                                    # shoulder axis from the column ax
 BASE_M5 = [(-80.0, 13.5), (-80.0, -13.5), (-54.0, 13.5), (-54.0, -13.5)]     # arm.base_parts() inserts (ARM frame)
 WY = 20.5                                     # base pillar half width
 CH = dict(ri=56.0, ro=66.0, floor=(60.5, 62.5), top=76.0)
+CAM_MOUNT = (81.0, 90.0)                      # scene camera mast flange block on the clamp (z), scene_cam.MOUNT
 CABLE_HOLE_XY = (27.0, -27.0)
 CABLE_A = math.atan2(CABLE_HOLE_XY[1], CABLE_HOLE_XY[0])
 TRAY_SCREWS = (100.0, 180.0, 260.0)           # tray to rotor top (vertical M3), away from the shelf / cable exit
@@ -127,18 +128,23 @@ def spacer():
 def clamp_ring():
     r = Reg(); z0, z1, ro = CLAMP
     s = cyl(ro, z0, z1)
-    boss = box(27.0, 49.0, -12.0, 12.0, z1 - 0.01, z1 + 12.0)                      # scene-camera post socket
+    # scene camera pedestal (scene_cam.py, 2026-11-13): inside the drum up to z 76, then flared out to the mast flange
+    # block x 22..62 |y| <= 22 at z 81..90 (r <= 65.8: over the turning cable tray r 66..70 / its top 76 and the
+    # rotor ribs r >= 67 / top 80), 4 x M3 x 8 inserts on top
+    ped = M.hull(union([box(24.0, 49.0, -14.0, 14.0, z1 - 0.01, 70.0), box(22.0, 62.0, -22.0, 22.0, CAM_MOUNT[0], CAM_MOUNT[1])]))
     drum = union([ring(CH['ri'] - 4.0, CH['ri'], z1 - 0.01, CH['top']), ring(CH['ri'] - 0.01, CH['ri'] + 3.0, CH['top'] - 2.0, CH['top'])])
-    s = union([s, boss, drum]) - beam_hole() - box(30.8, 45.2, -8.2, 8.2, z1 + 2.0, z1 + 13.0)
-    cut = [insert_cut((49.0, 0.0, z1 + 7.0), (-1, 0, 0), 'M3', length=4),
-           cyl(3.5, z0 - 1, z1 + 1, *CABLE_HOLE_XY, hole=True),
+    s = union([s, ped, drum]) - beam_hole()
+    cut = [cyl(3.5, z0 - 1, z1 + 1, *CABLE_HOLE_XY, hole=True),
            xf(box(30.0, CH['ri'] + 1, -4.0, 4.0, z1 - 0.01, z1 + 9.0), Rz(math.degrees(CABLE_A)))]
-    r.add('insert', 'M3', (49.0, 0.0, z1 + 7.0), (-1, 0, 0), 4, 'camera post set screw')
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            p = (42.0 + sx * 14.0, sy * 17.0, CAM_MOUNT[1])
+            cut.append(insert_cut(p, (0, 0, -1), 'M3', length=8)); r.add('insert', 'M3', p, (0, 0, -1), 8, 'scene camera mast flange')
     for (x, y) in CLAMP_SCREWS:
         p = (x, y, z1)
         cut.append(screw_cut(p, (0, 0, -1), 'M3', (z1 - z0) + 0.2 + 6.0, cb=0.0)); r.add('SHCS', 'M3', p, (0, 0, -1), 10, 'clamp to hub (squeezes the inner rings)')
     add('clamp_ring', s - union(cut), False, (0.55, 0.57, 0.60), r,
-        'clamps both inner rings + spacer; fixed inner wall of the cable channel; camera post socket; prints flat')
+        'clamps both inner rings + spacer; fixed inner wall of the cable channel; scene camera pedestal (4 inserts on top); prints flat (supports under the pedestal top)')
 
 
 def gantry_bracket():

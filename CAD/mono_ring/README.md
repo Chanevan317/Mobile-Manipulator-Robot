@@ -44,7 +44,7 @@ bolts through 4 of the gantry plate's own holes.
 |---|---|---|---|---|
 | M01 | `M01_ring_base.stl` | disc + hub (seat for both inner rings) + the shoulder under bearing 1 | PLA | disc down |
 | M02 | `M02_inner_spacer.stl` | ring between the two inner rings | PLA | flat |
-| M03 | `M03_clamp_ring.stl` | clamps the inner rings; cable channel's inner wall; scene-camera post socket | PLA | flat |
+| M03 | `M03_clamp_ring.stl` | clamps the inner rings; cable channel's inner wall; scene camera pedestal (4 × M3 × 8 inserts on top at z 90, for the mast in `../scene_cam/`) | PLA | flat |
 | M04 | `M04_gantry_bracket.stl` | L bracket: gantry plate (its own holes) to the disc + hub | PLA | on its side |
 | M05 | `M05_drive_mount.stl` | holds the ring-drive STS3215 under the disc | PLA | ear down |
 | M06 | `M06_drive_strap.stl` | closes the servo cradle | PLA | flat |

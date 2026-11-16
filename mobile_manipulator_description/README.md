@@ -14,6 +14,8 @@ The arm links use the real CAD parts from `../CAD/SCARA_arm/`, with their real m
 | `meshes/visual/` | STL files in metres. Shared by both arms. |
 | `meshes/collision/` | Convex pieces of every part, about 350 per arm. Each one is ready for PhysX. |
 | `scripts/drives.py` | The motor gains, in one place. Both Isaac scripts use it. |
+| `scripts/isaac_view.py` | Opens Isaac Sim with both robots side by side (two-arm and one-arm, `--layout` for one of them) and nothing else: no motion, every joint holds its zero pose (`--paused`, `--fix_base`, `--self_collision`). |
+| `scripts/isaac_arm_view.py` | One arm alone on a fixed stand (no base or lift), opening and closing its gripper slowly (`--period S`, default 20 s per cycle; `--layout prototype_mono_arm` for the one-arm robot's arm with its ring). |
 | `scripts/isaac_import_and_test.py` | Imports the robot into Isaac Sim, sets the motor drives, adds a floor, and plays a looping motion demo (`--duration S` stops it, `--save` writes a USD). |
 | `scripts/isaac_joint_test.py` | Tests every joint one at a time, or holds poses under gravity (`--hold`). |
 | `scripts/isaac_base_test.py` | Drives the mecanum base forward, sideways and turning, and measures how well it moves. |
@@ -45,9 +47,9 @@ The scripts still accept `--layout prototype` (the only choice).
 | Lift column | 0.18 m in front of the base centre, on the **working face** (the robot's front, +x) |
 | Arms | right beside the column at y = ±0.15; zero pose 45° toward the rear tote (±135°) |
 | Lift | OpenBuilds C-Beam XLarge kit, 1000 mm beam (80 mm open face to the rear), NEMA 23 at the bottom, **0–0.871 m** |
-| Carriage | the kit's XLarge gantry plate (125 × 125 × 6 mm, 1.5 mm behind the beam) with its 4 V-wheels + the printed **dual-arm holder** (`../CAD/dual_holder/`, PETG, two halves around the beam) carrying both arm bases and the scene camera post |
+| Carriage | the kit's XLarge gantry plate (125 × 125 × 6 mm, 1.5 mm behind the beam) with its 4 V-wheels + the printed **dual-arm holder** (`../CAD/dual_holder/`, PETG, two halves around the beam) carrying both arm bases and the scene camera mast |
 | Tote | behind the column, 0.35 × 0.48 m |
-| Scene camera | on a post in the dual-arm holder's socket, in front of the column (moves with the lift), looking at the working face; a pan mount is a planned upgrade |
+| Scene camera | Luxonis OAK-D Pro on an STS3215 pitch servo, on a printed mast on the carriage in front of the column (`../CAD/scene_cam/`), moves with the lift: lens 0.33 m over the carriage origin, 80 mm in front of the column; joint `scene_camera_pitch` −10° … +80° (+ = down) |
 | Lift moment, arms parked / both reaching with 0.25 kg | **0.1 / 14.2 N·m** |
 | Tote floor reached, either arm / both | 0.094 / 0.049 m² |
 | Arms colliding when each works its own half of the tote | **8 %** of target pairs |
@@ -244,7 +246,7 @@ column**, so the arm can swing all the way round the robot (front, both sides, t
 | Links | 130 + 130 mm | **one** 130 mm link, then the wrist (the forearm part is not used) |
 | Arm plane | carriage z 0.0655 | carriage z 0.084 |
 | Lift travel | 0–0.871 m | 0–0.81 m (the ring's clamp meets the lift's top end mount above 0.815 m) |
-| Scene camera | carriage bracket, faces forward | carriage, faces forward: a post in a socket on the fixed clamp ring, in front of the beam, and a bar over the arm |
+| Scene camera | OAK-D Pro on a pitch servo, mast on the holder's front bridge | the same camera and head, shorter mast on a pedestal on the ring clamp |
 
 ![mono-arm robot](preview_prototype_mono.png)
 
@@ -359,7 +361,7 @@ At zero, each arm points along its zero heading (±135°, toward the rear and pa
 **Fixed frames you can use:**
 - `left_/right_tcp`: between the fingertips, 12 mm in from the tip.
 - `left_/right_wrist_camera` and `*_wrist_camera_optical`: the 32 × 32 mm OV camera on each wrist (frame at the default 35° tilt; the real tilt is set by hand, 0–60°).
-- `scene_camera` and `scene_camera_optical`: the scene camera (on a carriage bracket in front of the column). The optical frames follow ROS conventions: z forward, x right, y down.
+- `scene_camera` (origin on the tilt axis, after joint `scene_camera_pitch`) and `scene_camera_optical` (the colour lens): the OAK-D Pro on its mast on the carriage. The optical frames follow ROS conventions: z forward, x right, y down.
 
 ## Masses (per arm: 2.09 kg in the URDF, a conservative estimate)
 

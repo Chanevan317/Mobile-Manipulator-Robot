@@ -477,6 +477,7 @@ def lift_prototype(mono=False):
     o += joint('top_beam_fixed', 'fixed', 'base_link', 'top_beam', f'{CX} 0 {CB_Z0 + CB_L:.6g}')
     o += '  <link name="estop">\n' + inertial(*cyl_props(0.03, 0.022, 0.02)) + vprim('0 0 0', cy(0.022, 0.02), RED) + '  </link>\n'
     o += joint('estop_fixed', 'fixed', 'top_beam', 'estop', '-0.005 0 0.022')
+    o += SCENE_XML['prototype_mono_arm' if mono else 'prototype']
     # carriage (origin on the column axis): the kit's gantry plate (125 x 125 x 6, 1.5 mm behind the beam's open face) with
     # its 4 V-wheels in the beam's V-grooves and the lead-screw nut block, + (two-arm robot) the printed dual-arm holder
     # (dual_holder.py, since 2026-11-13; was two estimated 8 mm aluminium brackets). The plate's top is at carriage
@@ -494,10 +495,7 @@ def lift_prototype(mono=False):
                lim=(0.0, MONO_LIFT_MAX if mono else CB_TRAVEL, 300.0, LIFT_SPEED, 50.0, 5.0))
     if mono:                      # mono: mono_mast_xml() from the ring's clamp socket (added with the arm)
         return o
-    # scene camera on the carriage: the same post + bar as the mono arm, standing in the dual holder's socket on its
-    # front bridge (in front of the beam; dual_holder.py). Until 2026-11-13 the post stood behind the gantry plate,
-    # where the holder's left leg now bolts on.
-    o += mono_mast_xml(DH.SOCKET['z0'] / 1000)
+    # scene camera: OAK-D Pro on a pitch servo, on a mast in the dual holder's front bridge (scene_cam.py, SCENE_XML)
     return o
 
 
@@ -518,6 +516,55 @@ def _holder_links():
 
 
 _holder_links()
+
+
+def _scene_cam_xml(layout):
+    """Scene camera (scene_cam.py): OAK-D Pro on an STS3215 pitch servo, on a mast on the carriage (two-arm: the dual
+    holder's front bridge; one-arm: the ring clamp's pedestal); it moves with the lift. scene_mast (fixed to the
+    carriage) -> scene_camera_pitch (revolute about y, + = tilt down, -10 .. +80 deg) -> scene_camera (origin on the
+    tilt axis, x forward) -> scene_camera_optical (the RGB lens)."""
+    import scene_cam as SC
+    SC.build_all(layout)
+    mast = dict(vis=[], col=[], props=[]); cam = dict(vis=[], col=[], props=[])
+    def put(L, fname, solid, color, mass=None, rho=None, col=True):
+        V, F = mesh_m(solid); write_stl(os.path.join(VIS, fname + '.stl'), V, F)
+        L['vis'].append((fname, color)); L['props'].append(mass_props(V / MM, F, mass=mass, rho=rho))
+        if col:
+            for k, h in enumerate(convex_pieces(solid)):
+                Vc, Fc = mesh_arrays(h); fn = f'{fname}_c{k:02d}'
+                write_stl(os.path.join(COL, fn + '.stl'), Vc * MM, Fc); L['col'].append(fn)
+    for nm in [k for k in SC.PARTS if k != 'camera_cradle']:
+        put(mast, 'scene_' + nm, SC.PARTS[nm]['solid'], SC.PARTS[nm]['color'], rho=RHO_PETG)
+    put(mast, 'scene_pitch_STS3215', SC.CONTEXT['servo'], (0.12, 0.12, 0.14), mass=0.055, col=False)
+    toax = T(-SC.CAM['axis_x'], 0, 0)                       # camera frame C -> the scene_camera link (origin on the axis)
+    put(cam, 'scene_camera_cradle', xf(SC.CONTEXT['cradle_C'], toax), SC.PARTS['camera_cradle']['color'], rho=RHO_PETG)
+    E = SC.camera_mesh_C() + np.array([-SC.CAM['axis_x'], 0, 0])
+    V = E.reshape(-1, 3); F = np.arange(len(V)).reshape(-1, 3)
+    write_stl(os.path.join(VIS, 'scene_oakd_pro.stl'), V * MM, F); cam['vis'].append(('scene_oakd_pro', (0.15, 0.15, 0.17)))
+    body = xf(SC.CONTEXT['cam_body_C'], toax)
+    Vb, Fb = mesh_arrays(body); cam['props'].append(mass_props(Vb, Fb, mass=0.091))
+    for k, h in enumerate(convex_pieces(body)):
+        Vc, Fc = mesh_arrays(h); fn = f'scene_oakd_pro_c{k:02d}'
+        write_stl(os.path.join(COL, fn + '.stl'), Vc * MM, Fc); cam['col'].append(fn)
+    def link(name, L):
+        return (f'  <link name="{name}">\n' + inertial(*combine(L['props'])) + ''.join(vis_mesh(f, c) for f, c in L['vis']) +
+                ''.join(col_mesh(f) for f in L['col']) + '  </link>\n')
+    o = link('scene_mast', mast) + joint('scene_mast_fixed', 'fixed', 'carriage', 'scene_mast', '0 0 0')
+    o += link('scene_camera', cam)
+    ax = (SC.AX * MM, 0.0, (SC.CONTEXT['zh'] + SC.HEAD_AXIS) * MM)
+    o += joint('scene_camera_pitch', 'revolute', 'scene_mast', 'scene_camera', f3(ax), axis='0 1 0',
+               lim=(math.radians(SC.PITCH[0]), math.radians(SC.PITCH[1]), 1.9, 4.7, 0.05, 0.02))
+    lx, ly, lz = SC.CAM['lens']
+    o += frame_link('scene_camera_optical')
+    o += joint('scene_camera_optical_fixed', 'fixed', 'scene_camera', 'scene_camera_optical', f3(((lx - SC.CAM['axis_x']) * MM, ly * MM, lz * MM)), '-1.5708 0 -1.5708')
+    return o
+
+
+for _f in os.listdir(VIS) + os.listdir(COL):
+    if _f.startswith('scene_'):
+        for _d in (VIS, COL):
+            if os.path.exists(os.path.join(_d, _f)): os.remove(os.path.join(_d, _f))
+SCENE_XML = {lay: _scene_cam_xml(lay) for lay in ('prototype', 'prototype_mono_arm')}
 _mono_links()
 MINERTIA = {k: combine(v['props']) for k, v in MLINKS.items()}
 
@@ -535,7 +582,7 @@ BODY['prototype_mono_arm'] = (base_xml(mono=True) + arm_xml('left', MLINKS, MINE
                                4.7 / MONO['ratio'], 0.05, 0.02), elbow=D(115), l1=MONO['l1']) +   # elbow = the base's shoulder servo: +-115 as on the prototype
                                '  <link name="left_arm_base">\n' + inertial(*INERTIA['base']) + _ab + '  </link>\n' +
                                joint('left_arm_base_fixed', 'fixed', 'left_upper_arm', 'left_arm_base', f"{MONO['l1']*MM:.6g} 0 0") +
-                               joint('left_arm_mount', 'fixed', 'carriage', 'left_base', f"0 0 {MONO['az']*MM:.6g}") + mono_mast_xml())
+                               joint('left_arm_mount', 'fixed', 'carriage', 'left_base', f"0 0 {MONO['az']*MM:.6g}"))
 
 mats = ''.join(f'  <material name="{n}"><color rgba="{f3(k)}"/></material>\n' for k, n in MATS.items())
 xml = ('<?xml version="1.0" encoding="utf-8"?>\n'

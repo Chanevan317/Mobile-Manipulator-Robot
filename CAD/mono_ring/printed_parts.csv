@@ -1,7 +1,7 @@
 file,part,material,turns_with_arm,size_mm,volume_cm3,note
 M01_ring_base.stl,ring_base,PLA,no,122.0 x 122.0 x 39.8,189.9,disc on the gantry plate + hub (seat of both 61820 inner rings) + shoulder under bearing 1; prints disc down
 M02_inner_spacer.stl,inner_spacer,PLA,no,107.0 x 107.0 x 8.0,8.8,between the two inner rings (same height as the rotor lip); prints flat
-M03_clamp_ring.stl,clamp_ring,PLA,no,118.0 x 118.0 x 16.0,47.4,clamps both inner rings + spacer; fixed inner wall of the cable channel; camera post socket; prints flat
+M03_clamp_ring.stl,clamp_ring,PLA,no,121.0 x 118.0 x 30.0,77.9,clamps both inner rings + spacer; fixed inner wall of the cable channel; scene camera pedestal (4 inserts on top); prints flat (supports under the pedestal top)
 M04_gantry_bracket.stl,gantry_bracket,PLA,no,33.0 x 100.0 x 112.0,150.0,"L bracket: the gantry plate (rear face, kit holes at y +-50 / z -12.5, -72.5) to the disc + hub; 12 mm leg; prints on its side"
 M05_drive_mount.stl,drive_mount,PLA,no,60.2 x 68.2 x 41.6,25.8,ear under the ring base + cradle for the ring-drive STS3215 (output up); servo goes in from below; prints ear down
 M06_drive_strap.stl,drive_strap,PLA,no,41.4 x 29.7 x 3.0,1.2,holds the servo in the cradle; prints flat

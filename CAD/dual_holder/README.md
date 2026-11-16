@@ -14,33 +14,35 @@ Made by `mobile_manipulator_description/generator/dual_holder.py` (shape, checks
 | Part of the frame | Where | What it does |
 |---|---|---|
 | **2 pads** | under each arm base, from 6.5 mm below to 5.5 mm above the plate top (12 mm thick) | each base bolts down with 4 × M5 × 20 from below into its own M5 × 8 inserts; the bases sit exactly where they were (150 mm each side, turned ±135°) |
-| **front bridge** | in front of the beam (1 mm clear), 24 mm deep | joins the two pads; carries the **scene camera's post** in a socket (as on the one-arm robot) |
+| **front bridge** | in front of the beam (1 mm clear), 24 mm deep | joins the two pads; carries the **scene camera mast** (`../scene_cam/`) in a 2 mm pocket across its top, on 4 × M3 × 8 inserts in the pocket floor |
 | **cheeks** | beside the gantry plate and its wheels | join pads, bridges and legs |
 | **legs** | behind the gantry plate | bolt through 4 of the plate's own 5.2 mm holes (50 mm each side of the centre, 12.5 and 72.5 mm below its top), nylocs on the plate's front face; a lip rests on the plate's top edge |
 | **rear bridge** | behind the plate | closes the frame around the beam |
 
 Nothing stands over the beam above the plate's top, so the lift keeps its full travel (0.871 m).
-The scene camera's post moved here from behind the plate: the left leg bolts on where it used to stand. The camera
-itself is where it was.
+The scene camera stands on the front bridge (OAK-D Pro on a pitch servo, `../scene_cam/`). Its mast flange sits in a
+2 mm deep pocket across the bridge top (the pocket's side walls locate it), so the flange's screw heads stay low under
+the arms. The flange covers the bridge top, so the front lap joint's screws come from below into inserts.
 
 ## Parts
 
 | # | File | What | Material | Print |
 |---|---|---|---|---|
-| D01 | `D01_holder_left.stl` | left half (the side of the left arm): pad, cheek, leg, upper layer of both lap joints, camera post socket | **PETG** | on its outer side face (the cheek down); supports under the pad |
+| D01 | `D01_holder_left.stl` | left half (the side of the left arm): pad, cheek, leg, upper layer of both lap joints, scene camera mast inserts | **PETG** | on its outer side face (the cheek down); supports under the pad |
 | D02 | `D02_holder_right.stl` | right half: pad, cheek, leg, lower layer of both lap joints | **PETG** | the same, mirrored |
 
 `printed_parts.csv` has sizes and volumes; `fasteners.csv` every screw and nut. `assembly_stl/` has both halves in
-place plus `context/` (the arm bases, the camera post, the kit's plate / wheels / beam).
+place plus `context/` (the arm bases, the camera mast stand-in, the kit's plate / wheels / beam).
 
 ## Assembly
 
 1. Bolt each arm base onto its half: 4 × M5 × 20 from below into the base's M5 × 8 inserts.
 2. Put the two halves together around the beam (front bridge in front of it, rear bridge behind the plate) and bolt the
-   lap joints: 6 × M5 + nylocs (4 in the front bridge, 2 in the rear).
+   lap joints: front bridge 4 × M5 × 16 from below into M5 × 6 inserts (heat-set into the left half's upper layer, from
+   the lap face, before assembly; × 6, not × 8: the pocket above leaves room for 6 mm), rear bridge 2 × M5 + nylocs.
 3. Rest the lips on the gantry plate's top edge and bolt the legs through the plate: 4 × M5 × 25 + nylocs on the front
    face of the plate (between the wheels).
-4. Scene camera post into the socket on the front bridge; M3 set screw from the front.
+4. Scene camera mast into the pocket on the front bridge: 4 × M3 × 10 into its inserts (see `../scene_cam/README.md`).
 
 ## Checked
 
@@ -48,7 +50,7 @@ place plus `context/` (the arm bases, the camera post, the kit's plate / wheels 
 - No contact with the kit's gantry plate, V-wheels, the beam (1 mm clear) or the column foot at the lowest lift; nothing
   inside the top end mount's footprint above the plate top.
 - The arm bases sit on the pads without overlap; each half is one solid and the halves don't overlap.
-- Arm sweep (left arm, 396 poses; the holder is symmetric): the arm touches the holder or the camera post only in
+- Arm sweep (left arm, 396 poses; the holder is symmetric): the arm touches the holder or the camera mast only in
   poses that were already blocked before (by the old brackets, the old camera post or the beam): the forearm or hand
   folded back toward the column. The holder blocks no pose that was free.
 
@@ -62,10 +64,11 @@ Printed strengths as for the ring (PETG 30 MPa, already reduced for walls / infi
 | holder (PETG) | pad + bridge leaving the cheek (936 mm² section, worst: the lift stopping at the bottom) | 2.8 MPa | 10.6 |
 | legs | M5 bolt through the gantry plate | 132 N | 38 |
 | legs (PETG) | bolt head pulling through a 12 mm leg | 0.4 MPa | 44 |
-| lap joint | M5 shear, one arm loaded and the other not | 465 N | 6.5 |
-| lap joint (PETG) | bolt bearing on a 12 mm lap layer | 7.7 MPa | 3.9 |
+| lap joint | M5 shear, one arm loaded and the other not | 542 N | 5.5 |
+| lap joint (PETG) | bolt bearing on an 11 mm lap layer | 9.9 MPa | 3.0 |
 | arm base | its own M5 × 8 inserts | 22 N | 54 |
 
-The lap joint was the weak spot with an 8 mm layer (safety factor 2.6), so the front bridge is 24 mm deep. That
+The lap joint was the weak spot with an 8 mm layer (safety factor 2.6), so the front bridge is 24 mm deep. The mast
+pocket takes 2 mm off its top, so the lap face moved down 1 mm (11 mm layers, safety factor 3.0). That
 figure is pessimistic: it puts one arm's whole moment on the closest bolt pair, while the plate bolts and the other
 bolts share it. Insert values are typical published figures, not measured.

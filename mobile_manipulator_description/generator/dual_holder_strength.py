@@ -83,9 +83,10 @@ def run(files):
         if side != 'left': continue
         O = np.array([0.0, DH.ARM_Y, DH.AZ]) / 1000.0
         m0 = max(m0, np.linalg.norm((M + np.cross(O, F))[[0, 2]]))
-    Fs = m0 / 0.028                                  # couple over the smallest bolt spacing in a lap (28 mm)
+    Fs = m0 / 0.024                                  # couple over the smallest bolt spacing in a lap (24 mm)
     rows.append(('lap joint', 'M5 shear (one arm loaded, the other not)', f'{m0:.2f} N m', f'{Fs:.0f} N', 'M5 steel ~3 kN shear', 3000.0 / Fs))
-    tl = min(DH.FRONT['z'][1] - DH.FRONT['zm'], DH.FRONT['zm'] - DH.FRONT['z'][0], DH.REAR['z'][1] - DH.REAR['zm'], DH.REAR['zm'] - DH.REAR['z'][0])
+    # front: the upper layer is thinner under the mast pocket, the lower layer's shank shorter by the sunk head
+    tl = min(DH.CAM_Z - DH.FRONT['zm'], DH.FRONT['zm'] - DH.FRONT['z'][0] - DH.LAP_CB, DH.REAR['z'][1] - DH.REAR['zm'], DH.REAR['zm'] - DH.REAR['z'][0])
     row('holder (PETG)', f'bolt bearing on the {tl:.1f} mm lap layer', f'{Fs:.0f} N', Fs / (5.0 * tl), STRENGTH['PETG'])
     # 4) the arm base's own inserts: tipping about its outer edge (x +36 from the shoulder)
     mb = max(np.linalg.norm(M[[0, 1]]) for _, _, F, M in W)
