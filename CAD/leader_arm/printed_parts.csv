@@ -1,8 +1,8 @@
 file,part,group,qty_mono,qty_proto,size_mm,volume_cm3,note
 01_shoulder_mount.stl,shoulder_mount,arm module,1,2,99.0 x 95.0 x 42.3,99.9,holds the shoulder servo (horn up) by its socket face; 4 x M3 down into the pedestal (any multiple of 45 deg); support ring under link 1 + stop rib at the back
-02_link1.stl,link1,arm module,1,2,87.0 x 35.8 x 34.0,28.7,"upper arm 91 mm: plate on the shoulder horn, clamp on the elbow servo; rides on the support ring, stop peg underneath"
+02_link1.stl,link1,arm module,1,2,87.0 x 35.8 x 34.0,28.6,"upper arm 91 mm: plate on the shoulder horn, clamp on the elbow servo; rides on the support ring, stop peg underneath"
 03_link2.stl,link2,arm module,1,2,86.0 x 60.4 x 29.0,34.6,"forearm 91 mm: fork on the elbow servo (horn + idler), clamp on the wrist-pan servo; prints on its side"
-04_wrist.stl,wrist,arm module,1,2,62.8 x 83.0 x 35.8,34.2,fork on the wrist-pan servo (horn + idler) + clamp holding the pitch servo
+04_wrist.stl,wrist,arm module,1,2,62.8 x 83.0 x 35.8,34.1,fork on the wrist-pan servo (horn + idler) + clamp holding the pitch servo
 05_pitch_fork.stl,pitch_fork,arm module,1,2,56.6 x 49.0 x 55.9,32.3,pitch fork (output horn + idler) + back plate holding the roll servo
 06_gripper_frame.stl,gripper_frame,arm module,1,2,52.5 x 37.5 x 46.5,21.6,"pinch gripper frame on the roll horn: holds the gripper servo (horn down, body forward); prints top plate down"
 07_gripper_fixed_jaw.stl,gripper_fixed_jaw,arm module,1,2,84.0 x 33.0 x 34.1,32.8,"fixed jaw with its finger loop (+Y), bolted under the gripper frame (2 x M3); prints standing on its loop"

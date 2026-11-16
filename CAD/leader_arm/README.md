@@ -187,3 +187,6 @@ is at most 16 mm tall; the cable is a flat 5 × 2.6 mm.
 - Print the gripper first and try the pinch: loop sizes and the 40° travel are first guesses.
 - Print one link and check the servo fit before printing the rest (the clamps hold the servo's rear end, as v2's
   stand did).
+- **Servo fit:** the same as the follower and the SO-100: line-to-line around the case, 0.1 mm play over the
+  servo's flat case face on the output side, M2 × 6 self-tapping case screws. If a servo is still too tight to slide
+  into a clamp, sand the clamp lightly rather than forcing it (the clamp walls are thin).

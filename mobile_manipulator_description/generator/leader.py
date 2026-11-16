@@ -108,11 +108,13 @@ _cache = {}
 
 
 def clamp_pocket():
-    """Space the servo's rear end needs in a clamp block it slides into along -X (servo frame)."""
+    """Space the servo's rear end needs in a clamp block it slides into along -X (servo frame).
+    Line-to-line around the case, plus the follower's SO100['cz_idler'] play (0.1 mm) over the -Z case face (2026-11-16,
+    user: same fit as the follower's tongue pockets; the clamp_screws seats already assume that gap)."""
     if 'clamp' not in _cache:
         M = basis((0, 0, 1), (0, 1, 0), (-1, 0, 0))
-        sw = sweep(xf(SERVO, M), +1, -42.0, -18.0, c=0.0, cz=0.0)
-        _cache['clamp'] = xf(sw, np.linalg.inv(M))
+        sw = xf(sweep(xf(SERVO, M), +1, -42.0, -18.0, c=0.0, cz=0.0), np.linalg.inv(M))
+        _cache['clamp'] = union([sw, xf(sw, T(0, 0, -SO100['cz_idler']))])
     return _cache['clamp']
 
 
