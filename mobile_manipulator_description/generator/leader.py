@@ -61,7 +61,10 @@ BEAM_Z = 15.0                           # beam half height
 CL = dict(x=(-37.5, -18.0), y=14.5, z=17.9)   # clamp on a servo's rear end (servo frame)
 XP = 40.0 * SCALE                       # 28: pitch axis forward of the wrist-pan axis (follower 40)
 ROOF = 2.8
-ZPD = OUT_F + PT + ROOF + 35.2 - 2.0    # 62.7: pitch axis below the arm plane (follower 74.6 x 0.7 = 52: the servo needs room)
+# v4: S2 and S3 are turned over (output UP, sockets DOWN) so their cable loops sit UNDER the joints: the wrist's bottom
+# prong is now the raised idler prong (IDL_F + BOSS + PT = 33.7 under the arm plane, was the output prong at 26.7)
+ZPD = IDL_F + BOSS + PT + ROOF + 35.2 - 2.0    # 69.7 (v3 62.7): pitch axis below the arm plane (the servo needs room)
+FLIP = Rx(180)                          # S2 / S3 turned over; link 2 and the wrist fork are built upright and turned with them
 XR = 85.0 * SCALE                       # 59.5: roll servo centre forward of the pitch axis (follower 85)
 # pinch gripper (grip frame: origin on the roll horn face, X forward along the roll axis, Z up at roll 0, Y left):
 # the gripper servo S6 lies with its shaft along Z at x = PX, output horn DOWN, its body FORWARD (so the pivot sits
@@ -73,9 +76,15 @@ PX = 15.0
 JAW = dict(g=2.0, t=3.0, z=(-52.0, -18.7))                 # closed gap at the blades, blade thickness, blade z
 LOOP = dict(xc=85.0, L=58.0, w=24.0, wall=3.0)              # oval finger loop (inside 58 x 24: 3 fingers or a thumb)
 CLAMP_YP = 21.5                                             # the clamp's +Y wall is thick: nut traps for the fixed jaw
-ZC1 = -(OUT_F + PT / 2)                 # -22.7: shoulder servo centre (link 1 sits on its horn at z -4 .. 4)
-H_ARM = 280.0                           # arm plane above the desk (seated; the gripper hanging straight down clears the desk)
-MOUNT_R, MOUNT_Z = 38.0, ZC1 - RIM - PT  # shoulder mount disc radius / underside (-46.6)
+# v4 (2026-11-17, user: "keep all cables to 20 cm", like the SO-100): the shoulder servo S1 TURNS WITH LINK 1. Its output
+# horn faces down and is screwed to a fixed hub on the pedestal; its body (sockets UP) sits in link 1's rear clamp at the
+# arm plane, rear end toward the elbow. No servo cable crosses the shoulder: S1 -> S2 runs along link 1 (~9 cm) and the
+# servo board rides on link 1 (a dovetail socket on a short tail behind S1), so only the board's USB + power cables
+# cross the shoulder (slack loop down to the desk). v3 (S1 fixed, horn up, ~31 / 36 cm shoulder cables) is in git.
+ZC1 = 0.0                               # S1 centre: in the arm plane (like S2 / S3)
+H_ARM = 287.0                           # arm plane above the desk (v4 +7 with ZPD: the hanging gripper keeps ~22 mm over the desk)
+MOUNT_R, MOUNT_Z = 38.0, -46.6          # hub flange radius / underside = the pedestal top (unchanged)
+HUB = dict(plate=(-OUT_F - PT, -OUT_F), r_plate=14.0, tube=(11.0, 17.0), flange_t=8.0)   # horn plate z, tube radii
 PROTO_Y, PROTO_YAW = 150.0 * SCALE, 135.0
 PFY = 5.5                               # pitch fork: idler-side prong moved out (S4's plug + the pitch cable loop)
 # pedestal yaw in the world (its 3 M5 holes must match the foot's); the shoulder mount turns on it in 45 deg steps.
@@ -85,24 +94,25 @@ PFY = 5.5                               # pitch fork: idler-side prong moved out
 # tote), proto = 180 deg (1.0 % vs 1.7 % at 0 deg; 45 deg off each arm's front).
 PED_YAW = {'mono': 0.0, 'proto': 180.0}
 MONO_FOOT_YAW, PROTO_FOOT_YAW = 0.0, 60.0   # foot M5 hole patterns (proto: 60 / 180 / 300 so the pedestal can sit at 180)
-CAP_HOLE = 22.0                         # hole through the pedestal cap: S1's plug slot (r <= 20.8) at any 45 deg mount angle
 # servo bus board: the SO-101 Waveshare mounting plate (51 x 42 x 4, 18 mm dovetail peg, as on the follower) slides DOWN
 # into a dovetail socket on a pad on the pedestal's +X side; the board on it is ASSUMED <= 16 mm tall
-BOARD = dict(pad_x=(22.0, 32.0), pad_y=15.0, zc=52.0, plate=(51.0, 42.0, 4.0), comp=16.0)   # zc: socket centre above the desk
+BOARD = dict(face_x=-26.0, pad_t=10.0, pad_y=15.0, zc=8.0, plate=(51.0, 42.0, 4.0), comp=16.0)   # link 1 frame: socket face
+                                        # (looks -X) behind S1, socket centre z; the plate (42 tall) stays over the support ring
 CABLE = dict(w=5.0, t=2.6)              # flat 3-wire servo cable allowance (width, thickness) for clips and corridors
 # shoulder support ring + end stop (2026-11-12): the arm (~435 g, COM 170-215 mm out) hung on S1's horn alone. A fixed
 # ring on the shoulder mount sits SUP_GAP under link 1's beam and carries it once it droops or is pushed down; a peg under
 # link 1 (outside the ring) hits a rib on the ring at the back (-X), so J1 stops at about +-174 deg and never reaches the
 # servo's +-180 wrap (the follower would swing the long way round) and the cables can't wind up.
 SUP = dict(ri=44.0, ro=47.5, gap=0.3)    # ring radii (3.5 mm wall) (outside the mount walls' corners r 41.6, inside link 1's clamp x 53.5)
-PEG = dict(r=(48.5, 53.6), hw=3.0, z=-14.0)      # peg under link 1: radial extent, half width, bottom z
+PEG = dict(r=(48.5, 53.6), hw=3.0, z=-24.0)      # peg under link 1's beam: radial extent, half width, bottom z
 RIB = dict(ro=51.5, hw=2.5)                      # stop rib on the ring's outside at -X, from the bed up to the ring top
-LIMITS = {'J1': (-173, 173), 'J2': (-130, 130), 'J3': (-127, 127), 'pitch': (-20, 120), 'roll': (-125, 125)}
+# v4: J2 +-120 (follower elbow +-115), roll +-90 (user: "in most scenario 90 deg is enough"; shorter cable loops)
+LIMITS = {'J1': (-173, 173), 'J2': (-120, 120), 'J3': (-127, 127), 'pitch': (-20, 120), 'roll': (-90, 90)}
 LIMITS_PROTO_J1 = (-120, 120)
 TRIG = (0.0, 40.0)                      # jaw opening (deg): thumb-finger span ~46 -> ~85 mm; maps to the follower's 0..90 mm
 PLUG = dict(x=(-18.5, -10.0), y=9.6)
 
-S1_IN_BASE = T(0, 0, ZC1) @ Rx(180)                                         # output up, body toward -x
+S1_IN_LINK1 = T(0, 0, ZC1) @ Rz(180)                                       # output DOWN (to the hub), sockets up, rear toward +x
 S4_IN_WRIST = T(XP, 0, -ZPD) @ basis((0, 0, -1), (1, 0, 0), (0, -1, 0))   # shaft +-Y, output +Y, body up
 S4_ROT = basis((0, 0, -1), (1, 0, 0), (0, -1, 0))
 S5_IN_PITCH = T(XR, 0, 0) @ basis((0, 0, 1), (0, 1, 0), (-1, 0, 0))       # shaft X, output +X, body down
@@ -171,7 +181,7 @@ def frames(q=(0, 0, 0, 0, 0), trig=0.0, root=None):
     return F
 
 
-SERVOS = [('S1_shoulder', 'base', S1_IN_BASE), ('S2_elbow', 'link1', T(L1, 0, 0)), ('S3_wrist_pan', 'link2', T(L2, 0, 0)),
+SERVOS = [('S1_shoulder', 'link1', S1_IN_LINK1), ('S2_elbow', 'link1', T(L1, 0, 0) @ FLIP), ('S3_wrist_pan', 'link2', T(L2, 0, 0) @ FLIP),
           ('S4_pitch', 'wrist', S4_IN_WRIST), ('S5_roll', 'pitch', S5_IN_PITCH), ('S6_gripper', 'grip', S6_IN_GRIP)]
 
 def clip_z(c):
@@ -201,9 +211,13 @@ def clip_x(y0_, y1_, x_face, sx, z):
     return blk - box(min(x_face, tx1) - 0.01, max(x_face, tx1) + 0.01, y0_, y1_, z[0] - 1, z[1] + 1)
 
 
-# where the cable clips sit (link frames)
-CLIP1 = dict(x=L1 - 33.5, y_face=CL['y'], sy=+1, z=(-CL['z'], -CL['z'] + 7.0))   # link 1: S1 -> S2 cable drops to the ring loop (clear of link 2's
-                                                                                 # bottom prong arm at elbow +130)
+
+WRIST_CLIP = dict(x=20.0, y_face=-CL['z'], sy=-1, z=(-39.2, -33.8))      # wrist: clip on the S4 clamp's -Y face for the drop
+                                                                         # (above the pitch loop: >= 30 mm from the pitch axis)
+ROLL_NOTCH = dict(hw=CABLE['w'] / 2 + 0.7, z0=12.5)                     # gripper frame back plate: cable notch (grip frame)
+LINK1_CLIP = dict(x=L1 - 34.0, y_face=CL['y'], sy=+1, z=(-6.0, 1.0))     # link 1: S1 -> S2 cable down the elbow clamp's +Y face
+                                                                         # (x 57: outside the support ring and the stop peg)
+CABLE_EXIT = -60.0                       # elbow / wrist pan: the cable leaves the gap under the top prong at this angle
 
 PARTS = {}            # arm module: name -> dict(solid, frame, color, note, qty)
 BASE_PARTS = {}       # bases: name -> dict(solid (base frame of ONE arm for 'pedestal'; world for the rest), variant, ...)
@@ -242,56 +256,71 @@ def plug_room():
     return box(PLUG['x'][0] - 0.2, PLUG['x'][1] + 0.2, -PLUG['y'] - 0.2, PLUG['y'] + 0.2, RIM - 0.01, RIM + 12.0)
 
 
-def clamp_cut(x):
-    return [xf(clamp_pocket(), T(x, 0, 0)), xf(clamp_screws(), T(x, 0, 0)), xf(plug_room(), T(x, 0, 0))]
+def clamp_cut(x, flip=False):
+    M_ = T(x, 0, 0) @ (FLIP if flip else np.eye(4))
+    return [xf(clamp_pocket(), M_), xf(clamp_screws(), M_), xf(plug_room(), M_)]
 
 
 def build():
     PARTS.clear(); BASE_PARTS.clear(); FASTENERS.clear()
 
-    # ---- shoulder mount: seat on S1's socket face (down) + low walls + disc with 4 x M3 to the pedestal (at 45 deg)
-    seat = xf(box(-38.6, 13.6, -15.4, 15.4, RIM, RIM + PT), S1_IN_BASE)
-    disc = cyl(MOUNT_R, MOUNT_Z, MOUNT_Z + PT)
-    walls = box(-38.6, 13.6, -15.4, 15.4, MOUNT_Z, -10.0) - box(-35.6, 10.6, -12.8, 12.8, MOUNT_Z + PT - 0.01, 0)
-    ring_top = ZC1 + OUT_F - SUP['gap']                                                  # link 1's underside - gap
-    ring = union([cyl(SUP['ro'], MOUNT_Z, MOUNT_Z + PT), cyl(SUP['ro'], MOUNT_Z + PT - 0.01, ring_top)]) \
-        - cyl(SUP['ri'], MOUNT_Z + PT, ring_top + 1)
+    # ---- shoulder hub (part 01, fixed): plate under S1's output horn (4 x M3 x 6 UP into the horn, reached through the
+    # hollow tube before the hub goes on the pedestal) + tube + flange with 4 x M3 down into the pedestal cap (any multiple
+    # of 45 deg) + the support ring under link 1's beam + the end-stop rib at the back (-X)
+    H = HUB; ring_top = -BEAM_Z - SUP['gap']                                             # link 1's beam underside - gap
+    plate = cyl(H['r_plate'], *H['plate'])
+    tube = cyl(H['tube'][1], MOUNT_Z + H['flange_t'] - 0.01, H['plate'][0] + 0.01) - cyl(H['tube'][0], MOUNT_Z, H['plate'][0] + 0.02)
+    flange = cyl(MOUNT_R, MOUNT_Z, MOUNT_Z + H['flange_t'])
+    ring = union([cyl(SUP['ro'], MOUNT_Z, MOUNT_Z + H['flange_t']), cyl(SUP['ro'], MOUNT_Z + H['flange_t'] - 0.01, ring_top)]) \
+        - cyl(SUP['ri'], MOUNT_Z + H['flange_t'], ring_top + 1)
     rib = box(-RIB['ro'], -SUP['ri'], -RIB['hw'], RIB['hw'], MOUNT_Z, ring_top)
-    chan = box(PLUG['x'][0], SUP['ro'] + 1.0, -CABLE['w'] / 2 - 0.5, CABLE['w'] / 2 + 0.5, MOUNT_Z - 1.0, MOUNT_Z + 4.0)  # S1 -> S2 cable to the front
-    m = union([seat, disc, walls, ring, rib]) - union([xf(seat_cut(), S1_IN_BASE), chan] +
-                                           [cyl(1.7, MOUNT_Z - 1, MOUNT_Z + PT + 1, 30 * math.cos(math.radians(a)), 30 * math.sin(math.radians(a)), hole=True)
-                                            for a in (45, 135, 225, 315)])
-    add('shoulder_mount', m, 'base', (0.85, 0.45, 0.15), 'holds the shoulder servo (horn up) by its socket face; '
-        '4 x M3 down into the pedestal (any multiple of 45 deg); support ring under link 1 + stop rib at the back')
-    fast('selftap', 'M2', 6, 4, 'shoulder servo case'); fast('SHCS', 'M3', 20, 4, 'shoulder mount to pedestal (nut in the cap underside)')
-    fast('nut', 'M3', None, 4, 'shoulder mount')
+    hub = union([plate, tube, flange, ring, rib]) - union(
+        [xf(horn_cut(OUT_F, PT, HORN_SCREW), S1_IN_LINK1), cyl(H['tube'][0], MOUNT_Z - 1, H['plate'][0] + 0.01)] +
+        [cyl(1.7, MOUNT_Z - 1, MOUNT_Z + H['flange_t'] + 1, 30 * math.cos(math.radians(a)), 30 * math.sin(math.radians(a)), hole=True)
+         for a in (45, 135, 225, 315)])
+    add('shoulder_hub', hub, 'base', (0.85, 0.45, 0.15), 'fixed hub under the shoulder servo: its output horn screws on '
+        'from below (4 x M3 x 6 through the hollow tube); 4 x M3 down into the pedestal (any multiple of 45 deg); '
+        'support ring under link 1 + stop rib at the back')
+    fast('SHCS', 'M3', HORN_SCREW, 4, 'shoulder horn onto the hub (from below, through the tube)')
+    fast('SHCS', 'M3', 20, 4, 'shoulder hub to pedestal (nut in the cap underside)'); fast('nut', 'M3', None, 4, 'shoulder hub')
 
-    # ---- link 1: plate on S1's horn (z -4 .. 4, above everything fixed: +-180) + beam + clamp on S2's rear end
-    zp = (ZC1 + OUT_F, ZC1 + OUT_F + PT)
-    peg = box(PEG['r'][0], PEG['r'][1], -PEG['hw'], PEG['hw'], PEG['z'], zp[0] + 0.01)           # end stop peg (into the clamp)
-    # the 2 front horn screws are under the beam (2026-11-17: only 2 of 4 could be reached): their head pockets run up
-    # through the beam top, and the beam root is a r 14 column so it keeps 15.6 of its 20 mm width between the pockets
-    l1 = union([cyl(14.0, *zp), cyl(14.0, zp[0], BEAM_Z), box(0, L1 + CL['x'][0] + 0.01, -W, W, zp[0], BEAM_Z), peg,
-                clip_z(CLIP1)] + clamp_block(L1))
-    l1 = l1 - union([xf(horn_cut(OUT_F, BEAM_Z - zp[0], HORN_SCREW), S1_IN_BASE)] + clamp_cut(L1))
-    add('link1', l1, 'link1', (0.30, 0.55, 0.85), f'upper arm {L1:.0f} mm: plate on the shoulder horn, clamp on the elbow servo; '
-        'rides on the support ring, stop peg underneath')
-    fast('SHCS', 'M3', HORN_SCREW, 4, 'shoulder horn (heads down the pockets)'); fast('selftap', 'M2', 6, 4, 'elbow servo case (link 1 clamp)')
+    # ---- link 1 (part 02): clamp on S1's rear end + 16 mm beam + clamp on S2's rear end; rails along S1's sides to a
+    # tail behind it with the board's dovetail socket (the SO-101 Waveshare plate slides DOWN into it, as on the follower)
+    B = BOARD; fx = B['face_x']
+    peg = box(PEG['r'][0], PEG['r'][1], -PEG['hw'], PEG['hw'], PEG['z'], -BEAM_Z + 0.01)       # end stop peg under the beam
+    s1_clamp = xf(box(CL['x'][0], CL['x'][1], -CL['y'], CL['y'], -CL['z'], CL['z']), S1_IN_LINK1)   # x 18 .. 37.5
+    beam = box(-CL['x'][0] - 0.01, L1 + CL['x'][0] + 0.01, -W, W, -BEAM_Z, BEAM_Z)
+    rails = [box(fx + B['pad_t'] - 0.01, -CL['x'][1] + 0.01, sy * 12.6, sy * 15.6, -10.0, 10.0) if sy > 0 else
+             box(fx + B['pad_t'] - 0.01, -CL['x'][1] + 0.01, -15.6, -12.6, -10.0, 10.0) for sy in (1, -1)]
+    pad = box(fx, fx + B['pad_t'], -B['pad_y'], B['pad_y'], B['zc'] - 12.0, B['zc'] + 12.0)
+    dv = CS([[(-1.0, -8.15), (1.0, -8.15), (2.6, -9.25), (4.0, -9.25), (4.0, 9.25), (2.6, 9.25), (1.0, 8.15), (-1.0, 8.15)]])
+    dv = xf(dv.extrude(30.0).translate((0, 0, B['zc'] - 9.25)), basis((1, 0, 0), (0, 1, 0), (0, 0, 1), (fx, 0, 0)))
+    # S1 -> S2 cable: S1's sockets are on top, S2's (turned over) underneath: it runs along the top and down a clip on the
+    # beam's +Y face, then under the elbow clamp
+    l1 = union([s1_clamp, beam, peg, pad, clip_z(LINK1_CLIP)] + rails + clamp_block(L1))
+    s1_cut = [xf(clamp_pocket(), S1_IN_LINK1), xf(clamp_screws(), S1_IN_LINK1), xf(plug_room(), S1_IN_LINK1)]
+    l1 = l1 - union(s1_cut + clamp_cut(L1, flip=True) + [dv])
+    add('link1', l1, 'link1', (0.30, 0.55, 0.85), f'upper arm {L1:.0f} mm: clamps on the shoulder and elbow servos\' rear '
+        'ends, rides on the support ring (stop peg underneath), board socket on the tail behind the shoulder servo')
+    fast('selftap', 'M2', 6, 4, 'shoulder servo case (link 1 clamp)'); fast('selftap', 'M2', 6, 4, 'elbow servo case (link 1 clamp)')
 
     # ---- link 2: fork around S2 + beam + clamp on S3 (+ an arch on the clamp top for the S2 -> S3 cable)
     p, c = fork(beam_to=L2)
-    p += [arch_x(L2 + CL['x'][0] + 4.5, L2 + CL['x'][0] + 10.5, CL['z'])]
-    add('link2', union(p) - union(c), 'link2', (0.30, 0.55, 0.85),
+    p += [arch_x(L2 + CL['x'][0] + 0.5, L2 + CL['x'][0] + 6.5, CL['z'])]   # on the clamp face (after the flip: underneath); at its
+    # far end, r >= 31 from the wrist-pan axis: closer in, the wrist's side cable met it past J3 -120
+    add('link2', xf(union(p) - union(c), FLIP), 'link2', (0.30, 0.55, 0.85),
         f'forearm {L2:.0f} mm: fork on the elbow servo (horn + idler), clamp on the wrist-pan servo; prints on its side')
     fast('SHCS', 'M3', HORN_SCREW, 4, 'elbow horn'); fast('SHCS', 'M3', IDL_SCREW, 4, 'elbow idler (head deep in the boss)'); fast('selftap', 'M2', 6, 4, 'wrist-pan servo case (link 2 clamp)')
 
     # ---- wrist: fork around S3 + clamp under the bottom prong holding S4's rear (top) end
     p, c = fork()
-    blk = box(XP - CL['y'], XP + CL['y'], -CL['z'], CL['z'], -ZPD + 18.0, PR_B[1])        # S4 clamp (S4 frame: y_s -> x)
-    p += [blk, box(0, WEB[1], -CL['z'], CL['z'], *PR_B),
-          arch_x(22.0, 28.0, PR_T[1]), clip_x(-CABLE['w'] / 2, CABLE['w'] / 2, WEB[1], +1, (-12.0, -6.0))]   # S3 -> S4 cable
-    c += [xf(clamp_pocket(), S4_IN_WRIST), xf(clamp_screws(), S4_IN_WRIST), xf(plug_room(), S4_IN_WRIST)]
-    add('wrist', union(p) - union(c), 'wrist', (0.93, 0.70, 0.25),
+    fk = xf(union(p) - union(c), FLIP)                                                   # turned over with S3: idler prong at the bottom
+    prb = (-PR_T[1], -PR_T[0])                                                            # that bottom prong's z (-33.7 .. -25.7)
+    blk = box(XP - CL['y'], XP + CL['y'], -CL['z'], CL['z'], -ZPD + 18.0, prb[0] + 0.01)   # S4 clamp (S4 frame: y_s -> x)
+    plate = box(0, WEB[1], -CL['z'], CL['z'], *prb) - xf(horn_cut(IDL_F, PT + BOSS, IDL_SCREW, side=+1), FLIP)
+    wr = union([fk, blk, plate, clip_z(WRIST_CLIP)])   # v4: S3 -> S4 cable leaves the gap under S3 at CABLE_EXIT, drops down the -Y side
+    wr = wr - union([xf(clamp_pocket(), S4_IN_WRIST), xf(clamp_screws(), S4_IN_WRIST), xf(plug_room(), S4_IN_WRIST)])
+    add('wrist', wr, 'wrist', (0.93, 0.70, 0.25),
         'fork on the wrist-pan servo (horn + idler) + clamp holding the pitch servo')
     fast('SHCS', 'M3', HORN_SCREW, 4, 'wrist-pan horn'); fast('SHCS', 'M3', IDL_SCREW, 4, 'wrist-pan idler (head deep in the boss)'); fast('selftap', 'M2', 6, 4, 'pitch servo case (wrist clamp)')
 
@@ -337,7 +366,10 @@ def build():
     side_open = union([box(pk[0] - 0.01, pk[3] + 0.01, -CL['y'] - 1.0, 0.0, -RIM - SO100['cz_idler'], RIM),
                        box(pk[0] - 0.01, PX + 29.9 + 0.3, -CL['y'] - 1.0, -9.2 + 0.2, RIM - 0.01, RIM + 1.8 + 0.2),
                        box(pk[0] - 0.01, pk[3] + 0.01, -CL['y'] - 1.0, -7.0 + 0.2, -CL['z'] - 1.0, -RIM - 0.05)])
-    cut = [xf(horn_cut(OUT_F, 4.0, HORN_SCREW), S5_IN_GRIP), xf(clamp_pocket(), S6_IN_GRIP), side_open, xf(clamp_screws(), S6_IN_GRIP),
+    # v4 roll cable: from over the roll servo's top it enters the gripper through a NOTCH in the back plate's top, close to
+    # the roll axis (it twists +-90 deg around S5's top there instead of wrapping a loop around the gripper's back)
+    notch = box(-0.1, 4.1, -ROLL_NOTCH['hw'], ROLL_NOTCH['hw'], ROLL_NOTCH['z0'], 24.1)
+    cut = [xf(horn_cut(OUT_F, 4.0, HORN_SCREW), S5_IN_GRIP), xf(clamp_pocket(), S6_IN_GRIP), side_open, notch, xf(clamp_screws(), S6_IN_GRIP),
            cyl(4.0, 20.0, 25.0, PX, 0, hole=True),                                               # over the idler / centre screw
            box(PX - PLUG['x'][1] - 0.5, PX - PLUG['x'][0] + 0.5, -PLUG['y'], PLUG['y'], 15.0, 25.0)]   # plug slot (socket face up; S6's x -> -X)
     nuts = [(cx[0] + 5.0, 17.5), (cx[1] - 5.0, 17.5)]
@@ -374,7 +406,7 @@ def build():
 
 # ------------------------------------------------------------------ bases (swap: 4 x M3 under the shoulder mount)
 def pedestal():
-    """Slim hollow column (r 26) from the desk to a cap (r 38) under the shoulder mount (base frame of one arm). The cap
+    """Slim hollow column (r 26) from the desk to a cap (r 38) under the shoulder hub (base frame of one arm). The cap
     has 8 M3 holes every 45 deg with nut pockets open on its underside (reachable from outside)."""
     zd = -H_ARM; zt = MOUNT_Z; ct = 10.0
     s = union([cyl(MOUNT_R, zt - ct, zt), cyl(26.0, zd + 4.0, zt - ct + 0.01), cyl(52.0, zd, zd + 6.0),
@@ -388,21 +420,14 @@ def pedestal():
     for k in range(3):                                                                       # 3 x M5 to the foot
         a = math.radians(120.0 * k)
         cut.append(cyl(2.75, zd - 1, zd + 7.0, 44 * math.cos(a), 44 * math.sin(a), hole=True))
-    cut.append(cyl(CAP_HOLE, zt - ct - 1.0, zt + 1.0))                                       # S1's cable down into the column
-    cut.append(box(18.0, 30.0, -7.0, 7.0, zd + 8.0, zd + 24.0))                              # cable window to the board (+X)
-    # board socket: a flat pad on the +X side, dovetail open at the TOP (the plate slides down until its peg bottoms)
-    B = BOARD; zc = zd + B['zc']
-    pad = box(B['pad_x'][0], B['pad_x'][1], -B['pad_y'], B['pad_y'], zc - 12.0, zc + 12.0)
-    dv = CS([[(-1.0, -8.15), (1.0, -8.15), (2.6, -9.25), (4.0, -9.25), (4.0, 9.25), (2.6, 9.25), (1.0, 8.15), (-1.0, 8.15)]])
-    dv = xf(dv.extrude(30.0).translate((0, 0, zc - 9.25)), basis((-1, 0, 0), (0, 1, 0), (0, 0, 1), (B['pad_x'][1], 0, 0)))
-    return (s + pad) - union(cut + [dv])
+    # v4: no board socket, cable window or cap hole any more (the board rides on link 1; no servo cable goes down here)
+    return s - union(cut)
 
 
 def build_bases():
     ped = pedestal()
     BASE_PARTS['pedestal'] = dict(solid=ped, variant='both', qty_mono=1, qty_proto=2, color=(0.55, 0.57, 0.60),
-                                  note='column under the shoulder mount; 8 nut traps (arm at any multiple of 45 deg); 3 x M5 to a foot; '
-                                       'cap hole for the shoulder servo cable, cable window + board socket on one side')
+                                  note='column under the shoulder hub; 8 nut traps (arm at any multiple of 45 deg); 3 x M5 to a foot')
     # one pedestal per arm module; grip = pedestal flange 6 + foot plate 6 = 12 mm, nut in a pocket under the foot
     fast('SHCS', 'M5', 12, 3, 'pedestal to foot (nut in the pocket under the foot)'); fast('nut', 'M5', None, 3, 'pedestal to foot')
     zd = -H_ARM

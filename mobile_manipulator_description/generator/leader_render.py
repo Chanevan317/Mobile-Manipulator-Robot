@@ -22,13 +22,17 @@ def draw(ax, q, el, az, trig=0.0, zoom=1.0, center=None, variant='mono', q2=None
     ax.view_init(el, az); ax.set_proj_type('ortho'); ax.set_axis_off(); ax.set_title(title, fontsize=14)
 
 
-fig = plt.figure(figsize=(22, 13), facecolor='white')
-draw(fig.add_subplot(2, 2, 1, projection='3d'), (0, 0, 0, 0, 0), 20, -60, zoom=1.1,
-     title='leader v3 on the mono base (0.7 x the follower, zero pose)')
-draw(fig.add_subplot(2, 2, 2, projection='3d'), (40, -70, 30, 90, 0), 20, -125, trig=20, zoom=1.1,
+fig = plt.figure(figsize=(33, 13), facecolor='white')
+draw(fig.add_subplot(2, 3, 1, projection='3d'), (0, 0, 0, 0, 0), 20, -60, zoom=1.1,
+     title='leader v4 on the mono base (0.7 x the follower, zero pose)')
+draw(fig.add_subplot(2, 3, 2, projection='3d'), (40, -70, 30, 90, 0), 20, -125, trig=20, zoom=1.1,
      title='hand down: J1 40, J2 -70, J3 30, pitch 90, gripper open 20 deg')
-draw(fig.add_subplot(2, 2, 3, projection='3d'), (0, 0, 0, 0, 0), 25, -60, variant='proto', zoom=1.05,
+draw(fig.add_subplot(2, 3, 4, projection='3d'), (0, 0, 0, 0, 0), 25, -60, variant='proto', zoom=1.05,
      title='same arm modules on the prototype base (yaw +-135, column stand-in between)')
-draw(fig.add_subplot(2, 2, 4, projection='3d'), (0, 0, 0, 0, 0), 35, -50, trig=25, zoom=2.2, center=(LD.L1 + LD.L2 + LD.XP + LD.XR + 60, 0, -LD.ZPD - 20),
+draw(fig.add_subplot(2, 3, 5, projection='3d'), (0, 0, 0, 0, 0), 35, -50, trig=25, zoom=2.2, center=(LD.L1 + LD.L2 + LD.XP + LD.XR + 60, 0, -LD.ZPD - 20),
      title='pinch gripper: frame + fixed jaw, moving jaw on the gripper servo, a finger loop on each (open 25 deg)')
+draw(fig.add_subplot(2, 3, 3, projection='3d'), (0, 0, 0, 0, 0), 25, 150, zoom=3.2, center=(5, 0, -15),
+     title='v4 shoulder: servo turns with link 1 (sockets up), horn on the fixed hub; board socket on the tail')
+draw(fig.add_subplot(2, 3, 6, projection='3d'), (0, 0, 0, 0, 0), -30, -70, zoom=3.0, center=(LD.L1 + 10, 0, -10),
+     title='v4 elbow from below: servo turned over, cable loop in the gap under it (all cables 20 cm)')
 plt.tight_layout(); plt.savefig(sys.argv[1], dpi=55)
