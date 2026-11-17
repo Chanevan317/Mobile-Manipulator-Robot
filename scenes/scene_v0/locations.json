@@ -1,0 +1,2693 @@
+{
+ "note": "scene_v0 location IDs (store_db.py, from scene.locations()); world frame = robot start, m; u = along the board, centre = (x, y) at the board front; facing = approach heading (deg)",
+ "locations": {
+  "R1-B1-01": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b0",
+   "level": 1,
+   "slot": 1,
+   "z": 0.761,
+   "u": [
+    -1.63,
+    -1.424
+   ],
+   "centre": [
+    -1.527,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": true,
+   "product": "P01",
+   "stations": [
+    "rack_b0_boxedCereal_l01"
+   ]
+  },
+  "R1-B1-02": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b0",
+   "level": 1,
+   "slot": 2,
+   "z": 0.761,
+   "u": [
+    -1.424,
+    -1.218
+   ],
+   "centre": [
+    -1.321,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": true,
+   "product": "P01",
+   "stations": [
+    "rack_b0_boxedCereal_l01"
+   ]
+  },
+  "R1-B1-03": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b0",
+   "level": 1,
+   "slot": 3,
+   "z": 0.761,
+   "u": [
+    -1.218,
+    -1.012
+   ],
+   "centre": [
+    -1.115,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": true,
+   "product": "P02",
+   "stations": [
+    "rack_b0_box_cracker_a01"
+   ]
+  },
+  "R1-B1-04": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b0",
+   "level": 1,
+   "slot": 4,
+   "z": 0.761,
+   "u": [
+    -1.012,
+    -0.806
+   ],
+   "centre": [
+    -0.909,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": true,
+   "product": "P02",
+   "stations": [
+    "rack_b0_box_cracker_a01"
+   ]
+  },
+  "R1-B1-05": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b0",
+   "level": 1,
+   "slot": 5,
+   "z": 0.761,
+   "u": [
+    -0.806,
+    -0.6
+   ],
+   "centre": [
+    -0.703,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": true,
+   "product": "P03",
+   "stations": [
+    "rack_b0_boxedFood_b01"
+   ]
+  },
+  "R1-B1-06": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b0",
+   "level": 1,
+   "slot": 6,
+   "z": 0.761,
+   "u": [
+    -0.6,
+    -0.394
+   ],
+   "centre": [
+    -0.497,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": true,
+   "product": "P03",
+   "stations": [
+    "rack_b0_boxedFood_b01"
+   ]
+  },
+  "R1-B1-07": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b0",
+   "level": 1,
+   "slot": 7,
+   "z": 0.761,
+   "u": [
+    -0.394,
+    -0.188
+   ],
+   "centre": [
+    -0.291,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": true,
+   "product": "P04",
+   "stations": [
+    "rack_b0_boxedFood_c01"
+   ]
+  },
+  "R1-B1-08": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b0",
+   "level": 1,
+   "slot": 8,
+   "z": 0.761,
+   "u": [
+    -0.188,
+    0.018
+   ],
+   "centre": [
+    -0.085,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": true,
+   "product": "P04",
+   "stations": [
+    "rack_b0_boxedFood_c01"
+   ]
+  },
+  "R1-B1-09": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b0",
+   "level": 1,
+   "slot": 9,
+   "z": 0.761,
+   "u": [
+    0.018,
+    0.224
+   ],
+   "centre": [
+    0.121,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": true,
+   "product": "P05",
+   "stations": [
+    "rack_b0_boxedFood_d01"
+   ]
+  },
+  "R1-B1-10": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b0",
+   "level": 1,
+   "slot": 10,
+   "z": 0.761,
+   "u": [
+    0.224,
+    0.43
+   ],
+   "centre": [
+    0.327,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": true,
+   "product": "P05",
+   "stations": [
+    "rack_b0_boxedFood_d01"
+   ]
+  },
+  "R1-B2-01": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b1",
+   "level": 2,
+   "slot": 1,
+   "z": 1.212,
+   "u": [
+    -1.63,
+    -1.424
+   ],
+   "centre": [
+    -1.527,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P01",
+   "stations": []
+  },
+  "R1-B2-02": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b1",
+   "level": 2,
+   "slot": 2,
+   "z": 1.212,
+   "u": [
+    -1.424,
+    -1.218
+   ],
+   "centre": [
+    -1.321,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P01",
+   "stations": []
+  },
+  "R1-B2-03": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b1",
+   "level": 2,
+   "slot": 3,
+   "z": 1.212,
+   "u": [
+    -1.218,
+    -1.012
+   ],
+   "centre": [
+    -1.115,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P01",
+   "stations": []
+  },
+  "R1-B2-04": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b1",
+   "level": 2,
+   "slot": 4,
+   "z": 1.212,
+   "u": [
+    -1.012,
+    -0.806
+   ],
+   "centre": [
+    -0.909,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P02",
+   "stations": []
+  },
+  "R1-B2-05": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b1",
+   "level": 2,
+   "slot": 5,
+   "z": 1.212,
+   "u": [
+    -0.806,
+    -0.6
+   ],
+   "centre": [
+    -0.703,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P02",
+   "stations": []
+  },
+  "R1-B2-06": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b1",
+   "level": 2,
+   "slot": 6,
+   "z": 1.212,
+   "u": [
+    -0.6,
+    -0.394
+   ],
+   "centre": [
+    -0.497,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P02",
+   "stations": []
+  },
+  "R1-B2-07": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b1",
+   "level": 2,
+   "slot": 7,
+   "z": 1.212,
+   "u": [
+    -0.394,
+    -0.188
+   ],
+   "centre": [
+    -0.291,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P02",
+   "stations": []
+  },
+  "R1-B2-08": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b1",
+   "level": 2,
+   "slot": 8,
+   "z": 1.212,
+   "u": [
+    -0.188,
+    0.018
+   ],
+   "centre": [
+    -0.085,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P05",
+   "stations": []
+  },
+  "R1-B2-09": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b1",
+   "level": 2,
+   "slot": 9,
+   "z": 1.212,
+   "u": [
+    0.018,
+    0.224
+   ],
+   "centre": [
+    0.121,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P05",
+   "stations": []
+  },
+  "R1-B2-10": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b1",
+   "level": 2,
+   "slot": 10,
+   "z": 1.212,
+   "u": [
+    0.224,
+    0.43
+   ],
+   "centre": [
+    0.327,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P05",
+   "stations": []
+  },
+  "R1-B3-01": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b2",
+   "level": 3,
+   "slot": 1,
+   "z": 1.663,
+   "u": [
+    -1.63,
+    -1.424
+   ],
+   "centre": [
+    -1.527,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P01",
+   "stations": []
+  },
+  "R1-B3-02": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b2",
+   "level": 3,
+   "slot": 2,
+   "z": 1.663,
+   "u": [
+    -1.424,
+    -1.218
+   ],
+   "centre": [
+    -1.321,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P01",
+   "stations": []
+  },
+  "R1-B3-03": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b2",
+   "level": 3,
+   "slot": 3,
+   "z": 1.663,
+   "u": [
+    -1.218,
+    -1.012
+   ],
+   "centre": [
+    -1.115,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P01",
+   "stations": []
+  },
+  "R1-B3-04": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b2",
+   "level": 3,
+   "slot": 4,
+   "z": 1.663,
+   "u": [
+    -1.012,
+    -0.806
+   ],
+   "centre": [
+    -0.909,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P01",
+   "stations": []
+  },
+  "R1-B3-05": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b2",
+   "level": 3,
+   "slot": 5,
+   "z": 1.663,
+   "u": [
+    -0.806,
+    -0.6
+   ],
+   "centre": [
+    -0.703,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P01",
+   "stations": []
+  },
+  "R1-B3-06": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b2",
+   "level": 3,
+   "slot": 6,
+   "z": 1.663,
+   "u": [
+    -0.6,
+    -0.394
+   ],
+   "centre": [
+    -0.497,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P02",
+   "stations": []
+  },
+  "R1-B3-07": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b2",
+   "level": 3,
+   "slot": 7,
+   "z": 1.663,
+   "u": [
+    -0.394,
+    -0.188
+   ],
+   "centre": [
+    -0.291,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P02",
+   "stations": []
+  },
+  "R1-B3-08": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b2",
+   "level": 3,
+   "slot": 8,
+   "z": 1.663,
+   "u": [
+    -0.188,
+    0.018
+   ],
+   "centre": [
+    -0.085,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P02",
+   "stations": []
+  },
+  "R1-B3-09": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b2",
+   "level": 3,
+   "slot": 9,
+   "z": 1.663,
+   "u": [
+    0.018,
+    0.224
+   ],
+   "centre": [
+    0.121,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P02",
+   "stations": []
+  },
+  "R1-B3-10": {
+   "unit": "R1",
+   "section": "breakfast and dry goods",
+   "board": "rack_b2",
+   "level": 3,
+   "slot": 10,
+   "z": 1.663,
+   "u": [
+    0.224,
+    0.43
+   ],
+   "centre": [
+    0.327,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P02",
+   "stations": []
+  },
+  "S1-B1-01": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b0",
+   "level": 1,
+   "slot": 1,
+   "z": 0.264,
+   "u": [
+    -0.14,
+    0.09
+   ],
+   "centre": [
+    -0.025,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P09",
+   "stations": []
+  },
+  "S1-B1-02": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b0",
+   "level": 1,
+   "slot": 2,
+   "z": 0.264,
+   "u": [
+    -0.37,
+    -0.14
+   ],
+   "centre": [
+    -0.255,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P09",
+   "stations": []
+  },
+  "S1-B1-03": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b0",
+   "level": 1,
+   "slot": 3,
+   "z": 0.264,
+   "u": [
+    -0.6,
+    -0.37
+   ],
+   "centre": [
+    -0.485,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P09",
+   "stations": []
+  },
+  "S1-B1-04": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b0",
+   "level": 1,
+   "slot": 4,
+   "z": 0.264,
+   "u": [
+    -0.83,
+    -0.6
+   ],
+   "centre": [
+    -0.715,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P10",
+   "stations": []
+  },
+  "S1-B1-05": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b0",
+   "level": 1,
+   "slot": 5,
+   "z": 0.264,
+   "u": [
+    -1.06,
+    -0.83
+   ],
+   "centre": [
+    -0.945,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P10",
+   "stations": []
+  },
+  "S1-B1-06": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b0",
+   "level": 1,
+   "slot": 6,
+   "z": 0.264,
+   "u": [
+    -1.29,
+    -1.06
+   ],
+   "centre": [
+    -1.175,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P10",
+   "stations": []
+  },
+  "S1-B2-01": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b1",
+   "level": 2,
+   "slot": 1,
+   "z": 0.667,
+   "u": [
+    -0.14,
+    0.09
+   ],
+   "centre": [
+    -0.025,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": true,
+   "product": "P11",
+   "stations": [
+    "shelf_b1_yogurt_a01"
+   ]
+  },
+  "S1-B2-02": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b1",
+   "level": 2,
+   "slot": 2,
+   "z": 0.667,
+   "u": [
+    -0.37,
+    -0.14
+   ],
+   "centre": [
+    -0.255,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": true,
+   "product": "P11",
+   "stations": [
+    "shelf_b1_yogurt_a01"
+   ]
+  },
+  "S1-B2-03": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b1",
+   "level": 2,
+   "slot": 3,
+   "z": 0.667,
+   "u": [
+    -0.6,
+    -0.37
+   ],
+   "centre": [
+    -0.485,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": true,
+   "product": "P11",
+   "stations": [
+    "shelf_b1_yogurt_a01"
+   ]
+  },
+  "S1-B2-04": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b1",
+   "level": 2,
+   "slot": 4,
+   "z": 0.667,
+   "u": [
+    -0.83,
+    -0.6
+   ],
+   "centre": [
+    -0.715,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": true,
+   "product": "P10",
+   "stations": [
+    "shelf_b1_milk_b01"
+   ]
+  },
+  "S1-B2-05": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b1",
+   "level": 2,
+   "slot": 5,
+   "z": 0.667,
+   "u": [
+    -1.06,
+    -0.83
+   ],
+   "centre": [
+    -0.945,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": true,
+   "product": "P10",
+   "stations": [
+    "shelf_b1_milk_b01"
+   ]
+  },
+  "S1-B2-06": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b1",
+   "level": 2,
+   "slot": 6,
+   "z": 0.667,
+   "u": [
+    -1.29,
+    -1.06
+   ],
+   "centre": [
+    -1.175,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": true,
+   "product": "P10",
+   "stations": [
+    "shelf_b1_milk_b01"
+   ]
+  },
+  "S1-B3-01": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b2",
+   "level": 3,
+   "slot": 1,
+   "z": 1.07,
+   "u": [
+    -0.14,
+    0.09
+   ],
+   "centre": [
+    -0.025,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": true,
+   "product": "P09",
+   "stations": [
+    "shelf_b2_milk_c01"
+   ]
+  },
+  "S1-B3-02": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b2",
+   "level": 3,
+   "slot": 2,
+   "z": 1.07,
+   "u": [
+    -0.37,
+    -0.14
+   ],
+   "centre": [
+    -0.255,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": true,
+   "product": "P09",
+   "stations": [
+    "shelf_b2_milk_c01"
+   ]
+  },
+  "S1-B3-03": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b2",
+   "level": 3,
+   "slot": 3,
+   "z": 1.07,
+   "u": [
+    -0.6,
+    -0.37
+   ],
+   "centre": [
+    -0.485,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": true,
+   "product": "P09",
+   "stations": [
+    "shelf_b2_milk_c01"
+   ]
+  },
+  "S1-B3-04": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b2",
+   "level": 3,
+   "slot": 4,
+   "z": 1.07,
+   "u": [
+    -0.83,
+    -0.6
+   ],
+   "centre": [
+    -0.715,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": true,
+   "product": "P12",
+   "stations": [
+    "shelf_b2_yogurt_c01"
+   ]
+  },
+  "S1-B3-05": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b2",
+   "level": 3,
+   "slot": 5,
+   "z": 1.07,
+   "u": [
+    -1.06,
+    -0.83
+   ],
+   "centre": [
+    -0.945,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": true,
+   "product": "P12",
+   "stations": [
+    "shelf_b2_yogurt_c01"
+   ]
+  },
+  "S1-B3-06": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b2",
+   "level": 3,
+   "slot": 6,
+   "z": 1.07,
+   "u": [
+    -1.29,
+    -1.06
+   ],
+   "centre": [
+    -1.175,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": true,
+   "product": "P12",
+   "stations": [
+    "shelf_b2_yogurt_c01"
+   ]
+  },
+  "S1-B4-01": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b3",
+   "level": 4,
+   "slot": 1,
+   "z": 1.473,
+   "u": [
+    -0.14,
+    0.09
+   ],
+   "centre": [
+    -0.025,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P09",
+   "stations": []
+  },
+  "S1-B4-02": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b3",
+   "level": 4,
+   "slot": 2,
+   "z": 1.473,
+   "u": [
+    -0.37,
+    -0.14
+   ],
+   "centre": [
+    -0.255,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P09",
+   "stations": []
+  },
+  "S1-B4-03": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b3",
+   "level": 4,
+   "slot": 3,
+   "z": 1.473,
+   "u": [
+    -0.6,
+    -0.37
+   ],
+   "centre": [
+    -0.485,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P09",
+   "stations": []
+  },
+  "S1-B4-04": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b3",
+   "level": 4,
+   "slot": 4,
+   "z": 1.473,
+   "u": [
+    -0.83,
+    -0.6
+   ],
+   "centre": [
+    -0.715,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P12",
+   "stations": []
+  },
+  "S1-B4-05": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b3",
+   "level": 4,
+   "slot": 5,
+   "z": 1.473,
+   "u": [
+    -1.06,
+    -0.83
+   ],
+   "centre": [
+    -0.945,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P12",
+   "stations": []
+  },
+  "S1-B4-06": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b3",
+   "level": 4,
+   "slot": 6,
+   "z": 1.473,
+   "u": [
+    -1.29,
+    -1.06
+   ],
+   "centre": [
+    -1.175,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P12",
+   "stations": []
+  },
+  "S1-B5-01": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b4",
+   "level": 5,
+   "slot": 1,
+   "z": 1.876,
+   "u": [
+    -0.14,
+    0.09
+   ],
+   "centre": [
+    -0.025,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P11",
+   "stations": []
+  },
+  "S1-B5-02": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b4",
+   "level": 5,
+   "slot": 2,
+   "z": 1.876,
+   "u": [
+    -0.37,
+    -0.14
+   ],
+   "centre": [
+    -0.255,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P11",
+   "stations": []
+  },
+  "S1-B5-03": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b4",
+   "level": 5,
+   "slot": 3,
+   "z": 1.876,
+   "u": [
+    -0.6,
+    -0.37
+   ],
+   "centre": [
+    -0.485,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P11",
+   "stations": []
+  },
+  "S1-B5-04": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b4",
+   "level": 5,
+   "slot": 4,
+   "z": 1.876,
+   "u": [
+    -0.83,
+    -0.6
+   ],
+   "centre": [
+    -0.715,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P11",
+   "stations": []
+  },
+  "S1-B5-05": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b4",
+   "level": 5,
+   "slot": 5,
+   "z": 1.876,
+   "u": [
+    -1.06,
+    -0.83
+   ],
+   "centre": [
+    -0.945,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P11",
+   "stations": []
+  },
+  "S1-B5-06": {
+   "unit": "S1",
+   "section": "dairy",
+   "board": "shelf_b4",
+   "level": 5,
+   "slot": 6,
+   "z": 1.876,
+   "u": [
+    -1.29,
+    -1.06
+   ],
+   "centre": [
+    -1.175,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P11",
+   "stations": []
+  },
+  "R2-B1-01": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b0",
+   "level": 1,
+   "slot": 1,
+   "z": 0.761,
+   "u": [
+    -3.78,
+    -3.574
+   ],
+   "centre": [
+    -3.677,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": true,
+   "product": "P06",
+   "stations": [
+    "rack2_b0_cannedFood_h01"
+   ]
+  },
+  "R2-B1-02": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b0",
+   "level": 1,
+   "slot": 2,
+   "z": 0.761,
+   "u": [
+    -3.574,
+    -3.368
+   ],
+   "centre": [
+    -3.471,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": true,
+   "product": "P06",
+   "stations": [
+    "rack2_b0_cannedFood_h01"
+   ]
+  },
+  "R2-B1-03": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b0",
+   "level": 1,
+   "slot": 3,
+   "z": 0.761,
+   "u": [
+    -3.368,
+    -3.162
+   ],
+   "centre": [
+    -3.265,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": true,
+   "product": "P06",
+   "stations": [
+    "rack2_b0_cannedFood_h01"
+   ]
+  },
+  "R2-B1-04": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b0",
+   "level": 1,
+   "slot": 4,
+   "z": 0.761,
+   "u": [
+    -3.162,
+    -2.956
+   ],
+   "centre": [
+    -3.059,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": true,
+   "product": "P06",
+   "stations": [
+    "rack2_b0_cannedFood_h01"
+   ]
+  },
+  "R2-B1-05": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b0",
+   "level": 1,
+   "slot": 5,
+   "z": 0.761,
+   "u": [
+    -2.956,
+    -2.75
+   ],
+   "centre": [
+    -2.853,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": true,
+   "product": "P06",
+   "stations": [
+    "rack2_b0_cannedFood_h01"
+   ]
+  },
+  "R2-B1-06": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b0",
+   "level": 1,
+   "slot": 6,
+   "z": 0.761,
+   "u": [
+    -2.75,
+    -2.544
+   ],
+   "centre": [
+    -2.647,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": true,
+   "product": "P07",
+   "stations": [
+    "rack2_b0_chocolate_e01"
+   ]
+  },
+  "R2-B1-07": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b0",
+   "level": 1,
+   "slot": 7,
+   "z": 0.761,
+   "u": [
+    -2.544,
+    -2.338
+   ],
+   "centre": [
+    -2.441,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": true,
+   "product": "P07",
+   "stations": [
+    "rack2_b0_chocolate_e01"
+   ]
+  },
+  "R2-B1-08": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b0",
+   "level": 1,
+   "slot": 8,
+   "z": 0.761,
+   "u": [
+    -2.338,
+    -2.132
+   ],
+   "centre": [
+    -2.235,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": true,
+   "product": "P07",
+   "stations": [
+    "rack2_b0_chocolate_e01"
+   ]
+  },
+  "R2-B1-09": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b0",
+   "level": 1,
+   "slot": 9,
+   "z": 0.761,
+   "u": [
+    -2.132,
+    -1.926
+   ],
+   "centre": [
+    -2.029,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": true,
+   "product": "P07",
+   "stations": [
+    "rack2_b0_chocolate_e01"
+   ]
+  },
+  "R2-B1-10": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b0",
+   "level": 1,
+   "slot": 10,
+   "z": 0.761,
+   "u": [
+    -1.926,
+    -1.72
+   ],
+   "centre": [
+    -1.823,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": true,
+   "product": "P07",
+   "stations": [
+    "rack2_b0_chocolate_e01"
+   ]
+  },
+  "R2-B2-01": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b1",
+   "level": 2,
+   "slot": 1,
+   "z": 1.212,
+   "u": [
+    -3.78,
+    -3.574
+   ],
+   "centre": [
+    -3.677,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P08",
+   "stations": []
+  },
+  "R2-B2-02": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b1",
+   "level": 2,
+   "slot": 2,
+   "z": 1.212,
+   "u": [
+    -3.574,
+    -3.368
+   ],
+   "centre": [
+    -3.471,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P08",
+   "stations": []
+  },
+  "R2-B2-03": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b1",
+   "level": 2,
+   "slot": 3,
+   "z": 1.212,
+   "u": [
+    -3.368,
+    -3.162
+   ],
+   "centre": [
+    -3.265,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P08",
+   "stations": []
+  },
+  "R2-B2-04": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b1",
+   "level": 2,
+   "slot": 4,
+   "z": 1.212,
+   "u": [
+    -3.162,
+    -2.956
+   ],
+   "centre": [
+    -3.059,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P08",
+   "stations": []
+  },
+  "R2-B2-05": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b1",
+   "level": 2,
+   "slot": 5,
+   "z": 1.212,
+   "u": [
+    -2.956,
+    -2.75
+   ],
+   "centre": [
+    -2.853,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P08",
+   "stations": []
+  },
+  "R2-B2-06": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b1",
+   "level": 2,
+   "slot": 6,
+   "z": 1.212,
+   "u": [
+    -2.75,
+    -2.544
+   ],
+   "centre": [
+    -2.647,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P06",
+   "stations": []
+  },
+  "R2-B2-07": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b1",
+   "level": 2,
+   "slot": 7,
+   "z": 1.212,
+   "u": [
+    -2.544,
+    -2.338
+   ],
+   "centre": [
+    -2.441,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P06",
+   "stations": []
+  },
+  "R2-B2-08": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b1",
+   "level": 2,
+   "slot": 8,
+   "z": 1.212,
+   "u": [
+    -2.338,
+    -2.132
+   ],
+   "centre": [
+    -2.235,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P06",
+   "stations": []
+  },
+  "R2-B2-09": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b1",
+   "level": 2,
+   "slot": 9,
+   "z": 1.212,
+   "u": [
+    -2.132,
+    -1.926
+   ],
+   "centre": [
+    -2.029,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P06",
+   "stations": []
+  },
+  "R2-B2-10": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b1",
+   "level": 2,
+   "slot": 10,
+   "z": 1.212,
+   "u": [
+    -1.926,
+    -1.72
+   ],
+   "centre": [
+    -1.823,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P06",
+   "stations": []
+  },
+  "R2-B3-01": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b2",
+   "level": 3,
+   "slot": 1,
+   "z": 1.663,
+   "u": [
+    -3.78,
+    -3.574
+   ],
+   "centre": [
+    -3.677,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P07",
+   "stations": []
+  },
+  "R2-B3-02": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b2",
+   "level": 3,
+   "slot": 2,
+   "z": 1.663,
+   "u": [
+    -3.574,
+    -3.368
+   ],
+   "centre": [
+    -3.471,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P07",
+   "stations": []
+  },
+  "R2-B3-03": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b2",
+   "level": 3,
+   "slot": 3,
+   "z": 1.663,
+   "u": [
+    -3.368,
+    -3.162
+   ],
+   "centre": [
+    -3.265,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P07",
+   "stations": []
+  },
+  "R2-B3-04": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b2",
+   "level": 3,
+   "slot": 4,
+   "z": 1.663,
+   "u": [
+    -3.162,
+    -2.956
+   ],
+   "centre": [
+    -3.059,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P07",
+   "stations": []
+  },
+  "R2-B3-05": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b2",
+   "level": 3,
+   "slot": 5,
+   "z": 1.663,
+   "u": [
+    -2.956,
+    -2.75
+   ],
+   "centre": [
+    -2.853,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P07",
+   "stations": []
+  },
+  "R2-B3-06": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b2",
+   "level": 3,
+   "slot": 6,
+   "z": 1.663,
+   "u": [
+    -2.75,
+    -2.544
+   ],
+   "centre": [
+    -2.647,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P08",
+   "stations": []
+  },
+  "R2-B3-07": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b2",
+   "level": 3,
+   "slot": 7,
+   "z": 1.663,
+   "u": [
+    -2.544,
+    -2.338
+   ],
+   "centre": [
+    -2.441,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P08",
+   "stations": []
+  },
+  "R2-B3-08": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b2",
+   "level": 3,
+   "slot": 8,
+   "z": 1.663,
+   "u": [
+    -2.338,
+    -2.132
+   ],
+   "centre": [
+    -2.235,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P08",
+   "stations": []
+  },
+  "R2-B3-09": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b2",
+   "level": 3,
+   "slot": 9,
+   "z": 1.663,
+   "u": [
+    -2.132,
+    -1.926
+   ],
+   "centre": [
+    -2.029,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P08",
+   "stations": []
+  },
+  "R2-B3-10": {
+   "unit": "R2",
+   "section": "snacks and canned",
+   "board": "rack2_b2",
+   "level": 3,
+   "slot": 10,
+   "z": 1.663,
+   "u": [
+    -1.926,
+    -1.72
+   ],
+   "centre": [
+    -1.823,
+    1.1
+   ],
+   "width": 0.206,
+   "facing": 90.0,
+   "reachable": false,
+   "product": "P08",
+   "stations": []
+  },
+  "S2-B1-01": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b0",
+   "level": 1,
+   "slot": 1,
+   "z": 0.264,
+   "u": [
+    -1.69,
+    -1.46
+   ],
+   "centre": [
+    -1.575,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P13",
+   "stations": []
+  },
+  "S2-B1-02": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b0",
+   "level": 1,
+   "slot": 2,
+   "z": 0.264,
+   "u": [
+    -1.92,
+    -1.69
+   ],
+   "centre": [
+    -1.805,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P13",
+   "stations": []
+  },
+  "S2-B1-03": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b0",
+   "level": 1,
+   "slot": 3,
+   "z": 0.264,
+   "u": [
+    -2.15,
+    -1.92
+   ],
+   "centre": [
+    -2.035,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P13",
+   "stations": []
+  },
+  "S2-B1-04": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b0",
+   "level": 1,
+   "slot": 4,
+   "z": 0.264,
+   "u": [
+    -2.38,
+    -2.15
+   ],
+   "centre": [
+    -2.265,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P14",
+   "stations": []
+  },
+  "S2-B1-05": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b0",
+   "level": 1,
+   "slot": 5,
+   "z": 0.264,
+   "u": [
+    -2.61,
+    -2.38
+   ],
+   "centre": [
+    -2.495,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P14",
+   "stations": []
+  },
+  "S2-B1-06": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b0",
+   "level": 1,
+   "slot": 6,
+   "z": 0.264,
+   "u": [
+    -2.84,
+    -2.61
+   ],
+   "centre": [
+    -2.725,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P14",
+   "stations": []
+  },
+  "S2-B2-01": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b1",
+   "level": 2,
+   "slot": 1,
+   "z": 0.667,
+   "u": [
+    -1.69,
+    -1.46
+   ],
+   "centre": [
+    -1.575,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": true,
+   "product": "P14",
+   "stations": [
+    "shelf2_b1_ketchup_i01"
+   ]
+  },
+  "S2-B2-02": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b1",
+   "level": 2,
+   "slot": 2,
+   "z": 0.667,
+   "u": [
+    -1.92,
+    -1.69
+   ],
+   "centre": [
+    -1.805,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": true,
+   "product": "P14",
+   "stations": [
+    "shelf2_b1_ketchup_i01"
+   ]
+  },
+  "S2-B2-03": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b1",
+   "level": 2,
+   "slot": 3,
+   "z": 0.667,
+   "u": [
+    -2.15,
+    -1.92
+   ],
+   "centre": [
+    -2.035,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": true,
+   "product": "P14",
+   "stations": [
+    "shelf2_b1_ketchup_i01"
+   ]
+  },
+  "S2-B2-04": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b1",
+   "level": 2,
+   "slot": 4,
+   "z": 0.667,
+   "u": [
+    -2.38,
+    -2.15
+   ],
+   "centre": [
+    -2.265,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": true,
+   "product": "P15",
+   "stations": [
+    "shelf2_b1_ketchup_c01"
+   ]
+  },
+  "S2-B2-05": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b1",
+   "level": 2,
+   "slot": 5,
+   "z": 0.667,
+   "u": [
+    -2.61,
+    -2.38
+   ],
+   "centre": [
+    -2.495,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": true,
+   "product": "P15",
+   "stations": [
+    "shelf2_b1_ketchup_c01"
+   ]
+  },
+  "S2-B2-06": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b1",
+   "level": 2,
+   "slot": 6,
+   "z": 0.667,
+   "u": [
+    -2.84,
+    -2.61
+   ],
+   "centre": [
+    -2.725,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": true,
+   "product": "P15",
+   "stations": [
+    "shelf2_b1_ketchup_c01"
+   ]
+  },
+  "S2-B3-01": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b2",
+   "level": 3,
+   "slot": 1,
+   "z": 1.07,
+   "u": [
+    -1.69,
+    -1.46
+   ],
+   "centre": [
+    -1.575,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": true,
+   "product": "P15",
+   "stations": [
+    "shelf2_b2_ketchup_c01"
+   ]
+  },
+  "S2-B3-02": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b2",
+   "level": 3,
+   "slot": 2,
+   "z": 1.07,
+   "u": [
+    -1.92,
+    -1.69
+   ],
+   "centre": [
+    -1.805,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": true,
+   "product": "P15",
+   "stations": [
+    "shelf2_b2_ketchup_c01"
+   ]
+  },
+  "S2-B3-03": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b2",
+   "level": 3,
+   "slot": 3,
+   "z": 1.07,
+   "u": [
+    -2.15,
+    -1.92
+   ],
+   "centre": [
+    -2.035,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": true,
+   "product": "P15",
+   "stations": [
+    "shelf2_b2_ketchup_c01"
+   ]
+  },
+  "S2-B3-04": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b2",
+   "level": 3,
+   "slot": 4,
+   "z": 1.07,
+   "u": [
+    -2.38,
+    -2.15
+   ],
+   "centre": [
+    -2.265,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": true,
+   "product": "P13",
+   "stations": [
+    "shelf2_b2_ketchup_a02"
+   ]
+  },
+  "S2-B3-05": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b2",
+   "level": 3,
+   "slot": 5,
+   "z": 1.07,
+   "u": [
+    -2.61,
+    -2.38
+   ],
+   "centre": [
+    -2.495,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": true,
+   "product": "P13",
+   "stations": [
+    "shelf2_b2_ketchup_a02"
+   ]
+  },
+  "S2-B3-06": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b2",
+   "level": 3,
+   "slot": 6,
+   "z": 1.07,
+   "u": [
+    -2.84,
+    -2.61
+   ],
+   "centre": [
+    -2.725,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": true,
+   "product": "P13",
+   "stations": [
+    "shelf2_b2_ketchup_a02"
+   ]
+  },
+  "S2-B4-01": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b3",
+   "level": 4,
+   "slot": 1,
+   "z": 1.473,
+   "u": [
+    -1.69,
+    -1.46
+   ],
+   "centre": [
+    -1.575,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P13",
+   "stations": []
+  },
+  "S2-B4-02": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b3",
+   "level": 4,
+   "slot": 2,
+   "z": 1.473,
+   "u": [
+    -1.92,
+    -1.69
+   ],
+   "centre": [
+    -1.805,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P13",
+   "stations": []
+  },
+  "S2-B4-03": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b3",
+   "level": 4,
+   "slot": 3,
+   "z": 1.473,
+   "u": [
+    -2.15,
+    -1.92
+   ],
+   "centre": [
+    -2.035,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P13",
+   "stations": []
+  },
+  "S2-B4-04": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b3",
+   "level": 4,
+   "slot": 4,
+   "z": 1.473,
+   "u": [
+    -2.38,
+    -2.15
+   ],
+   "centre": [
+    -2.265,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P14",
+   "stations": []
+  },
+  "S2-B4-05": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b3",
+   "level": 4,
+   "slot": 5,
+   "z": 1.473,
+   "u": [
+    -2.61,
+    -2.38
+   ],
+   "centre": [
+    -2.495,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P14",
+   "stations": []
+  },
+  "S2-B4-06": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b3",
+   "level": 4,
+   "slot": 6,
+   "z": 1.473,
+   "u": [
+    -2.84,
+    -2.61
+   ],
+   "centre": [
+    -2.725,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": "P14",
+   "stations": []
+  },
+  "S2-B5-01": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b4",
+   "level": 5,
+   "slot": 1,
+   "z": 1.876,
+   "u": [
+    -1.69,
+    -1.46
+   ],
+   "centre": [
+    -1.575,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": null,
+   "stations": []
+  },
+  "S2-B5-02": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b4",
+   "level": 5,
+   "slot": 2,
+   "z": 1.876,
+   "u": [
+    -1.92,
+    -1.69
+   ],
+   "centre": [
+    -1.805,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": null,
+   "stations": []
+  },
+  "S2-B5-03": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b4",
+   "level": 5,
+   "slot": 3,
+   "z": 1.876,
+   "u": [
+    -2.15,
+    -1.92
+   ],
+   "centre": [
+    -2.035,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": null,
+   "stations": []
+  },
+  "S2-B5-04": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b4",
+   "level": 5,
+   "slot": 4,
+   "z": 1.876,
+   "u": [
+    -2.38,
+    -2.15
+   ],
+   "centre": [
+    -2.265,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": null,
+   "stations": []
+  },
+  "S2-B5-05": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b4",
+   "level": 5,
+   "slot": 5,
+   "z": 1.876,
+   "u": [
+    -2.61,
+    -2.38
+   ],
+   "centre": [
+    -2.495,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": null,
+   "stations": []
+  },
+  "S2-B5-06": {
+   "unit": "S2",
+   "section": "sauces",
+   "board": "shelf2_b4",
+   "level": 5,
+   "slot": 6,
+   "z": 1.876,
+   "u": [
+    -2.84,
+    -2.61
+   ],
+   "centre": [
+    -2.725,
+    -1.165
+   ],
+   "width": 0.23,
+   "facing": -90.0,
+   "reachable": false,
+   "product": null,
+   "stations": []
+  },
+  "T1-01": {
+   "unit": "T1",
+   "section": "table (work area)",
+   "board": "table",
+   "level": 1,
+   "slot": 1,
+   "z": 0.85,
+   "u": null,
+   "centre": [
+    0.42,
+    -0.45
+   ],
+   "width": 0.12,
+   "facing": 0.0,
+   "reachable": true,
+   "product": "P11",
+   "stations": [
+    "table_yogurt_a01"
+   ]
+  },
+  "T1-02": {
+   "unit": "T1",
+   "section": "table (work area)",
+   "board": "table",
+   "level": 1,
+   "slot": 2,
+   "z": 0.85,
+   "u": null,
+   "centre": [
+    0.42,
+    -0.57
+   ],
+   "width": 0.12,
+   "facing": 0.0,
+   "reachable": true,
+   "product": "P06",
+   "stations": [
+    "table_cannedFood_h01"
+   ]
+  },
+  "T1-03": {
+   "unit": "T1",
+   "section": "table (work area)",
+   "board": "table",
+   "level": 1,
+   "slot": 3,
+   "z": 0.85,
+   "u": null,
+   "centre": [
+    0.42,
+    -0.69
+   ],
+   "width": 0.12,
+   "facing": 0.0,
+   "reachable": true,
+   "product": "P08",
+   "stations": [
+    "table_coffeeCup_b01"
+   ]
+  },
+  "T1-04": {
+   "unit": "T1",
+   "section": "table (work area)",
+   "board": "table",
+   "level": 1,
+   "slot": 4,
+   "z": 0.85,
+   "u": null,
+   "centre": [
+    0.42,
+    -0.81
+   ],
+   "width": 0.12,
+   "facing": 0.0,
+   "reachable": true,
+   "product": "P12",
+   "stations": [
+    "table_yogurt_c01"
+   ]
+  }
+ }
+}

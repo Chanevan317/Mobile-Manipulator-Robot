@@ -1,0 +1,303 @@
+{
+ "note": "scene_v0 product database (user 2026-11-17): product id -> name, package (assets.py), mass, size (x, y, z mm), locations it covers (location IDs, store_db.py). Edit the locations here; mass / size are copies of assets.py (store_db.py checks them).",
+ "products": {
+  "P01": {
+   "name": "Boxed cereal L01",
+   "package": "food_processed_boxedCereal_l01",
+   "mass_kg": 0.25,
+   "size_mm": [
+    60,
+    140,
+    200
+   ],
+   "locations": [
+    "R1-B1-01",
+    "R1-B1-02",
+    "R1-B2-01",
+    "R1-B2-02",
+    "R1-B2-03",
+    "R1-B3-01",
+    "R1-B3-02",
+    "R1-B3-03",
+    "R1-B3-04",
+    "R1-B3-05"
+   ]
+  },
+  "P02": {
+   "name": "Cracker A01",
+   "package": "food_box_cracker_a01",
+   "mass_kg": 0.25,
+   "size_mm": [
+    164,
+    72,
+    213
+   ],
+   "locations": [
+    "R1-B1-03",
+    "R1-B1-04",
+    "R1-B2-04",
+    "R1-B2-05",
+    "R1-B2-06",
+    "R1-B2-07",
+    "R1-B3-06",
+    "R1-B3-07",
+    "R1-B3-08",
+    "R1-B3-09",
+    "R1-B3-10"
+   ]
+  },
+  "P03": {
+   "name": "Boxed food B01",
+   "package": "food_processed_boxedFood_b01",
+   "mass_kg": 0.15,
+   "size_mm": [
+    37,
+    129,
+    130
+   ],
+   "locations": [
+    "R1-B1-05",
+    "R1-B1-06"
+   ]
+  },
+  "P04": {
+   "name": "Boxed food C01",
+   "package": "food_processed_boxedFood_c01",
+   "mass_kg": 0.2,
+   "size_mm": [
+    35,
+    135,
+    190
+   ],
+   "locations": [
+    "R1-B1-07",
+    "R1-B1-08"
+   ]
+  },
+  "P05": {
+   "name": "Boxed food D01",
+   "package": "food_processed_boxedFood_d01",
+   "mass_kg": 0.2,
+   "size_mm": [
+    48,
+    104,
+    210
+   ],
+   "locations": [
+    "R1-B1-09",
+    "R1-B1-10",
+    "R1-B2-08",
+    "R1-B2-09",
+    "R1-B2-10"
+   ]
+  },
+  "P06": {
+   "name": "Canned food H01",
+   "package": "food_processed_cannedFood_h01",
+   "mass_kg": 0.16,
+   "size_mm": [
+    54,
+    94,
+    51
+   ],
+   "locations": [
+    "R2-B1-01",
+    "R2-B1-02",
+    "R2-B1-03",
+    "R2-B1-04",
+    "R2-B1-05",
+    "R2-B2-06",
+    "R2-B2-07",
+    "R2-B2-08",
+    "R2-B2-09",
+    "R2-B2-10",
+    "T1-02"
+   ]
+  },
+  "P07": {
+   "name": "Chocolate E01",
+   "package": "food_processed_chocolate_e01",
+   "mass_kg": 0.1,
+   "size_mm": [
+    165,
+    60,
+    15
+   ],
+   "locations": [
+    "R2-B1-06",
+    "R2-B1-07",
+    "R2-B1-08",
+    "R2-B1-09",
+    "R2-B1-10",
+    "R2-B3-01",
+    "R2-B3-02",
+    "R2-B3-03",
+    "R2-B3-04",
+    "R2-B3-05"
+   ]
+  },
+  "P08": {
+   "name": "Coffee cup B01",
+   "package": "food_beverage_coffeeCup_b01",
+   "mass_kg": 0.03,
+   "size_mm": [
+    67,
+    67,
+    102
+   ],
+   "locations": [
+    "R2-B2-01",
+    "R2-B2-02",
+    "R2-B2-03",
+    "R2-B2-04",
+    "R2-B2-05",
+    "R2-B3-06",
+    "R2-B3-07",
+    "R2-B3-08",
+    "R2-B3-09",
+    "R2-B3-10",
+    "T1-03"
+   ]
+  },
+  "P09": {
+   "name": "Milk C01",
+   "package": "food_processed_milk_c01",
+   "mass_kg": 0.25,
+   "size_mm": [
+    60,
+    60,
+    123
+   ],
+   "locations": [
+    "S1-B1-01",
+    "S1-B1-02",
+    "S1-B1-03",
+    "S1-B3-01",
+    "S1-B3-02",
+    "S1-B3-03",
+    "S1-B4-01",
+    "S1-B4-02",
+    "S1-B4-03"
+   ]
+  },
+  "P10": {
+   "name": "Milk B01",
+   "package": "food_processed_milk_b01",
+   "mass_kg": 0.25,
+   "size_mm": [
+    68,
+    66,
+    152
+   ],
+   "locations": [
+    "S1-B1-04",
+    "S1-B1-05",
+    "S1-B1-06",
+    "S1-B2-04",
+    "S1-B2-05",
+    "S1-B2-06"
+   ]
+  },
+  "P11": {
+   "name": "Yogurt A01",
+   "package": "food_processed_yogurt_a01",
+   "mass_kg": 0.13,
+   "size_mm": [
+    63,
+    63,
+    51
+   ],
+   "locations": [
+    "S1-B2-01",
+    "S1-B2-02",
+    "S1-B2-03",
+    "S1-B5-01",
+    "S1-B5-02",
+    "S1-B5-03",
+    "S1-B5-04",
+    "S1-B5-05",
+    "S1-B5-06",
+    "T1-01"
+   ]
+  },
+  "P12": {
+   "name": "Yogurt C01",
+   "package": "food_processed_yogurt_c01",
+   "mass_kg": 0.15,
+   "size_mm": [
+    70,
+    70,
+    110
+   ],
+   "locations": [
+    "S1-B3-04",
+    "S1-B3-05",
+    "S1-B3-06",
+    "S1-B4-04",
+    "S1-B4-05",
+    "S1-B4-06",
+    "T1-04"
+   ]
+  },
+  "P13": {
+   "name": "Ketchup A02",
+   "package": "food_condiment_ketchup_a02",
+   "mass_kg": 0.2,
+   "size_mm": [
+    45,
+    74,
+    145
+   ],
+   "locations": [
+    "S2-B1-01",
+    "S2-B1-02",
+    "S2-B1-03",
+    "S2-B3-04",
+    "S2-B3-05",
+    "S2-B3-06",
+    "S2-B4-01",
+    "S2-B4-02",
+    "S2-B4-03"
+   ]
+  },
+  "P14": {
+   "name": "Ketchup I01",
+   "package": "food_processed_ketchup_i01",
+   "mass_kg": 0.22,
+   "size_mm": [
+    55,
+    55,
+    175
+   ],
+   "locations": [
+    "S2-B1-04",
+    "S2-B1-05",
+    "S2-B1-06",
+    "S2-B2-01",
+    "S2-B2-02",
+    "S2-B2-03",
+    "S2-B4-04",
+    "S2-B4-05",
+    "S2-B4-06"
+   ]
+  },
+  "P15": {
+   "name": "Ketchup C01",
+   "package": "food_processed_ketchup_c01",
+   "mass_kg": 0.25,
+   "size_mm": [
+    55,
+    55,
+    191
+   ],
+   "locations": [
+    "S2-B2-04",
+    "S2-B2-05",
+    "S2-B2-06",
+    "S2-B3-01",
+    "S2-B3-02",
+    "S2-B3-03"
+   ]
+  }
+ }
+}

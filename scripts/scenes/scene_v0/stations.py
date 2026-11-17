@@ -135,7 +135,9 @@ def compute():
             r = base_for(pkg, centre, zt, hd, inset, 0.02)
             name = f'{key}_{pkg.replace("food_", "").replace("processed_", "").replace("beverage_", "").replace("condiment_", "")}'
             st[name] = dict(r or {}, product=pkg, board=key, surface=zt, section=SC.SECTION_NAMES[key.split('_')[0]],
-                            target=[round(centre[0], 3), round(centre[1], 3)], task=SC.TASK_BOARD.get(pkg) == key)
+                            target=[round(centre[0], 3), round(centre[1], 3)], task=SC.TASK_BOARD.get(pkg) == key,
+                            locations=sorted(l for l, o in SC.LOCATIONS.items() if o['board'] == key
+                                             and a - 1e-6 <= (o['u'][0] + o['u'][1]) / 2 <= b + 1e-6))
             if r is None:
                 st[name]['note'] = 'NO STATION: not reachable with a clear footprint'
     for pkg, (z, x, y, hd) in SC.REST.items():
@@ -143,7 +145,8 @@ def compute():
             continue
         r = base_for(pkg, (x, y), z, 0.0, x - SC.TABLE_EDGE, 0.10)
         st[f'table_{pkg.replace("food_", "").replace("processed_", "").replace("beverage_", "")}'] = dict(
-            r or {}, product=pkg, board='table', surface=z, section='table', target=[x, y], task=True)
+            r or {}, product=pkg, board='table', surface=z, section='table', target=[x, y], task=True,
+            locations=[l for p in SC.PRODUCTS.values() if p['package'] == pkg for l in p['locations'] if l.startswith('T1-')])
     for name, s_ in st.items():
         if 'x' in s_:
             s_['approach'] = approach_for(s_)

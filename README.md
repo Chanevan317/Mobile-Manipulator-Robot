@@ -4,7 +4,13 @@ A wheeled mobile manipulator for restocking retail shelves: a mecanum base, a C-
 arms (STS3215 servos), with a small leader arm for teleoperation. Work in progress: the arms are being printed, and
 the robot is tested in simulation (Isaac Sim, ROS 2).
 
-![robot](mobile_manipulator_description/preview_prototype_dual.png)
+**One-arm prototype** (the official prototype: one arm on a ring bearing around the lift column):
+
+![one-arm robot](mobile_manipulator_description/preview_prototype_mono.png)
+
+**Two-arm layout** (both arms beside the column):
+
+![two-arm robot](mobile_manipulator_description/preview_prototype_dual.png)
 
 ## Folders
 

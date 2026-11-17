@@ -799,42 +799,6 @@ def Xform "World"
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ", "xformOp:scale"]
             }
 
-            def Cube "table_yogurt_a01" (
-                prepend apiSchemas = ["MaterialBindingAPI"]
-            )
-            {
-                rel material:binding = </World/store/looks/mark_task>
-                double size = 1
-                float xformOp:rotateZ = 0
-                float3 xformOp:scale = (0.1, 0.1, 0.003)
-                double3 xformOp:translate = (-0.01, -0.45, 0.0015)
-                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ", "xformOp:scale"]
-            }
-
-            def Cube "table_yogurt_a01_heading" (
-                prepend apiSchemas = ["MaterialBindingAPI"]
-            )
-            {
-                rel material:binding = </World/store/looks/mark_task>
-                double size = 1
-                float xformOp:rotateZ = 0
-                float3 xformOp:scale = (0.16, 0.025, 0.003)
-                double3 xformOp:translate = (0.12000000000000001, -0.45, 0.0015)
-                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ", "xformOp:scale"]
-            }
-
-            def Cube "table_yogurt_a01_turn" (
-                prepend apiSchemas = ["MaterialBindingAPI"]
-            )
-            {
-                rel material:binding = </World/store/looks/mark_turn>
-                double size = 1
-                float xformOp:rotateZ = 0
-                float3 xformOp:scale = (0.04, 0.04, 0.003)
-                double3 xformOp:translate = (-0.11, -0.45, 0.0015)
-                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ", "xformOp:scale"]
-            }
-
             def Cube "table_cannedFood_h01" (
                 prepend apiSchemas = ["MaterialBindingAPI"]
             )
@@ -904,6 +868,42 @@ def Xform "World"
                 float xformOp:rotateZ = 0
                 float3 xformOp:scale = (0.04, 0.04, 0.003)
                 double3 xformOp:translate = (-0.11, -0.49, 0.0015)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ", "xformOp:scale"]
+            }
+
+            def Cube "table_yogurt_a01" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                rel material:binding = </World/store/looks/mark_task>
+                double size = 1
+                float xformOp:rotateZ = 0
+                float3 xformOp:scale = (0.1, 0.1, 0.003)
+                double3 xformOp:translate = (-0.01, -0.45, 0.0015)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ", "xformOp:scale"]
+            }
+
+            def Cube "table_yogurt_a01_heading" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                rel material:binding = </World/store/looks/mark_task>
+                double size = 1
+                float xformOp:rotateZ = 0
+                float3 xformOp:scale = (0.16, 0.025, 0.003)
+                double3 xformOp:translate = (0.12000000000000001, -0.45, 0.0015)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ", "xformOp:scale"]
+            }
+
+            def Cube "table_yogurt_a01_turn" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                rel material:binding = </World/store/looks/mark_turn>
+                double size = 1
+                float xformOp:rotateZ = 0
+                float3 xformOp:scale = (0.04, 0.04, 0.003)
+                double3 xformOp:translate = (-0.11, -0.45, 0.0015)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ", "xformOp:scale"]
             }
 
@@ -1731,64 +1731,6 @@ def Xform "World"
             }
         }
 
-        def Xform "processed_yogurt_a01"
-        {
-            float xformOp:rotateZ = 0
-            double3 xformOp:translate = (0.42, -0.45000000931322576, 0.853)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
-
-            def Xform "asset" (
-                prepend references = @../assets/simready/food_processed_yogurt_a01/simready_usd/sm_food_processed_yogurt_a01_01.usd@
-                variants = {
-                    string PhysX = "Enabled"
-                }
-            )
-            {
-                over "Geometry"
-                {
-                    over "sm_food_processed_yogurt_a01_obj_00"
-                    {
-                        float3 xformOp:rotateXYZ = (0, 0, 0)
-                        float3 xformOp:scale = (1, 1, 1)
-                        double3 xformOp:translate = (0, 0, 0)
-
-                        over "sm_food_processed_yogurt_a01_mesh_00" (
-                            instanceable = false
-                        )
-                        {
-                            over "VisualMaterials"
-                            {
-                                over "m_opaque__plastic__yogurt_a01" (
-                                    instanceable = false
-                                )
-                                {
-                                }
-                            }
-
-                            over "sm_food_processed_yogurt_a01_mesh_00" (
-                                prepend apiSchemas = ["PhysicsMeshCollisionAPI"]
-                            )
-                            {
-                                uniform token physics:approximation = "convexDecomposition"
-                                float3 physics:diagonalInertia = (0.00007648204, 0.00007599979, 0.00009122336)
-                                float physics:mass = 0.13
-                            }
-                        }
-
-                        over "grasp_identifier"
-                        {
-                            over "grasp_identifier_curve_001"
-                            {
-                                float3 xformOp:rotateXYZ = (0, 0, 0)
-                                float3 xformOp:scale = (1, 1, 1)
-                                double3 xformOp:translate = (0, 0, 0)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         def Xform "processed_cannedFood_h01"
         {
             float xformOp:rotateZ = 90
@@ -1985,6 +1927,64 @@ def Xform "World"
             }
         }
 
+        def Xform "processed_yogurt_a01"
+        {
+            float xformOp:rotateZ = 0
+            double3 xformOp:translate = (0.42, -0.45000000931322576, 0.853)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
+
+            def Xform "asset" (
+                prepend references = @../assets/simready/food_processed_yogurt_a01/simready_usd/sm_food_processed_yogurt_a01_01.usd@
+                variants = {
+                    string PhysX = "Enabled"
+                }
+            )
+            {
+                over "Geometry"
+                {
+                    over "sm_food_processed_yogurt_a01_obj_00"
+                    {
+                        float3 xformOp:rotateXYZ = (0, 0, 0)
+                        float3 xformOp:scale = (1, 1, 1)
+                        double3 xformOp:translate = (0, 0, 0)
+
+                        over "sm_food_processed_yogurt_a01_mesh_00" (
+                            instanceable = false
+                        )
+                        {
+                            over "VisualMaterials"
+                            {
+                                over "m_opaque__plastic__yogurt_a01" (
+                                    instanceable = false
+                                )
+                                {
+                                }
+                            }
+
+                            over "sm_food_processed_yogurt_a01_mesh_00" (
+                                prepend apiSchemas = ["PhysicsMeshCollisionAPI"]
+                            )
+                            {
+                                uniform token physics:approximation = "convexDecomposition"
+                                float3 physics:diagonalInertia = (0.00007648204, 0.00007599979, 0.00009122336)
+                                float physics:mass = 0.13
+                            }
+                        }
+
+                        over "grasp_identifier"
+                        {
+                            over "grasp_identifier_curve_001"
+                            {
+                                float3 xformOp:rotateXYZ = (0, 0, 0)
+                                float3 xformOp:scale = (1, 1, 1)
+                                double3 xformOp:translate = (0, 0, 0)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         def Xform "processed_yogurt_c01"
         {
             float xformOp:rotateZ = 0
@@ -2158,7 +2158,7 @@ def Xform "World"
         def Xform "processed_boxedFood_b01"
         {
             float xformOp:rotateZ = 180
-            double3 xformOp:translate = (-0.6003881882876155, 1.2034566951990129, 0.7639988600611687)
+            double3 xformOp:translate = (-0.6003881882876159, 1.2034566951990129, 0.7639988600611687)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
             def Xform "asset" (
@@ -2216,7 +2216,7 @@ def Xform "World"
         def Xform "processed_boxedFood_c01"
         {
             float xformOp:rotateZ = 180
-            double3 xformOp:translate = (-0.18799999999999972, 1.2075, 0.7624691385179758)
+            double3 xformOp:translate = (-0.188, 1.2075, 0.7624691385179758)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
             def Xform "asset" (
@@ -2284,7 +2284,7 @@ def Xform "World"
         def Xform "processed_boxedFood_d01"
         {
             float xformOp:rotateZ = 180
-            double3 xformOp:translate = (0.22456341663002988, 1.1919859724193813, 0.7639653100967407)
+            double3 xformOp:translate = (0.22456341663002968, 1.1919859724193813, 0.7639653100967407)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
             def Xform "asset" (
@@ -2503,7 +2503,7 @@ def Xform "World"
         def Xform "processed_milk_c01"
         {
             float xformOp:rotateZ = -90
-            double3 xformOp:translate = (-0.2550000000000001, -1.235, 1.0728779632151126)
+            double3 xformOp:translate = (-0.255, -1.235, 1.0728779632151126)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
             def Xform "asset" (
@@ -2869,7 +2869,7 @@ def Xform "World"
             def Xform "rack_b0_00_boxedFood_b01"
             {
                 float xformOp:rotateZ = 181.06674
-                double3 xformOp:translate = (-0.7758686978059949, 1.1934496491146958, 0.7639988600611687)
+                double3 xformOp:translate = (-0.7758686978059951, 1.1934496491146958, 0.7639988600611687)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -2927,7 +2927,7 @@ def Xform "World"
             def Xform "rack_b0_01_boxedFood_c01"
             {
                 float xformOp:rotateZ = 180.70407
-                double3 xformOp:translate = (-0.0509999999999997, 1.1975, 0.7624691385179758)
+                double3 xformOp:translate = (-0.050999999999999976, 1.1975, 0.7624691385179758)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -2995,7 +2995,7 @@ def Xform "World"
             def Xform "rack_b0_02_boxedFood_d01"
             {
                 float xformOp:rotateZ = 179.87079
-                double3 xformOp:translate = (0.05456338356448529, 1.1819847019190703, 0.7639653100967407)
+                double3 xformOp:translate = (0.05456338356448505, 1.1819847019190703, 0.7639653100967407)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -3053,7 +3053,7 @@ def Xform "World"
             def Xform "rack_b0_03_boxedFood_d01"
             {
                 float xformOp:rotateZ = 180.87105
-                double3 xformOp:translate = (0.32956356477069404, 1.1819945391168418, 0.7639653100967407)
+                double3 xformOp:translate = (0.3295635647706938, 1.1819945391168418, 0.7639653100967407)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -3111,7 +3111,7 @@ def Xform "World"
             def Xform "rack_b0_04_boxedFood_d01"
             {
                 float xformOp:rotateZ = 181.35028
-                double3 xformOp:translate = (0.3875635907327683, 1.1819992530394996, 0.7639653100967407)
+                double3 xformOp:translate = (0.3875635907327681, 1.1819992530394996, 0.7639653100967407)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -3394,14 +3394,14 @@ def Xform "World"
                 }
             }
 
-            def Xform "rack_b1_04_boxedCereal_l01"
+            def Xform "rack_b1_04_box_cracker_a01"
             {
-                float xformOp:rotateZ = 178.82724
-                double3 xformOp:translate = (-1.03077146372107, 1.2000567357502652, 1.2148776391148566)
+                float xformOp:rotateZ = 89.61905
+                double3 xformOp:translate = (-0.9640000055878118, 1.2120000000371534, 1.2149999999999999)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
-                    prepend references = @../assets/simready/food_processed_boxedCereal_l01/simready_usd/sm_food_processed_boxedCereal_l01_01.usda@
+                    prepend references = @../assets/simready/food_box_cracker_a01/simready_usd/sm_food_box_cracker_a01_01.usda@
                     variants = {
                         string PhysX = "Enabled"
                     }
@@ -3409,27 +3409,24 @@ def Xform "World"
                 {
                     over "Geometry"
                     {
-                        over "sm_food_processed_boxedCereal_l01_obj_00"
+                        over "food_box_cracker_a01_obj_00"
                         {
                             bool physics:rigidBodyEnabled = 0
-                            float3 xformOp:rotateXYZ = (0, 0, 0)
-                            float3 xformOp:scale = (1, 1, 1)
-                            double3 xformOp:translate = (0, 0, 0)
 
-                            over "sm_food_processed_boxedCereal_l01_mesh_00" (
+                            over "food_box_cracker_a01_mesh_00" (
                                 instanceable = false
                             )
                             {
                                 over "VisualMaterials"
                                 {
-                                    over "m_opaque__cardboard__boxedCereal_l01" (
+                                    over "m_opaque__cardboard__food_box_cracker_a01" (
                                         instanceable = false
                                     )
                                     {
                                     }
                                 }
 
-                                over "sm_food_processed_boxedCereal_l01_mesh_00" (
+                                over "food_box_cracker_a01_mesh_00" (
                                     prepend apiSchemas = ["PhysicsMeshCollisionAPI"]
                                 )
                                 {
@@ -3453,8 +3450,8 @@ def Xform "World"
 
             def Xform "rack_b1_05_box_cracker_a01"
             {
-                float xformOp:rotateZ = 88.723625
-                double3 xformOp:translate = (-0.8133333389198822, 1.2120000001244717, 1.2149999999999999)
+                float xformOp:rotateZ = 88.53155
+                double3 xformOp:translate = (-0.8820000055861003, 1.2120000001431996, 1.2149999999999999)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -3507,8 +3504,8 @@ def Xform "World"
 
             def Xform "rack_b1_06_box_cracker_a01"
             {
-                float xformOp:rotateZ = 89.058525
-                double3 xformOp:translate = (-0.48533333892051456, 1.212000000091816, 1.2149999999999999)
+                float xformOp:rotateZ = 91.0313
+                double3 xformOp:translate = (-0.8000000055870303, 1.2119999998994249, 1.2149999999999999)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -3559,14 +3556,14 @@ def Xform "World"
                 }
             }
 
-            def Xform "rack_b1_07_boxedFood_d01"
+            def Xform "rack_b1_07_box_cracker_a01"
             {
-                float xformOp:rotateZ = 179.76587
-                double3 xformOp:translate = (-0.22010331206430395, 1.1819836701497604, 1.2149653100967406)
+                float xformOp:rotateZ = 89.058525
+                double3 xformOp:translate = (-0.5540000055871812, 1.212000000091816, 1.2149999999999999)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
-                    prepend references = @../assets/simready/food_processed_boxedFood_d01/simready_usd/sm_food_processed_boxedFood_d01_01.usd@
+                    prepend references = @../assets/simready/food_box_cracker_a01/simready_usd/sm_food_box_cracker_a01_01.usda@
                     variants = {
                         string PhysX = "Enabled"
                     }
@@ -3574,27 +3571,24 @@ def Xform "World"
                 {
                     over "Geometry"
                     {
-                        over "sm_objaverse_food_processed_boxedFood_d01_obj_00"
+                        over "food_box_cracker_a01_obj_00"
                         {
                             bool physics:rigidBodyEnabled = 0
-                            float3 xformOp:rotateXYZ = (0, 0, 0)
-                            float3 xformOp:scale = (1, 1, 1)
-                            double3 xformOp:translate = (0, 0, 0)
 
-                            over "sm_objaverse_food_processed_boxedFood_d01_mesh_00" (
+                            over "food_box_cracker_a01_mesh_00" (
                                 instanceable = false
                             )
                             {
                                 over "VisualMaterials"
                                 {
-                                    over "m_opaque__cardboard__boxedFood_d01" (
+                                    over "m_opaque__cardboard__food_box_cracker_a01" (
                                         instanceable = false
                                     )
                                     {
                                     }
                                 }
 
-                                over "sm_objaverse_food_processed_boxedFood_d01_mesh_00" (
+                                over "food_box_cracker_a01_mesh_00" (
                                     prepend apiSchemas = ["PhysicsMeshCollisionAPI"]
                                 )
                                 {
@@ -3619,7 +3613,7 @@ def Xform "World"
             def Xform "rack_b1_08_boxedFood_d01"
             {
                 float xformOp:rotateZ = 179.46417
-                double3 xformOp:translate = (-0.16210340585588745, 1.1819807041182522, 1.2149653100967406)
+                double3 xformOp:translate = (-0.09343673918922085, 1.1819807041182522, 1.2149653100967406)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -3675,8 +3669,8 @@ def Xform "World"
 
             def Xform "rack_b1_09_boxedFood_d01"
             {
-                float xformOp:rotateZ = 179.53903
-                double3 xformOp:translate = (-0.10410338112814982, 1.181981439986264, 1.2149653100967406)
+                float xformOp:rotateZ = 178.87674
+                double3 xformOp:translate = (0.02256303337459912, 1.1819749302752398, 1.2149653100967406)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -3732,350 +3726,8 @@ def Xform "World"
 
             def Xform "rack_b1_10_boxedFood_d01"
             {
-                float xformOp:rotateZ = 181.11534
-                double3 xformOp:translate = (-0.04610308373460706, 1.1819969421080483, 1.2149653100967406)
-                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
-
-                def Xform "asset" (
-                    prepend references = @../assets/simready/food_processed_boxedFood_d01/simready_usd/sm_food_processed_boxedFood_d01_01.usd@
-                    variants = {
-                        string PhysX = "Enabled"
-                    }
-                )
-                {
-                    over "Geometry"
-                    {
-                        over "sm_objaverse_food_processed_boxedFood_d01_obj_00"
-                        {
-                            bool physics:rigidBodyEnabled = 0
-                            float3 xformOp:rotateXYZ = (0, 0, 0)
-                            float3 xformOp:scale = (1, 1, 1)
-                            double3 xformOp:translate = (0, 0, 0)
-
-                            over "sm_objaverse_food_processed_boxedFood_d01_mesh_00" (
-                                instanceable = false
-                            )
-                            {
-                                over "VisualMaterials"
-                                {
-                                    over "m_opaque__cardboard__boxedFood_d01" (
-                                        instanceable = false
-                                    )
-                                    {
-                                    }
-                                }
-
-                                over "sm_objaverse_food_processed_boxedFood_d01_mesh_00" (
-                                    prepend apiSchemas = ["PhysicsMeshCollisionAPI"]
-                                )
-                                {
-                                    uniform token physics:approximation = "convexHull"
-                                }
-                            }
-
-                            over "grasp_identifier"
-                            {
-                                over "grasp_identifier_curve"
-                                {
-                                    float3 xformOp:rotateXYZ = (0, 0, 0)
-                                    float3 xformOp:scale = (1, 1, 1)
-                                    double3 xformOp:translate = (0, 0, 0)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            def Xform "rack_b1_11_boxedFood_d01"
-            {
-                float xformOp:rotateZ = 180.87234
-                double3 xformOp:translate = (0.011896898228428168, 1.181994551970187, 1.2149653100967406)
-                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
-
-                def Xform "asset" (
-                    prepend references = @../assets/simready/food_processed_boxedFood_d01/simready_usd/sm_food_processed_boxedFood_d01_01.usd@
-                    variants = {
-                        string PhysX = "Enabled"
-                    }
-                )
-                {
-                    over "Geometry"
-                    {
-                        over "sm_objaverse_food_processed_boxedFood_d01_obj_00"
-                        {
-                            bool physics:rigidBodyEnabled = 0
-                            float3 xformOp:rotateXYZ = (0, 0, 0)
-                            float3 xformOp:scale = (1, 1, 1)
-                            double3 xformOp:translate = (0, 0, 0)
-
-                            over "sm_objaverse_food_processed_boxedFood_d01_mesh_00" (
-                                instanceable = false
-                            )
-                            {
-                                over "VisualMaterials"
-                                {
-                                    over "m_opaque__cardboard__boxedFood_d01" (
-                                        instanceable = false
-                                    )
-                                    {
-                                    }
-                                }
-
-                                over "sm_objaverse_food_processed_boxedFood_d01_mesh_00" (
-                                    prepend apiSchemas = ["PhysicsMeshCollisionAPI"]
-                                )
-                                {
-                                    uniform token physics:approximation = "convexHull"
-                                }
-                            }
-
-                            over "grasp_identifier"
-                            {
-                                over "grasp_identifier_curve"
-                                {
-                                    float3 xformOp:rotateXYZ = (0, 0, 0)
-                                    float3 xformOp:scale = (1, 1, 1)
-                                    double3 xformOp:translate = (0, 0, 0)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            def Xform "rack_b1_12_boxedFood_d01"
-            {
-                float xformOp:rotateZ = 179.3783
-                double3 xformOp:translate = (0.06989656458854657, 1.1819798598618916, 1.2149653100967406)
-                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
-
-                def Xform "asset" (
-                    prepend references = @../assets/simready/food_processed_boxedFood_d01/simready_usd/sm_food_processed_boxedFood_d01_01.usd@
-                    variants = {
-                        string PhysX = "Enabled"
-                    }
-                )
-                {
-                    over "Geometry"
-                    {
-                        over "sm_objaverse_food_processed_boxedFood_d01_obj_00"
-                        {
-                            bool physics:rigidBodyEnabled = 0
-                            float3 xformOp:rotateXYZ = (0, 0, 0)
-                            float3 xformOp:scale = (1, 1, 1)
-                            double3 xformOp:translate = (0, 0, 0)
-
-                            over "sm_objaverse_food_processed_boxedFood_d01_mesh_00" (
-                                instanceable = false
-                            )
-                            {
-                                over "VisualMaterials"
-                                {
-                                    over "m_opaque__cardboard__boxedFood_d01" (
-                                        instanceable = false
-                                    )
-                                    {
-                                    }
-                                }
-
-                                over "sm_objaverse_food_processed_boxedFood_d01_mesh_00" (
-                                    prepend apiSchemas = ["PhysicsMeshCollisionAPI"]
-                                )
-                                {
-                                    uniform token physics:approximation = "convexHull"
-                                }
-                            }
-
-                            over "grasp_identifier"
-                            {
-                                over "grasp_identifier_curve"
-                                {
-                                    float3 xformOp:rotateXYZ = (0, 0, 0)
-                                    float3 xformOp:scale = (1, 1, 1)
-                                    double3 xformOp:translate = (0, 0, 0)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            def Xform "rack_b1_13_boxedFood_d01"
-            {
-                float xformOp:rotateZ = 180.69666
-                double3 xformOp:translate = (0.12789687887288886, 1.1819928238687873, 1.2149653100967406)
-                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
-
-                def Xform "asset" (
-                    prepend references = @../assets/simready/food_processed_boxedFood_d01/simready_usd/sm_food_processed_boxedFood_d01_01.usd@
-                    variants = {
-                        string PhysX = "Enabled"
-                    }
-                )
-                {
-                    over "Geometry"
-                    {
-                        over "sm_objaverse_food_processed_boxedFood_d01_obj_00"
-                        {
-                            bool physics:rigidBodyEnabled = 0
-                            float3 xformOp:rotateXYZ = (0, 0, 0)
-                            float3 xformOp:scale = (1, 1, 1)
-                            double3 xformOp:translate = (0, 0, 0)
-
-                            over "sm_objaverse_food_processed_boxedFood_d01_mesh_00" (
-                                instanceable = false
-                            )
-                            {
-                                over "VisualMaterials"
-                                {
-                                    over "m_opaque__cardboard__boxedFood_d01" (
-                                        instanceable = false
-                                    )
-                                    {
-                                    }
-                                }
-
-                                over "sm_objaverse_food_processed_boxedFood_d01_mesh_00" (
-                                    prepend apiSchemas = ["PhysicsMeshCollisionAPI"]
-                                )
-                                {
-                                    uniform token physics:approximation = "convexHull"
-                                }
-                            }
-
-                            over "grasp_identifier"
-                            {
-                                over "grasp_identifier_curve"
-                                {
-                                    float3 xformOp:rotateXYZ = (0, 0, 0)
-                                    float3 xformOp:scale = (1, 1, 1)
-                                    double3 xformOp:translate = (0, 0, 0)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            def Xform "rack_b1_14_boxedFood_d01"
-            {
-                float xformOp:rotateZ = 179.67313
-                double3 xformOp:translate = (0.18589666076668154, 1.181982758339714, 1.2149653100967406)
-                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
-
-                def Xform "asset" (
-                    prepend references = @../assets/simready/food_processed_boxedFood_d01/simready_usd/sm_food_processed_boxedFood_d01_01.usd@
-                    variants = {
-                        string PhysX = "Enabled"
-                    }
-                )
-                {
-                    over "Geometry"
-                    {
-                        over "sm_objaverse_food_processed_boxedFood_d01_obj_00"
-                        {
-                            bool physics:rigidBodyEnabled = 0
-                            float3 xformOp:rotateXYZ = (0, 0, 0)
-                            float3 xformOp:scale = (1, 1, 1)
-                            double3 xformOp:translate = (0, 0, 0)
-
-                            over "sm_objaverse_food_processed_boxedFood_d01_mesh_00" (
-                                instanceable = false
-                            )
-                            {
-                                over "VisualMaterials"
-                                {
-                                    over "m_opaque__cardboard__boxedFood_d01" (
-                                        instanceable = false
-                                    )
-                                    {
-                                    }
-                                }
-
-                                over "sm_objaverse_food_processed_boxedFood_d01_mesh_00" (
-                                    prepend apiSchemas = ["PhysicsMeshCollisionAPI"]
-                                )
-                                {
-                                    uniform token physics:approximation = "convexHull"
-                                }
-                            }
-
-                            over "grasp_identifier"
-                            {
-                                over "grasp_identifier_curve"
-                                {
-                                    float3 xformOp:rotateXYZ = (0, 0, 0)
-                                    float3 xformOp:scale = (1, 1, 1)
-                                    double3 xformOp:translate = (0, 0, 0)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            def Xform "rack_b1_15_boxedFood_d01"
-            {
-                float xformOp:rotateZ = 181.48384
-                double3 xformOp:translate = (0.24389692427613668, 1.182000566746979, 1.2149653100967406)
-                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
-
-                def Xform "asset" (
-                    prepend references = @../assets/simready/food_processed_boxedFood_d01/simready_usd/sm_food_processed_boxedFood_d01_01.usd@
-                    variants = {
-                        string PhysX = "Enabled"
-                    }
-                )
-                {
-                    over "Geometry"
-                    {
-                        over "sm_objaverse_food_processed_boxedFood_d01_obj_00"
-                        {
-                            bool physics:rigidBodyEnabled = 0
-                            float3 xformOp:rotateXYZ = (0, 0, 0)
-                            float3 xformOp:scale = (1, 1, 1)
-                            double3 xformOp:translate = (0, 0, 0)
-
-                            over "sm_objaverse_food_processed_boxedFood_d01_mesh_00" (
-                                instanceable = false
-                            )
-                            {
-                                over "VisualMaterials"
-                                {
-                                    over "m_opaque__cardboard__boxedFood_d01" (
-                                        instanceable = false
-                                    )
-                                    {
-                                    }
-                                }
-
-                                over "sm_objaverse_food_processed_boxedFood_d01_mesh_00" (
-                                    prepend apiSchemas = ["PhysicsMeshCollisionAPI"]
-                                )
-                                {
-                                    uniform token physics:approximation = "convexHull"
-                                }
-                            }
-
-                            over "grasp_identifier"
-                            {
-                                over "grasp_identifier_curve"
-                                {
-                                    float3 xformOp:rotateXYZ = (0, 0, 0)
-                                    float3 xformOp:scale = (1, 1, 1)
-                                    double3 xformOp:translate = (0, 0, 0)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            def Xform "rack_b1_16_boxedFood_d01"
-            {
-                float xformOp:rotateZ = 180.42226
-                double3 xformOp:translate = (0.359896838041801, 1.1819901250039533, 1.2149653100967406)
+                float xformOp:rotateZ = 179.06197
+                double3 xformOp:translate = (0.312563111479996, 1.1819767506320773, 1.2149653100967406)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -4873,7 +4525,7 @@ def Xform "World"
             def Xform "rack_b2_13_box_cracker_a01"
             {
                 float xformOp:rotateZ = 88.743546
-                double3 xformOp:translate = (-0.3060000055865918, 1.2120000001225297, 1.666)
+                double3 xformOp:translate = (-0.3060000055865919, 1.2120000001225297, 1.666)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -4927,7 +4579,7 @@ def Xform "World"
             def Xform "rack_b2_14_box_cracker_a01"
             {
                 float xformOp:rotateZ = 89.78881
-                double3 xformOp:translate = (0.10399999441210268, 1.212000000020597, 1.666)
+                double3 xformOp:translate = (0.10399999441210257, 1.212000000020597, 1.666)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -4981,7 +4633,7 @@ def Xform "World"
             def Xform "rack_b2_15_box_cracker_a01"
             {
                 float xformOp:rotateZ = 90.778656
-                double3 xformOp:translate = (0.3499999944125808, 1.2119999999240618, 1.666)
+                double3 xformOp:translate = (0.3499999944125807, 1.2119999999240618, 1.666)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -5787,7 +5439,7 @@ def Xform "World"
             def Xform "shelf_b0_08_milk_c01"
             {
                 float xformOp:rotateZ = -89.73202
-                double3 xformOp:translate = (-0.558, -1.225, 0.2668779632151127)
+                double3 xformOp:translate = (-0.5579999999999999, -1.225, 0.2668779632151127)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -6975,7 +6627,7 @@ def Xform "World"
             def Xform "shelf_b1_04_yogurt_a01"
             {
                 float xformOp:rotateZ = -89.50632
-                double3 xformOp:translate = (-0.5565000093128801, -1.226500000080246, 0.67)
+                double3 xformOp:translate = (-0.55650000931288, -1.226500000080246, 0.67)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -7033,7 +6685,7 @@ def Xform "World"
             def Xform "shelf_b1_05_yogurt_a01"
             {
                 float xformOp:rotateZ = -91.11572
-                double3 xformOp:translate = (-0.4835000093114602, -1.2264999998186554, 0.67)
+                double3 xformOp:translate = (-0.48350000931146, -1.2264999998186554, 0.67)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -7091,7 +6743,7 @@ def Xform "World"
             def Xform "shelf_b1_06_yogurt_a01"
             {
                 float xformOp:rotateZ = -89.63824
-                double3 xformOp:translate = (-0.4105000093130402, -1.2265000000588029, 0.67)
+                double3 xformOp:translate = (-0.41050000931304, -1.2265000000588029, 0.67)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -7149,7 +6801,7 @@ def Xform "World"
             def Xform "shelf_b1_07_yogurt_a01"
             {
                 float xformOp:rotateZ = -91.19485
-                double3 xformOp:translate = (-0.26450000931120077, -1.2264999998057957, 0.67)
+                double3 xformOp:translate = (-0.26450000931120055, -1.2264999998057957, 0.67)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -7207,7 +6859,7 @@ def Xform "World"
             def Xform "shelf_b1_08_yogurt_a01"
             {
                 float xformOp:rotateZ = -89.929375
-                double3 xformOp:translate = (-0.19150000931321876, -1.2265000000114805, 0.67)
+                double3 xformOp:translate = (-0.19150000931321853, -1.2265000000114805, 0.67)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -7265,7 +6917,7 @@ def Xform "World"
             def Xform "shelf_b1_09_yogurt_a01"
             {
                 float xformOp:rotateZ = -90.69666
-                double3 xformOp:translate = (-0.11850000931253739, -1.2264999998867627, 0.67)
+                double3 xformOp:translate = (-0.11850000931253717, -1.2264999998867627, 0.67)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -7323,7 +6975,7 @@ def Xform "World"
             def Xform "shelf_b1_10_yogurt_a01"
             {
                 float xformOp:rotateZ = -90.886696
-                double3 xformOp:translate = (-0.045500009312110574, -1.226499999855876, 0.67)
+                double3 xformOp:translate = (-0.04550000931211035, -1.226499999855876, 0.67)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -7671,7 +7323,7 @@ def Xform "World"
             def Xform "shelf_b2_05_milk_c01"
             {
                 float xformOp:rotateZ = -90.00394
-                double3 xformOp:translate = (-0.558, -1.225, 1.0728779632151126)
+                double3 xformOp:translate = (-0.5579999999999999, -1.225, 1.0728779632151126)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -7989,7 +7641,7 @@ def Xform "World"
             def Xform "shelf_b2_08_milk_c01"
             {
                 float xformOp:rotateZ = -89.5499
-                double3 xformOp:translate = (-0.1380000000000001, -1.225, 1.0728779632151126)
+                double3 xformOp:translate = (-0.13799999999999998, -1.225, 1.0728779632151126)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -8095,7 +7747,7 @@ def Xform "World"
             def Xform "shelf_b2_09_milk_c01"
             {
                 float xformOp:rotateZ = -88.940025
-                double3 xformOp:translate = (-0.06800000000000009, -1.225, 1.0728779632151126)
+                double3 xformOp:translate = (-0.06799999999999998, -1.225, 1.0728779632151126)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -8201,7 +7853,7 @@ def Xform "World"
             def Xform "shelf_b2_10_milk_c01"
             {
                 float xformOp:rotateZ = -90.44244
-                double3 xformOp:translate = (0.0019999999999999185, -1.225, 1.0728779632151126)
+                double3 xformOp:translate = (0.0020000000000000295, -1.225, 1.0728779632151126)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -8649,7 +8301,7 @@ def Xform "World"
             def Xform "shelf_b3_06_milk_c01"
             {
                 float xformOp:rotateZ = -89.63217
-                double3 xformOp:translate = (-0.558, -1.225, 1.4758779632151127)
+                double3 xformOp:translate = (-0.5579999999999999, -1.225, 1.4758779632151127)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -10149,7 +9801,7 @@ def Xform "World"
             def Xform "rack2_b0_00_cannedFood_h01"
             {
                 float xformOp:rotateZ = 179.11447
-                double3 xformOp:translate = (-3.741000000094226, 1.1770000002426275, 0.7640399108976126)
+                double3 xformOp:translate = (-3.7410000000942256, 1.1770000002426275, 0.7640399108976126)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -10232,7 +9884,7 @@ def Xform "World"
             def Xform "rack2_b0_01_cannedFood_h01"
             {
                 float xformOp:rotateZ = 178.60944
-                double3 xformOp:translate = (-3.6770000000920837, 1.1770000002434486, 0.7640399108976126)
+                double3 xformOp:translate = (-3.6770000000920833, 1.1770000002434486, 0.7640399108976126)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -10315,7 +9967,7 @@ def Xform "World"
             def Xform "rack2_b0_02_cannedFood_h01"
             {
                 float xformOp:rotateZ = 179.38623
-                double3 xformOp:translate = (-3.6130000000953757, 1.1770000002421779, 0.7640399108976126)
+                double3 xformOp:translate = (-3.6130000000953753, 1.1770000002421779, 0.7640399108976126)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -10398,7 +10050,7 @@ def Xform "World"
             def Xform "rack2_b0_03_cannedFood_h01"
             {
                 float xformOp:rotateZ = 180.74586
-                double3 xformOp:translate = (-3.549000000101095, 1.1770000002398466, 0.7640399108976126)
+                double3 xformOp:translate = (-3.5490000001010946, 1.1770000002398466, 0.7640399108976126)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -10481,7 +10133,7 @@ def Xform "World"
             def Xform "rack2_b0_04_cannedFood_h01"
             {
                 float xformOp:rotateZ = 181.11514
-                double3 xformOp:translate = (-3.4850000001026387, 1.17700000023919, 0.7640399108976126)
+                double3 xformOp:translate = (-3.485000000102638, 1.17700000023919, 0.7640399108976126)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -10564,7 +10216,7 @@ def Xform "World"
             def Xform "rack2_b0_05_cannedFood_h01"
             {
                 float xformOp:rotateZ = 179.71004
-                double3 xformOp:translate = (-3.421000000096743, 1.177000000241635, 0.7640399108976126)
+                double3 xformOp:translate = (-3.4210000000967424, 1.177000000241635, 0.7640399108976126)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -10647,7 +10299,7 @@ def Xform "World"
             def Xform "rack2_b0_06_cannedFood_h01"
             {
                 float xformOp:rotateZ = 178.59993
-                double3 xformOp:translate = (-3.357000000092043, 1.1770000002434637, 0.7640399108976126)
+                double3 xformOp:translate = (-3.3570000000920426, 1.1770000002434637, 0.7640399108976126)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -10730,7 +10382,7 @@ def Xform "World"
             def Xform "rack2_b0_07_cannedFood_h01"
             {
                 float xformOp:rotateZ = 180.55869
-                double3 xformOp:translate = (-3.293000000100311, 1.1770000002401755, 0.7640399108976126)
+                double3 xformOp:translate = (-3.2930000001003106, 1.1770000002401755, 0.7640399108976126)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -10813,7 +10465,7 @@ def Xform "World"
             def Xform "rack2_b0_08_cannedFood_h01"
             {
                 float xformOp:rotateZ = 178.5459
-                double3 xformOp:translate = (-3.2290000000918133, 1.1770000002435506, 0.7640399108976126)
+                double3 xformOp:translate = (-3.229000000091813, 1.1770000002435506, 0.7640399108976126)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -10896,7 +10548,7 @@ def Xform "World"
             def Xform "rack2_b0_09_cannedFood_h01"
             {
                 float xformOp:rotateZ = 181.43523
-                double3 xformOp:translate = (-3.1650000001039733, 1.177000000238613, 0.7640399108976126)
+                double3 xformOp:translate = (-3.165000000103973, 1.177000000238613, 0.7640399108976126)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -10979,7 +10631,7 @@ def Xform "World"
             def Xform "rack2_b0_10_cannedFood_h01"
             {
                 float xformOp:rotateZ = 179.30815
-                double3 xformOp:translate = (-3.0370000000950452, 1.1770000002423076, 0.7640399108976126)
+                double3 xformOp:translate = (-3.037000000095045, 1.1770000002423076, 0.7640399108976126)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -11062,7 +10714,7 @@ def Xform "World"
             def Xform "rack2_b0_11_cannedFood_h01"
             {
                 float xformOp:rotateZ = 179.82373
-                double3 xformOp:translate = (-2.9090000000972216, 1.1770000002414425, 0.7640399108976126)
+                double3 xformOp:translate = (-2.909000000097221, 1.1770000002414425, 0.7640399108976126)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -11145,7 +10797,7 @@ def Xform "World"
             def Xform "rack2_b0_12_cannedFood_h01"
             {
                 float xformOp:rotateZ = 179.43399
-                double3 xformOp:translate = (-2.845000000095577, 1.1770000002420982, 0.7640399108976126)
+                double3 xformOp:translate = (-2.8450000000955766, 1.1770000002420982, 0.7640399108976126)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -11866,7 +11518,7 @@ def Xform "World"
             def Xform "rack2_b1_00_beverage_coffeeCup_b01"
             {
                 float xformOp:rotateZ = 88.744446
-                double3 xformOp:translate = (-3.7344743110437153, 1.1634994127853575, 1.2149997174165286)
+                double3 xformOp:translate = (-3.734474311043715, 1.1634994127853575, 1.2149997174165286)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -11970,7 +11622,7 @@ def Xform "World"
             def Xform "rack2_b1_01_beverage_coffeeCup_b01"
             {
                 float xformOp:rotateZ = 88.757996
-                double3 xformOp:translate = (-3.6574743109055636, 1.163499418860551, 1.2149997174165286)
+                double3 xformOp:translate = (-3.657474310905563, 1.163499418860551, 1.2149997174165286)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -12074,7 +11726,7 @@ def Xform "World"
             def Xform "rack2_b1_02_beverage_coffeeCup_b01"
             {
                 float xformOp:rotateZ = 89.26003
-                double3 xformOp:translate = (-3.503474306799728, 1.1634996439721645, 1.2149997174165286)
+                double3 xformOp:translate = (-3.5034743067997276, 1.1634996439721645, 1.2149997174165286)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -12178,7 +11830,7 @@ def Xform "World"
             def Xform "rack2_b1_03_beverage_coffeeCup_b01"
             {
                 float xformOp:rotateZ = 91.47733
-                double3 xformOp:translate = (-3.3494743122622204, 1.1635006382975617, 1.2149997174165286)
+                double3 xformOp:translate = (-3.34947431226222, 1.1635006382975617, 1.2149997174165286)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -12282,7 +11934,7 @@ def Xform "World"
             def Xform "rack2_b1_04_beverage_coffeeCup_b01"
             {
                 float xformOp:rotateZ = 90.172424
-                double3 xformOp:translate = (-3.2724743043880853, 1.1635000531445125, 1.2149997174165286)
+                double3 xformOp:translate = (-3.272474304388085, 1.1635000531445125, 1.2149997174165286)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -12386,7 +12038,7 @@ def Xform "World"
             def Xform "rack2_b1_05_beverage_coffeeCup_b01"
             {
                 float xformOp:rotateZ = 89.628365
-                double3 xformOp:translate = (-3.1954743050418752, 1.1634998091519329, 1.2149997174165286)
+                double3 xformOp:translate = (-3.195474305041875, 1.1634998091519329, 1.2149997174165286)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -12490,7 +12142,7 @@ def Xform "World"
             def Xform "rack2_b1_06_beverage_coffeeCup_b01"
             {
                 float xformOp:rotateZ = 90.58152
-                double3 xformOp:translate = (-3.1184743054225463, 1.1635002366125482, 1.2149997174165286)
+                double3 xformOp:translate = (-3.118474305422546, 1.1635002366125482, 1.2149997174165286)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -12594,7 +12246,7 @@ def Xform "World"
             def Xform "rack2_b1_07_beverage_coffeeCup_b01"
             {
                 float xformOp:rotateZ = 90.86531
-                double3 xformOp:translate = (-3.041474306909676, 1.1635003638758203, 1.2149997174165286)
+                double3 xformOp:translate = (-3.0414743069096755, 1.1635003638758203, 1.2149997174165286)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -12698,7 +12350,7 @@ def Xform "World"
             def Xform "rack2_b1_08_beverage_coffeeCup_b01"
             {
                 float xformOp:rotateZ = 88.90251
-                double3 xformOp:translate = (-2.8874743095214757, 1.1634994836578656, 1.2149997174165286)
+                double3 xformOp:translate = (-2.887474309521475, 1.1634994836578656, 1.2149997174165286)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -12802,7 +12454,7 @@ def Xform "World"
             def Xform "rack2_b1_09_beverage_coffeeCup_b01"
             {
                 float xformOp:rotateZ = 91.11743
-                double3 xformOp:translate = (-2.8104743087596176, 1.163500476931465, 1.2149997174165286)
+                double3 xformOp:translate = (-2.810474308759617, 1.163500476931465, 1.2149997174165286)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -13956,7 +13608,7 @@ def Xform "World"
             def Xform "rack2_b2_00_chocolate_e01"
             {
                 float xformOp:rotateZ = 90.575516
-                double3 xformOp:translate = (-3.737146552746496, 1.129969431545622, 1.6744598595276474)
+                double3 xformOp:translate = (-3.7371465527464958, 1.129969431545622, 1.6744598595276474)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -14013,7 +13665,7 @@ def Xform "World"
             def Xform "rack2_b2_01_chocolate_e01"
             {
                 float xformOp:rotateZ = 91.169876
-                double3 xformOp:translate = (-3.6662904766144497, 1.1299827252545773, 1.6744598595276474)
+                double3 xformOp:translate = (-3.6662904766144493, 1.1299827252545773, 1.6744598595276474)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -14070,7 +13722,7 @@ def Xform "World"
             def Xform "rack2_b2_02_chocolate_e01"
             {
                 float xformOp:rotateZ = 89.462135
-                double3 xformOp:translate = (-3.598750351756466, 1.129968429835251, 1.6744598595276474)
+                double3 xformOp:translate = (-3.5987503517564656, 1.129968429835251, 1.6744598595276474)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -14127,7 +13779,7 @@ def Xform "World"
             def Xform "rack2_b2_03_chocolate_e01"
             {
                 float xformOp:rotateZ = 89.12322
-                double3 xformOp:translate = (-3.529238524799798, 1.1299743121329024, 1.6744598595276474)
+                double3 xformOp:translate = (-3.5292385247997977, 1.1299743121329024, 1.6744598595276474)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -14184,7 +13836,7 @@ def Xform "World"
             def Xform "rack2_b2_04_chocolate_e01"
             {
                 float xformOp:rotateZ = 89.39104
-                double3 xformOp:translate = (-3.4588527669676075, 1.1299694245136005, 1.6744598595276474)
+                double3 xformOp:translate = (-3.458852766967607, 1.1299694245136005, 1.6744598595276474)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -14241,7 +13893,7 @@ def Xform "World"
             def Xform "rack2_b2_05_chocolate_e01"
             {
                 float xformOp:rotateZ = 89.39381
-                double3 xformOp:translate = (-3.3888487767629822, 1.129969383380324, 1.6744598595276474)
+                double3 xformOp:translate = (-3.388848776762982, 1.129969383380324, 1.6744598595276474)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -14298,7 +13950,7 @@ def Xform "World"
             def Xform "rack2_b2_06_chocolate_e01"
             {
                 float xformOp:rotateZ = 89.14236
-                double3 xformOp:translate = (-3.3192109616401098, 1.1299739030759148, 1.6744598595276474)
+                double3 xformOp:translate = (-3.3192109616401093, 1.1299739030759148, 1.6744598595276474)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -14355,7 +14007,7 @@ def Xform "World"
             def Xform "rack2_b2_07_chocolate_e01"
             {
                 float xformOp:rotateZ = 90.20414
-                double3 xformOp:translate = (-3.247681502605605, 1.1299656334547414, 1.6744598595276474)
+                double3 xformOp:translate = (-3.2476815026056047, 1.1299656334547414, 1.6744598595276474)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -14412,7 +14064,7 @@ def Xform "World"
             def Xform "rack2_b2_08_chocolate_e01"
             {
                 float xformOp:rotateZ = 90.57281
-                double3 xformOp:translate = (-3.177150454177952, 1.1299693912932083, 1.6744598595276474)
+                double3 xformOp:translate = (-3.1771504541779514, 1.1299693912932083, 1.6744598595276474)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -14469,7 +14121,7 @@ def Xform "World"
             def Xform "rack2_b2_09_chocolate_e01"
             {
                 float xformOp:rotateZ = 90.25267
-                double3 xformOp:translate = (-3.1076115903132684, 1.1299659328547746, 1.6744598595276474)
+                double3 xformOp:translate = (-3.107611590313268, 1.1299659328547746, 1.6744598595276474)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -14526,7 +14178,7 @@ def Xform "World"
             def Xform "rack2_b2_10_chocolate_e01"
             {
                 float xformOp:rotateZ = 91.17474
-                double3 xformOp:translate = (-3.0362834647114356, 1.1299828708193236, 1.6744598595276474)
+                double3 xformOp:translate = (-3.036283464711435, 1.1299828708193236, 1.6744598595276474)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -14583,7 +14235,7 @@ def Xform "World"
             def Xform "rack2_b2_11_chocolate_e01"
             {
                 float xformOp:rotateZ = 90.690895
-                double3 xformOp:translate = (-2.966980349966882, 1.129971317619707, 1.6744598595276474)
+                double3 xformOp:translate = (-2.9669803499668816, 1.129971317619707, 1.6744598595276474)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -14640,7 +14292,7 @@ def Xform "World"
             def Xform "rack2_b2_12_chocolate_e01"
             {
                 float xformOp:rotateZ = 88.63664
-                double3 xformOp:translate = (-2.899939315299233, 1.129987806005491, 1.6744598595276474)
+                double3 xformOp:translate = (-2.8999393152992328, 1.129987806005491, 1.6744598595276474)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (
@@ -14697,7 +14349,7 @@ def Xform "World"
             def Xform "rack2_b2_13_chocolate_e01"
             {
                 float xformOp:rotateZ = 89.84983
-                double3 xformOp:translate = (-2.8281918858450044, 1.1299652419798798, 1.6744598595276474)
+                double3 xformOp:translate = (-2.828191885845004, 1.1299652419798798, 1.6744598595276474)
                 uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZ"]
 
                 def Xform "asset" (

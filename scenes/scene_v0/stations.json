@@ -40,6 +40,10 @@
     1.21
    ],
    "task": true,
+   "locations": [
+    "R1-B1-01",
+    "R1-B1-02"
+   ],
    "approach": [
     -1.224,
     0.64
@@ -61,6 +65,10 @@
     1.222
    ],
    "task": true,
+   "locations": [
+    "R1-B1-03",
+    "R1-B1-04"
+   ],
    "approach": [
     -0.812,
     0.632
@@ -82,6 +90,10 @@
     1.205
    ],
    "task": true,
+   "locations": [
+    "R1-B1-05",
+    "R1-B1-06"
+   ],
    "approach": [
     -0.4,
     0.634
@@ -103,6 +115,10 @@
     1.208
    ],
    "task": true,
+   "locations": [
+    "R1-B1-07",
+    "R1-B1-08"
+   ],
    "approach": [
     -0.188,
     0.637
@@ -124,6 +140,10 @@
     1.192
    ],
    "task": true,
+   "locations": [
+    "R1-B1-09",
+    "R1-B1-10"
+   ],
    "approach": [
     -0.176,
     0.632
@@ -145,6 +165,11 @@
     -1.239
    ],
    "task": true,
+   "locations": [
+    "S1-B2-04",
+    "S1-B2-05",
+    "S1-B2-06"
+   ],
    "approach": [
     -1.145,
     -0.679
@@ -166,6 +191,11 @@
     -1.227
    ],
    "task": false,
+   "locations": [
+    "S1-B2-01",
+    "S1-B2-02",
+    "S1-B2-03"
+   ],
    "approach": [
     -0.255,
     -0.677
@@ -187,6 +217,11 @@
     -1.23
    ],
    "task": false,
+   "locations": [
+    "S1-B3-04",
+    "S1-B3-05",
+    "S1-B3-06"
+   ],
    "approach": [
     -1.145,
     -0.68
@@ -208,6 +243,11 @@
     -1.235
    ],
    "task": true,
+   "locations": [
+    "S1-B3-01",
+    "S1-B3-02",
+    "S1-B3-03"
+   ],
    "approach": [
     -0.455,
     -0.675
@@ -229,6 +269,13 @@
     1.177
    ],
    "task": false,
+   "locations": [
+    "R2-B1-01",
+    "R2-B1-02",
+    "R2-B1-03",
+    "R2-B1-04",
+    "R2-B1-05"
+   ],
    "approach": [
     -3.265,
     0.637
@@ -250,6 +297,13 @@
     1.223
    ],
    "task": true,
+   "locations": [
+    "R2-B1-06",
+    "R2-B1-07",
+    "R2-B1-08",
+    "R2-B1-09",
+    "R2-B1-10"
+   ],
    "approach": [
     -2.235,
     0.632
@@ -271,6 +325,11 @@
     -1.232
    ],
    "task": true,
+   "locations": [
+    "S2-B2-04",
+    "S2-B2-05",
+    "S2-B2-06"
+   ],
    "approach": [
     -2.695,
     -0.682
@@ -292,6 +351,11 @@
     -1.232
    ],
    "task": true,
+   "locations": [
+    "S2-B2-01",
+    "S2-B2-02",
+    "S2-B2-03"
+   ],
    "approach": [
     -2.005,
     -0.682
@@ -313,6 +377,11 @@
     -1.242
    ],
    "task": true,
+   "locations": [
+    "S2-B3-04",
+    "S2-B3-05",
+    "S2-B3-06"
+   ],
    "approach": [
     -2.695,
     -0.682
@@ -334,30 +403,14 @@
     -1.223
    ],
    "task": false,
+   "locations": [
+    "S2-B3-01",
+    "S2-B3-02",
+    "S2-B3-03"
+   ],
    "approach": [
     -2.005,
     -0.683
-   ]
-  },
-  "table_yogurt_a01": {
-   "x": -0.01,
-   "y": -0.45,
-   "yaw": 0.0,
-   "grasp": "top",
-   "reach": 0.43,
-   "offset": 0.0,
-   "product": "food_processed_yogurt_a01",
-   "board": "table",
-   "surface": 0.85,
-   "section": "table",
-   "target": [
-    0.42,
-    -0.45
-   ],
-   "task": true,
-   "approach": [
-    -0.11,
-    -0.45
    ]
   },
   "table_cannedFood_h01": {
@@ -376,6 +429,9 @@
     -0.57
    ],
    "task": true,
+   "locations": [
+    "T1-02"
+   ],
    "approach": [
     -0.11,
     -0.57
@@ -397,9 +453,36 @@
     -0.69
    ],
    "task": true,
+   "locations": [
+    "T1-03"
+   ],
    "approach": [
     -0.11,
     -0.49
+   ]
+  },
+  "table_yogurt_a01": {
+   "x": -0.01,
+   "y": -0.45,
+   "yaw": 0.0,
+   "grasp": "top",
+   "reach": 0.43,
+   "offset": 0.0,
+   "product": "food_processed_yogurt_a01",
+   "board": "table",
+   "surface": 0.85,
+   "section": "table",
+   "target": [
+    0.42,
+    -0.45
+   ],
+   "task": true,
+   "locations": [
+    "T1-01"
+   ],
+   "approach": [
+    -0.11,
+    -0.45
    ]
   },
   "table_yogurt_c01": {
@@ -418,6 +501,9 @@
     -0.81
    ],
    "task": true,
+   "locations": [
+    "T1-04"
+   ],
    "approach": [
     -0.11,
     -0.61

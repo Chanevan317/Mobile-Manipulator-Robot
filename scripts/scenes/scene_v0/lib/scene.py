@@ -17,7 +17,7 @@ Layout (metres):
   shelf  storage_shelf_basic_b01 on the robot's right: front at y -1.165, centred on x -0.6; products on 0.667 / 1.070.
          Its own collision mesh tipped standing bottles over (Isaac 2026-11-16), so it collides through invisible boxes
          instead: a flat plate on each board (top 0.264 + k 0.403, just over the board mesh) + its 4 corner posts
-  Store sections (SECTIONS): blue rack 1 breakfast and dry goods, blue rack 2 snacks and canned, grey shelf 1 dairy,
+  Store sections (products.json, store_db.py): blue rack 1 breakfast and dry goods, blue rack 2 snacks and canned, grey shelf 1 dairy,
   grey shelf 2 sauces; each board holds runs of one product side by side (facings), each run with its own random stock
   level; the 11 shelf task products sit mid-run on boards the arm reaches (TASK_BOARD). The table is the work /
   staging area: 4 short task products at its edge, the crate, a mixed back row.
@@ -40,7 +40,7 @@ shelf boards ~0.265 + k 0.405 (ridged: the products settle ~0.668 / 1.071; 0.675
 """
 import math, os, sys
 import random
-try:                                  # the layout (REST, SECTIONS, FURNITURE, ...) also loads without Isaac (stations.py)
+try:                                  # the layout (REST, LOCATIONS, PRODUCTS, FURNITURE, ...) also loads without Isaac (stations.py)
     from pxr import Usd, UsdGeom, UsdPhysics, UsdLux, UsdShade, Sdf, Gf
 except ImportError:
     Usd = None
@@ -81,22 +81,14 @@ STRIPS = [(x, y) for x in (-3.0, -1.6, -0.2) for y in (-1.0, 1.0)] + [(0.7, -0.6
 #   table: the hand comes along +x;  rack: along +y;  shelf: along -y
 _T = [('food_processed_yogurt_a01', 0.42, -0.45), ('food_processed_cannedFood_h01', 0.42, -0.57),
       ('food_beverage_coffeeCup_b01', 0.42, -0.69), ('food_processed_yogurt_c01', 0.42, -0.81)]
-# store sections (user 2026-11-17: "organize the shelves by products and sections"): board key -> runs of one product
-# each, side by side along the board (equal lengths), like shelf facings. Each run gets its own random stock level.
+# store sections: which product covers which location is in the PRODUCT DATABASE (scenes/scene_v0/products.json,
+# store_db.py; user 2026-11-17); the unit names stay here
+SECTION_NAMES = {'rack': 'breakfast and dry goods', 'rack2': 'snacks and canned', 'shelf': 'dairy', 'shelf2': 'sauces'}
 _P, _F = 'food_processed_', 'food_'
 CEREAL, CRACKER, BOX_B, BOX_C, BOX_D = _P + 'boxedCereal_l01', _F + 'box_cracker_a01', _P + 'boxedFood_b01', _P + 'boxedFood_c01', _P + 'boxedFood_d01'
 CAN, CHOC, CUP = _P + 'cannedFood_h01', _P + 'chocolate_e01', _F + 'beverage_coffeeCup_b01'
 MILK_B, MILK_C, YOG_A, YOG_C = _P + 'milk_b01', _P + 'milk_c01', _P + 'yogurt_a01', _P + 'yogurt_c01'
 KET_C, KET_I, KET_A = _P + 'ketchup_c01', _P + 'ketchup_i01', _F + 'condiment_ketchup_a02'
-SECTION_NAMES = {'rack': 'breakfast and dry goods', 'rack2': 'snacks and canned', 'shelf': 'dairy', 'shelf2': 'sauces'}
-SECTIONS = {
-    'rack_b0': [CEREAL, CRACKER, BOX_B, BOX_C, BOX_D], 'rack_b1': [CEREAL, CRACKER, BOX_D], 'rack_b2': [CEREAL, CRACKER],
-    'rack2_b0': [CAN, CHOC], 'rack2_b1': [CUP, CAN], 'rack2_b2': [CHOC, CUP],
-    'shelf_b0': [MILK_B, MILK_C], 'shelf_b1': [MILK_B, YOG_A], 'shelf_b2': [YOG_C, MILK_C], 'shelf_b3': [YOG_C, MILK_C],
-    'shelf_b4': [YOG_A],                                   # top board: 0.144 m under the shelf top
-    'shelf2_b0': [KET_I, KET_A], 'shelf2_b1': [KET_C, KET_I], 'shelf2_b2': [KET_A, KET_C], 'shelf2_b3': [KET_I, KET_A],
-    'shelf2_b4': [],                                       # top board: too low for the bottles
-}
 # the 11 shelf task products: in the middle of their own run on a board the mono arm reaches. Short products (<= 70 mm,
 # picked from above) only on boards <= ~0.8 m: from above at 1.07 m needs lift 0.87 > 0.81 (stations.py found it)
 TASK_BOARD = {CEREAL: 'rack_b0', CRACKER: 'rack_b0', BOX_B: 'rack_b0', BOX_C: 'rack_b0', BOX_D: 'rack_b0',
@@ -387,16 +379,23 @@ def _surfaces():
 
 
 def _segments(key, u0, u1):
-    """The board's product runs: (u start, u end, package), equal lengths in the SECTIONS order."""
-    prods = SECTIONS.get(key, [])
-    L = (u1 - u0) / max(1, len(prods))
-    return [(u0 + i * L, u0 + (i + 1) * L, p) for i, p in enumerate(prods)]
+    """The board's product runs: (u start, u end, package) from the product database: each product's locations on
+    this board, neighbouring slots merged into one run (a product may have several runs, on several boards)."""
+    runs = []
+    for p in PRODUCTS.values():
+        for a, b in sorted(LOCATIONS[l]['u'] for l in p['locations'] if LOCATIONS[l]['board'] == key):
+            if runs and runs[-1][2] == p['package'] and abs(runs[-1][1] - a) < 1e-6:
+                runs[-1] = (runs[-1][0], b, p['package'])
+            else:
+                runs.append((a, b, p['package']))
+    return sorted(runs)
 
 
 def _task_rest():
     """Resting place (surface z, x, y, approach heading) of every task product: the table ones from _T, the shelf ones
     in the middle of their run on TASK_BOARD (y is set in build() from the product's depth: 40 mm in from the front)."""
-    rest = {p: (TABLE_TOP, x, y, 0.0) for p, x, y in _T}
+    rest = {p['package']: (TABLE_TOP, *LOCATIONS[l]['centre'], 0.0)              # table spot from the database
+            for p in PRODUCTS.values() for l in p['locations'] if l.startswith('T1-')}
     surf = {sf[0]: sf for sf in _surfaces()}
     for pkg, key in TASK_BOARD.items():
         _, z, (u0, u1), front, hd, clr, dyn = surf[key]
@@ -476,6 +475,76 @@ def slot_matrix(xy, yaw_deg, z_bottom, rng):
     t = Gf.Vec3d(xy[0] - (ca * c[0] - sa * c[1]), xy[1] - (sa * c[0] + ca * c[1]), z_bottom - rng[0][2])
     m = Gf.Matrix4d().SetRotate(Gf.Rotation(Gf.Vec3d(0, 0, 1), yaw_deg)); m.SetTranslateOnly(t)
     return m
+
+
+# ------------------------------------------------------------ location IDs + product database
+# (user 2026-11-17: "each location an ID and ... a product database where one product can have 1 or more ID locations")
+# Every board is cut into fixed-width SLOTS; ID = <unit>-B<board, 1 = lowest>-<slot, 01 = leftmost seen from the
+# aisle>, e.g. R1-B1-03. Table pick spots: T1-01..04. The slot counts keep each product run of the first layout on
+# whole slots (racks: 10 x 0.206 m, so 5 / 3 / 2 products = 2 / 3-4 / 5 slots; shelves: 6 x 0.23 m, 2 products = 3 each).
+UNITS = {'rack': ('R1', 10), 'rack2': ('R2', 10), 'shelf': ('S1', 6), 'shelf2': ('S2', 6)}   # unit code, slots per board
+UNIT_NAMES = {'R1': 'blue rack 1', 'R2': 'blue rack 2', 'S1': 'grey shelf 1', 'S2': 'grey shelf 2', 'T1': 'table'}
+TABLE_SPOTS = [(x, y) for _, x, y in _T]                 # T1-01.. (the table task products' pick spots)
+PRODUCTS_FILE = os.path.join(RP.scene_dir('scene_v0'), 'products.json')
+
+
+def locations():
+    """{ID: dict(unit, section, board, level, slot, z, u (start, end along the board), centre (x, y at the board front),
+    width, facing (approach heading, deg), reachable (the mono arm reaches the board))} for every slot + table spot."""
+    out = {}
+    for key, zt, (u0, u1), front, hd, clr, dyn in _surfaces():
+        unit = key.split('_')[0]
+        if unit not in UNITS:
+            continue
+        code, n = UNITS[unit]; lvl = int(key.rsplit('_b', 1)[1]) + 1; w = (u1 - u0) / n
+        for i in range(n):
+            k = i if hd == 90.0 else n - 1 - i                 # racks face +y (left = -x), shelves face -y (left = +x)
+            a, b = u0 + k * w, u0 + (k + 1) * w
+            out[f'{code}-B{lvl}-{i + 1:02d}'] = dict(
+                unit=code, section=SECTION_NAMES[unit], board=key, level=lvl, slot=i + 1, z=round(zt, 3),
+                u=[round(a, 4), round(b, 4)], centre=[round((a + b) / 2, 3), round(front, 3)], width=round(w, 3),
+                facing=hd, reachable=dyn)
+    for i, (x, y) in enumerate(TABLE_SPOTS):
+        out[f'T1-{i + 1:02d}'] = dict(unit='T1', section='table (work area)', board='table', level=1, slot=i + 1,
+                                      z=TABLE_TOP, u=None, centre=[x, y], width=0.12, facing=0.0, reachable=True)
+    return out
+
+
+def load_products(path=None):
+    """The product database: {product id: dict(name, package, mass_kg, size_mm, locations [IDs])}."""
+    import json
+    return json.load(open(path or PRODUCTS_FILE))['products']
+
+
+LOCATIONS = locations()
+try:
+    PRODUCTS = load_products()
+except FileNotFoundError:                                # first run of store_db.py --init (it writes the file)
+    PRODUCTS = {}
+
+
+def check_products(products=None, locs=None):
+    """Problems in the product database: unknown IDs, a location claimed twice, task products off their board."""
+    products, locs = PRODUCTS if products is None else products, LOCATIONS if locs is None else locs
+    bad, owner = [], {}
+    for pid, p in products.items():
+        if not p['locations']:
+            bad.append(f'{pid}: no locations')
+        for l in p['locations']:
+            if l not in locs:
+                bad.append(f'{pid}: unknown location {l}')
+            elif l in owner:
+                bad.append(f'{l}: claimed by {owner[l]} and {pid}')
+            else:
+                owner[l] = pid
+    pk = {p['package']: pid for pid, p in products.items()}
+    for pkg, key in TASK_BOARD.items():
+        if pkg not in pk or not any(locs[l]['board'] == key for l in products[pk[pkg]]['locations'] if l in locs):
+            bad.append(f'task product {pkg}: no location on its task board {key}')
+    for i in range(len(TABLE_SPOTS)):
+        if f'T1-{i + 1:02d}' not in owner:
+            bad.append(f'T1-{i + 1:02d}: no product (the table task needs one per spot)')
+    return bad
 
 
 REST = _task_rest()          # after _surfaces(): the shelf task products' spots come from the sections

@@ -10,7 +10,8 @@ A small store room for testing the mono (one-arm) robot in Isaac Sim 5.1, built 
 - **Table** (0.85 m) in front of the robot's start: the work / staging area, with a crate and a mixed back row.
 - **Store sections:** blue rack 1 *breakfast and dry goods* (cereal, crackers, boxed food), blue rack 2 *snacks and
   canned* (canned food, chocolate, coffee cups) on the robot's left; grey shelf 1 *dairy* (milk, yogurt), grey shelf 2
-  *sauces* (ketchups) on its right. Each board holds runs of one product side by side, like shelf facings.
+  *sauces* (ketchups) on its right. Each board holds runs of one product side by side, like shelf facings. Which
+  product goes where comes from the **product database** (section 6).
 - **15 task products** placed where the one arm can reach them, each in its own section (0.03-0.25 kg, our weights;
   the packages' own weights are wrong).
 - **Filler products:** the rest of each run, every run stocked at random from a few items to full (higher boards too).
@@ -94,12 +95,40 @@ What `stations.py` checks: the arm can reach the product from the station (joint
 (the base plus the camera in front, + 2 cm) clears the furniture and walls at the station, on the way in and out, and
 while turning. Not checked: the arm against the furniture (the grasp test does that).
 
+## 6. Locations and the product database
+
+Every board is cut into fixed-width **locations**, each with an ID:
+
+| ID | Meaning |
+|---|---|
+| `R1-B1-03` | blue rack 1 (R1; R2 = blue rack 2, S1 / S2 = grey shelves 1 / 2), board 1 (the lowest), slot 3 (counted from the left, as seen from the aisle) |
+| `T1-01` … `T1-04` | the four pick spots on the table |
+
+Racks have 10 slots of 0.206 m per board, grey shelves 6 of 0.23 m: 124 locations in all.
+
+The **product database** `products.json` lists each product: id (`P01`…), name, package (the asset), weight, size and
+the **locations it covers**. One product can cover one location or many, on one or several boards. Neighbouring
+locations on a board form one run of that product. The scene is built from this file: fillers stock each run, and the
+task products sit in theirs. To change the store layout, edit the locations in `products.json`.
+
+```bash
+python3 scripts/scenes/scene_v0/store_db.py                        # check products.json, write locations.json, print the catalogue
+python3 scripts/scenes/scene_v0/store_db.py --product cereal       # where a product is (id, package or part of its name)
+python3 scripts/scenes/scene_v0/store_db.py --at S1-B2-05          # what is at a location, and which station serves it
+```
+
+The check fails if a location is unknown or claimed by two products, a task product has no location on its board, or
+a table spot is empty. After an edit: `store_db.py`, then `stations.py` (each station lists the locations it serves),
+then `check_scene.py` and `save_scene.py` in Isaac Sim.
+
 ## Files
 
 | File | What |
 |---|---|
 | `scene_v0.usda` | the saved scene (refers to the downloaded assets by relative path) |
-| `stations.json` | the robot stations: name, x, y, heading, turning point, product, how it is grasped |
+| `stations.json` | the robot stations: name, x, y, heading, turning point, product, how it is grasped, locations it serves |
+| `products.json` | the product database: id, name, package, weight, size, the locations each product covers (edit this) |
+| `locations.json` | every location ID: unit, board, slot, height, position, reachable, product, station (written by `store_db.py`) |
 | `CREDITS.md` | attribution for the NVIDIA assets |
 | `preview_scene_v0.png` | picture of the scene (rendered with `check_scene.py --shot`, 4 views) |
 
@@ -113,6 +142,7 @@ Scripts, in `../../scripts/scenes/scene_v0/`:
 | `fetch_assets.py` | downloads the assets |
 | `check_scene.py` | reach + scene checks with the robot; viewing window |
 | `save_scene.py` | writes `scene_v0.usda` |
+| `store_db.py` | checks the product database, writes `locations.json`, looks up products and locations (no simulator) |
 | `stations.py` | works out the robot stations and routes -> `stations.json` (no simulator) |
 | `lib/scene_robot.py` | the robot in the scene and one drive between stations (used by the two below) |
 | `drive_stations.py` | drives the robot along a route of stations (`--route`, `--tour`) |
