@@ -15,9 +15,9 @@ follower's hand moves, without translating in your head.
     follower's mounts, with a stand-in for the lift column between them. Two leaders, one per hand.
   - Swapping takes 4 screws: the arm's shoulder hub bolts onto the pedestal top, which has holes every 45°.
 - **Every servo cable is a stock 20 cm cable (v4, 2026-11-17), as on the SO-100.** The shoulder servo **turns with
-  link 1** (its horn faces down onto a fixed hub, its sockets up), and the **servo board rides on link 1** (a dovetail
-  socket on a short tail behind the shoulder servo). No servo cable crosses the shoulder: only the board's USB and power
-  cables do, with a slack loop down to the desk. The elbow and wrist-pan servos are **turned over** (sockets down), so
+  link 1** (its horn faces down onto a fixed hub, its sockets up). Its cable goes **over the top and down the stop rib**
+  at the back (the dead end, where the arm never goes) to the **servo board right under the platform**, in a socket on
+  the pedestal (v4.1: tried on the printed hub first; the board rode on link 1 in v4). The elbow and wrist-pan servos are **turned over** (sockets down), so
   their cables loop under the joints and go straight on to the next servo. The roll range is **±90°**, so the roll
   cable only twists a quarter turn either way around the roll servo's top. v3 (needed 30–40 cm cables) is in git.
 - **The shoulder carries the arm on a ring, not on the servo alone.** The arm (~435 g, its weight 170–215 mm out)
@@ -54,19 +54,19 @@ stack, 0.4 scale) are in the git history.
 | File | What it is | Mono | Prototype | Volume (cm³) |
 |---|---|---|---|---|
 | `01_shoulder_hub.stl` | fixed hub on the pedestal: the shoulder servo's horn screws onto it from below (through its hollow tube); 4 × M3 onto the pedestal; support ring under link 1 + stop rib | 1 | 2 | 88 |
-| `02_link1.stl` | upper arm (91 mm): clamps on the shoulder and elbow servos' rear ends, stop peg under the beam, cable clip on the elbow clamp, board socket on the tail behind the shoulder servo | 1 | 2 | 32 |
+| `02_link1.stl` | upper arm (91 mm): clamps on the shoulder and elbow servos' rear ends, stop peg under the beam, cable clip on the elbow clamp (v4.1: no board tail) | 1 | 2 | 22 |
 | `03_link2.stl` | forearm (91 mm): fork around the elbow servo (turned over: idler prong underneath), clamp on the wrist-pan servo, cable arch under the clamp | 1 | 2 | 34 |
 | `04_wrist.stl` | fork around the wrist-pan servo (turned over) + clamp holding the pitch servo, cable clip on its −Y side | 1 | 2 | 33 |
 | `05_pitch_fork.stl` | fork around the pitch servo + plate holding the roll servo | 1 | 2 | 32 |
 | `06_gripper_frame.stl` | on the roll horn: holds the gripper servo (horn down, body forward), cable notch in the back plate, cable arch on top | 1 | 2 | 20 |
 | `07_gripper_fixed_jaw.stl` | the fixed jaw with its finger loop, bolted under the frame | 1 | 2 | 33 |
 | `08_gripper_jaw.stl` | the moving jaw on the gripper servo's horn, with its finger loop | 1 | 2 | 27 |
-| `09_pedestal.stl` | hollow column from the desk to the shoulder hub | 1 | 2 | 194 |
+| `09_pedestal.stl` | hollow column from the desk to the shoulder hub; at the back, right under the cap: the board socket (the plate slides in sideways) and a closed cable loop under the stop rib | 1 | 2 | 239 |
 | `10_mono_foot.stl` | foot for one leader (mono) | 1 | – | 174 |
 | `11_proto_foot_left.stl`, `12_proto_foot_right.stl` | the two halves of the prototype foot, with the column stand-in | – | 1 each | 205 each |
 
 Print like the follower (0.2 mm, 4 walls, 15 % cubic). Orientations are set in the STLs: the links, wrist and
-the wrist print on their side, the gripper frame and the moving jaw upside down, the fixed jaw standing on its loop. The pedestal's cap overhangs its column by 8 mm, now as a ring around a 44 mm hole (use tree supports there if your printer sags).
+the wrist print on their side, the gripper frame and the moving jaw upside down, the fixed jaw standing on its loop. The pedestal's cap overhangs its column, and the board pad and the cable loop stick out under it: print the pedestal standing up with tree supports under the cap, the pad and the loop.
 Sizes are in `printed_parts.csv`; screws in `fasteners.csv` (per arm module).
 
 ## Purchased parts (one arm module)
@@ -75,7 +75,7 @@ Sizes are in `printed_parts.csv`; screws in `fasteners.csv` (per arm module).
 |---|---|---|
 | STS3215 servo, leader version | 6 | see below |
 | Servo horns | 6 + 3 | output horns on all six; idler horns on the elbow, wrist pan and pitch (the forks) |
-| Waveshare bus servo board + power supply | 1 | the same as the follower's, on the SO-101 mounting plate (print `../SCARA_arm/SO100/WaveShare_Mounting_Plate_SO101.stl`), in link 1's socket |
+| Waveshare bus servo board + power supply | 1 | the same as the follower's, on the SO-101 mounting plate (print `../SCARA_arm/SO100/WaveShare_Mounting_Plate_SO101.stl`), in the pedestal's socket under the cap |
 | Servo cables (3-pin 5264) | 6 | **all stock 20 cm** (the SO-100's): lengths in **Cables** below |
 | Gamepad (USB / Bluetooth) | 1 | drives the base and the lift between picks (one for both leaders) |
 | USB foot pedal (optional) | 1 | clutch, if you'd rather keep it off the gamepad |
@@ -120,11 +120,13 @@ Never put a C044 or C046 in the follower: it can't hold the follower's load.
    (3 × M2: 2 on top, 1 underneath on the fixed jaw's side). Fixed jaw under the frame (2 × M3 × 30 into the nuts in
    the frame's side wall; its hole lets you reach that bottom case screw later). Moving jaw on the gripper servo's horn
    (4 × M3 × 6) with the blades just touching.
-5. Pedestal onto the foot (3 × M5 × 12 into the nuts under the foot).
-6. Shoulder hub onto the pedestal (4 × M3 × 20, nuts in the cap's underside), **turned like the follower's arm**
-   (holes every 45°; on the prototype foot each arm at the follower's ±135°).
-7. Route the cables as in **Cables** below; slide the board's plate down into link 1's socket and plug in the shoulder
-   servo's cable. The board's USB and power cables hang from link 1 in a loose loop down to the desk.
+5. Pedestal onto the foot (3 × M5 × 12 into the nuts under the foot). Its board socket faces the back (mono: away from
+   where the arm points at zero; prototype feet: each pedestal is turned with its arm, the holes only fit that way).
+6. Shoulder hub onto the pedestal (4 × M3 × 20, nuts in the cap's underside) with its **stop rib right above the board
+   socket**.
+7. Slide the board's plate into the socket **sideways** (from the open side to the closed end). Route the cables as in
+   **Cables** below: the shoulder servo's cable goes over the top, down the rib's outer face, through the **closed
+   cable loop** under the rib (thread the board-end plug through it once) and into the board.
 
 ## Joint ranges (checked in CAD)
 
@@ -163,7 +165,7 @@ servos are on one bus: board → shoulder → elbow → wrist pan → pitch → 
 
 | Cable | Route | Needed (+15 %) |
 |---|---|---|
-| board → shoulder | both ride on link 1: from the board behind the shoulder servo over to its socket on top | 10 cm |
+| board → shoulder | from the shoulder servo's top socket over its back end, down to the ring at the dead end, over the ring and the stop rib, down the rib's outer face, through the **closed loop** under it (it holds that cable still; only the part above the rib moves with the arm) to the board right below | 19 cm (longest with the arm pointing forward; small margin, as found on the printed parts) |
 | shoulder → elbow | along link 1's top, down the **clip on the elbow clamp's side**, under the clamp to the elbow servo's socket (no joint crossed) | 16 cm |
 | elbow → wrist pan | a loop in the gap **under** the elbow servo, out beside the fork 60° from straight back, across link 2's short beam, through the **arch under the clamp** to the wrist-pan servo | 17 cm |
 | wrist pan → pitch | a loop under the wrist-pan servo, out beside the fork, down the **clip on the wrist's −Y side** to the pitch servo | 15 cm |
@@ -172,14 +174,17 @@ servos are on one bus: board → shoulder → elbow → wrist pan → pitch → 
 
 All six are stock 20 cm cables. "Needed" is the path over the geometry plus each joint's worst position, 12 mm per plug
 end, plus 15 % (`leader_cables.py`); the roll → gripper run uses the whole 20 cm, so dry-fit it first. No loose loops
-outside the arm except the board's USB + power cables.
+outside the arm. **Shoulder note:** link 1's beam passes 0.3 mm over the support ring, so in the last ~10° before the
+end stops (beyond ±164°) it comes down onto the cable where it crosses the ring at the dead end. Either stay inside
+±164° (clamp it in the teleop software) or check that the cable slides aside there without being pinched.
 
-**The board** slides down into the dovetail socket on link 1's tail (the same SO-101 plate as on the follower, checked
-with its real STL: held in every direction, slides out upward). Nothing else touches it in 1428 random mono poses and
-524 prototype poses.
+**The board** slides sideways into the dovetail socket at the back of the pedestal, its top 20 mm under the platform
+(room for the plug under the cable loop). The same SO-101 plate as on the follower, checked with its real STL: held in
+every direction, slides out sideways. The arm touches the board in under 1 % of random poses, all with the hand folded
+down at the back beside the pedestal (the follower can't take those poses either).
 
 **Assumed, not measured:** the plug sticks 3.5 mm out of the servo and its wires need 5 mm before they bend; the board
-is at most 16 mm tall; the cable is a flat 5 × 2.6 mm.
+is at most 16 mm tall with its servo connector on the top edge; the cable is a flat 5 × 2.6 mm.
 
 ## Using it
 

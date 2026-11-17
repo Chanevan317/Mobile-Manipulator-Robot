@@ -92,12 +92,19 @@ PFY = 5.5                               # pitch fork: idler-side prong moved out
 # arm touches a board on any side in ~1 % of random poses, all with the hand folded down beside the pedestal): mono =
 # in FRONT of the arm (the follower's hand never goes down right in front of its column / scene camera; behind it is the
 # tote), proto = 180 deg (1.0 % vs 1.7 % at 0 deg; 45 deg off each arm's front).
-PED_YAW = {'mono': 0.0, 'proto': 180.0}
-MONO_FOOT_YAW, PROTO_FOOT_YAW = 0.0, 60.0   # foot M5 hole patterns (proto: 60 / 180 / 300 so the pedestal can sit at 180)
+MONO_FOOT_YAW = 0.0                     # foot M5 hole pattern (mono); proto feet: each pedestal turned with its arm (+-PROTO_YAW)
 # servo bus board: the SO-101 Waveshare mounting plate (51 x 42 x 4, 18 mm dovetail peg, as on the follower) slides DOWN
 # into a dovetail socket on a pad on the pedestal's +X side; the board on it is ASSUMED <= 16 mm tall
-BOARD = dict(face_x=-26.0, pad_t=10.0, pad_y=15.0, zc=8.0, plate=(51.0, 42.0, 4.0), comp=16.0)   # link 1 frame: socket face
-                                        # (looks -X) behind S1, socket centre z; the plate (42 tall) stays over the support ring
+# v4.1 (2026-11-17, user tested it on the printed parts): the board is back on the PEDESTAL, right under the cap at the
+# DEAD END (arm frame -X, under the stop rib, where link 1 never goes). The shoulder servo's cable runs over the top
+# and down the rib's outer face onto the board. Pedestal frame (= the arm root's frame, the pedestal turns with it):
+# pad face at x = face_x (looks -X, just outside the cap r 38), plate slides in SIDEWAYS (the hub ring above blocks a
+# top entry), from -Y, against a closed end at +Y; top of the plate just under the cap.
+BOARD = dict(face_x=-39.0, pad_in=-23.0, pad_y=27.5, top=MOUNT_Z - 10.0 - 10.5, stop_y=9.3, plate=(51.0, 42.0, 4.0), comp=16.0)
+                                        # top: 10 mm under the cable guide = room for the plug on the board's top edge
+# closed square loop under the rib (user: the board's cable must stay still, not follow the turning arm): the cable on
+# the rib's outer face (x -54.1..-51.5) passes through it; the opening (11 x 6.5) just lets the 3-pin plug through once
+CABLE_GUIDE = dict(x=(-56.0, -49.5), hw=5.5, wall=2.0, z=(MOUNT_Z - 10.0, MOUNT_Z - 0.5))
 CABLE = dict(w=5.0, t=2.6)              # flat 3-wire servo cable allowance (width, thickness) for clips and corridors
 # shoulder support ring + end stop (2026-11-12): the arm (~435 g, COM 170-215 mm out) hung on S1's horn alone. A fixed
 # ring on the shoulder mount sits SUP_GAP under link 1's beam and carries it once it droops or is pushed down; a peg under
@@ -284,24 +291,17 @@ def build():
     fast('SHCS', 'M3', HORN_SCREW, 4, 'shoulder horn onto the hub (from below, through the tube)')
     fast('SHCS', 'M3', 20, 4, 'shoulder hub to pedestal (nut in the cap underside)'); fast('nut', 'M3', None, 4, 'shoulder hub')
 
-    # ---- link 1 (part 02): clamp on S1's rear end + 16 mm beam + clamp on S2's rear end; rails along S1's sides to a
-    # tail behind it with the board's dovetail socket (the SO-101 Waveshare plate slides DOWN into it, as on the follower)
-    B = BOARD; fx = B['face_x']
+    # ---- link 1 (part 02): clamp on S1's rear end + beam + clamp on S2's rear end (v4.1: no board tail any more)
     peg = box(PEG['r'][0], PEG['r'][1], -PEG['hw'], PEG['hw'], PEG['z'], -BEAM_Z + 0.01)       # end stop peg under the beam
     s1_clamp = xf(box(CL['x'][0], CL['x'][1], -CL['y'], CL['y'], -CL['z'], CL['z']), S1_IN_LINK1)   # x 18 .. 37.5
     beam = box(-CL['x'][0] - 0.01, L1 + CL['x'][0] + 0.01, -W, W, -BEAM_Z, BEAM_Z)
-    rails = [box(fx + B['pad_t'] - 0.01, -CL['x'][1] + 0.01, sy * 12.6, sy * 15.6, -10.0, 10.0) if sy > 0 else
-             box(fx + B['pad_t'] - 0.01, -CL['x'][1] + 0.01, -15.6, -12.6, -10.0, 10.0) for sy in (1, -1)]
-    pad = box(fx, fx + B['pad_t'], -B['pad_y'], B['pad_y'], B['zc'] - 12.0, B['zc'] + 12.0)
-    dv = CS([[(-1.0, -8.15), (1.0, -8.15), (2.6, -9.25), (4.0, -9.25), (4.0, 9.25), (2.6, 9.25), (1.0, 8.15), (-1.0, 8.15)]])
-    dv = xf(dv.extrude(30.0).translate((0, 0, B['zc'] - 9.25)), basis((1, 0, 0), (0, 1, 0), (0, 0, 1), (fx, 0, 0)))
     # S1 -> S2 cable: S1's sockets are on top, S2's (turned over) underneath: it runs along the top and down a clip on the
     # beam's +Y face, then under the elbow clamp
-    l1 = union([s1_clamp, beam, peg, pad, clip_z(LINK1_CLIP)] + rails + clamp_block(L1))
+    l1 = union([s1_clamp, beam, peg, clip_z(LINK1_CLIP)] + clamp_block(L1))
     s1_cut = [xf(clamp_pocket(), S1_IN_LINK1), xf(clamp_screws(), S1_IN_LINK1), xf(plug_room(), S1_IN_LINK1)]
-    l1 = l1 - union(s1_cut + clamp_cut(L1, flip=True) + [dv])
+    l1 = l1 - union(s1_cut + clamp_cut(L1, flip=True))
     add('link1', l1, 'link1', (0.30, 0.55, 0.85), f'upper arm {L1:.0f} mm: clamps on the shoulder and elbow servos\' rear '
-        'ends, rides on the support ring (stop peg underneath), board socket on the tail behind the shoulder servo')
+        'ends, rides on the support ring (stop peg underneath)')
     fast('selftap', 'M2', 6, 4, 'shoulder servo case (link 1 clamp)'); fast('selftap', 'M2', 6, 4, 'elbow servo case (link 1 clamp)')
 
     # ---- link 2: fork around S2 + beam + clamp on S3 (+ an arch on the clamp top for the S2 -> S3 cable)
@@ -420,14 +420,28 @@ def pedestal():
     for k in range(3):                                                                       # 3 x M5 to the foot
         a = math.radians(120.0 * k)
         cut.append(cyl(2.75, zd - 1, zd + 7.0, 44 * math.cos(a), 44 * math.sin(a), hole=True))
-    # v4: no board socket, cable window or cap hole any more (the board rides on link 1; no servo cable goes down here)
-    return s - union(cut)
+    # v4.1 board socket at the dead end (-X): pad from the column out past the cap, dovetail along Y (plate slides in
+    # from -Y to a closed end at +Y), plate top just under the cap; a U-slot guide under the rib holds the cable that
+    # comes down the rib's outer face and drops it onto the board's top edge
+    B = BOARD; zt_b = B['top']; zc = zt_b - B['plate'][1] / 2
+    pad = box(B['face_x'], B['pad_in'], -B['pad_y'], B['pad_y'], zt_b - B['plate'][1] - 2.0, zt - ct + 0.01)   # up to the cap
+    dv = CS([[(-1.0, -8.15), (1.0, -8.15), (2.6, -9.25), (4.0, -9.25), (4.0, 9.25), (2.6, 9.25), (1.0, 8.15), (-1.0, 8.15)]])
+    # profile in (x out of the face, z); the socket runs along Y from the open end (-Y) to 2 mm short of the +Y end
+    # profile u = into the pad (+X), v = Z; extruded along local z = world -Y: from the closed end y = stop_y (the
+    # plate's peg then sits centred, y = 0) out through the open -Y end
+    dv = xf(dv.extrude(B['pad_y'] + 1.0 + B['stop_y']).translate((0, 0, -B['stop_y'])),
+            basis((1, 0, 0), (0, 0, 1), (0, -1, 0), (B['face_x'], 0, zc)))
+    G = CABLE_GUIDE
+    # the loop's arm runs into the cap (r 38) so it prints as one piece with the pedestal
+    guide = box(G['x'][0] - G['wall'], -30.0, -G['hw'] - G['wall'], G['hw'] + G['wall'], *G['z']) \
+        - box(G['x'][0], G['x'][1], -G['hw'], G['hw'], G['z'][0] - 1, G['z'][1] + 1)     # closed all round
+    return (s + pad + guide) - union(cut + [dv])
 
 
 def build_bases():
     ped = pedestal()
     BASE_PARTS['pedestal'] = dict(solid=ped, variant='both', qty_mono=1, qty_proto=2, color=(0.55, 0.57, 0.60),
-                                  note='column under the shoulder hub; 8 nut traps (arm at any multiple of 45 deg); 3 x M5 to a foot')
+                                  note='column under the shoulder hub; 8 nut traps; 3 x M5 to a foot; board socket + cable guide at the back under the cap')
     # one pedestal per arm module; grip = pedestal flange 6 + foot plate 6 = 12 mm, nut in a pocket under the foot
     fast('SHCS', 'M5', 12, 3, 'pedestal to foot (nut in the pocket under the foot)'); fast('nut', 'M5', None, 3, 'pedestal to foot')
     zd = -H_ARM
@@ -451,7 +465,7 @@ def build_bases():
         y0, y1 = sorted((sy * 4.0, sy * (PROTO_Y + 70.0)))
         h = box(-90.0, 90.0, y0, y1, zd - 6.0, zd)
         h = union([h, box(-14.0, 14.0, min(sy * 4.0, sy * 28.0), max(sy * 4.0, sy * 28.0), zd, zd + 60.0)])   # half the column stand-in (0.7 x 40 x 80)
-        h = h - union(holes(0, sy * PROTO_Y, PROTO_FOOT_YAW) + [box(x - 10, x + 10, sy * (PROTO_Y + 55.0) - 4, sy * (PROTO_Y + 55.0) + 4, zd - 7, zd + 1) for x in (-75.0, 75.0)]
+        h = h - union(holes(0, sy * PROTO_Y, sy * PROTO_YAW) + [box(x - 10, x + 10, sy * (PROTO_Y + 55.0) - 4, sy * (PROTO_Y + 55.0) + 4, zd - 7, zd + 1) for x in (-75.0, 75.0)]
                       + [xf(cyl(1.7, -20, 20, hole=True), T(x, sy * 4.0, zd + 30.0) @ Rx(90)) for x in (-7.0, 7.0)]
                       + [cyl(2.75, zd - 7, zd + 1, x, sy * 12.0, hole=True) for x in (-60.0, 60.0)])
         h = h - union([box(x0, x1, min(sy * y0, sy * y1), max(sy * y0, sy * y1), zd - 7, zd + 1)
@@ -471,9 +485,8 @@ def roots(variant='mono'):
 
 
 def ped_frame(R0, variant):
-    """The pedestal under an arm root R0: same position, turned to PED_YAW in the world (the mount turns on it)."""
-    P = Rz(PED_YAW[variant]); P[:3, 3] = R0[:3, 3]
-    return P
+    """The pedestal under an arm root R0 (v4.1: turned with the arm, so its board socket sits under the stop rib)."""
+    return R0.copy()
 
 
 def world(q=(0, 0, 0, 0, 0), trig=0.0, bought=True, variant='mono', q2=None):

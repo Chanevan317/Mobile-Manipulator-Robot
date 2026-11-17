@@ -32,7 +32,7 @@ draw(fig.add_subplot(2, 3, 4, projection='3d'), (0, 0, 0, 0, 0), 25, -60, varian
 draw(fig.add_subplot(2, 3, 5, projection='3d'), (0, 0, 0, 0, 0), 35, -50, trig=25, zoom=2.2, center=(LD.L1 + LD.L2 + LD.XP + LD.XR + 60, 0, -LD.ZPD - 20),
      title='pinch gripper: frame + fixed jaw, moving jaw on the gripper servo, a finger loop on each (open 25 deg)')
 draw(fig.add_subplot(2, 3, 3, projection='3d'), (0, 0, 0, 0, 0), 25, 150, zoom=3.2, center=(5, 0, -15),
-     title='v4 shoulder: servo turns with link 1 (sockets up), horn on the fixed hub; board socket on the tail')
+     title='v4.1 shoulder: servo turns with link 1 (sockets up); board socket + cable guide under the stop rib')
 draw(fig.add_subplot(2, 3, 6, projection='3d'), (0, 0, 0, 0, 0), -30, -70, zoom=3.0, center=(LD.L1 + 10, 0, -10),
      title='v4 elbow from below: servo turned over, cable loop in the gap under it (all cables 20 cm)')
 plt.tight_layout(); plt.savefig(sys.argv[1], dpi=55)

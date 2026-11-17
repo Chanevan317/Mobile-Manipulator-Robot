@@ -137,10 +137,11 @@ def plate_solid():
     return M(mesh)
 
 
-def board_in_link1_frame():
-    """(plate, plate + board envelope) at rest in link 1's socket. STL: plate z 0..4.0, peg z 4.0..7.6 (centred); the peg
-    side against the socket face (x = face_x, looking -X): STL z -> -X, STL x -> Y, STL y -> Z."""
-    B = LD.BOARD; zc = B['zc'] - 0.15; fx = B['face_x']
+def board_in_ped_frame():
+    """(plate, plate + board envelope) at rest in the pedestal's socket (pedestal frame = arm root frame). STL: plate
+    z 0..4.0, peg z 4.0..7.6 (centred); the peg goes +X into the socket at x = face_x: STL z -> +X, STL x -> Y,
+    STL y -> Z."""
+    B = LD.BOARD; zc = B['top'] - B['plate'][1] / 2 - 0.15; fx = B['face_x']
     Tp = np.array([[0, 0, 1, fx - 4.0], [1, 0, 0, 0], [0, 1, 0, zc], [0, 0, 0, 1]], float)
     plate = xf(plate_solid(), Tp)
     env = box(fx - 4.0 - B['comp'], fx, -25.5, 25.5, zc - 21.0, zc + 21.0)
@@ -152,11 +153,11 @@ def board_job(args):
     W = LD.world(q, 0.0, variant=variant); res = []
     if folded_into_base(W): return q, variant, None
     qs_ = [q] if variant == 'mono' else [q, tuple(-v if i in (0, 1, 2, 4) else v for i, v in enumerate(q))]
-    envs = [xf(BOARD_ENV, LD.frames(qa, 0.0, root=R0)['link1']) for R0, qa in zip(LD.roots(variant), qs_)]
+    envs = [xf(BOARD_ENV, LD.ped_frame(R0, variant)) for R0 in LD.roots(variant)]       # v4.1: on the pedestal
     for k, e in enumerate(envs):
         bb = e.bounding_box(); own = '' if variant == 'mono' else ('L_', 'R_')[k]
         for nm, s, c, body in W:
-            if body in ('desk',) or body == own + 'link1': continue
+            if body in ('desk',) or nm == own + 'pedestal': continue
             sb = s.bounding_box()
             if any(bb[i] > sb[i + 3] or sb[i] > bb[i + 3] for i in range(3)): continue
             v = (e ^ s).volume()
@@ -165,6 +166,28 @@ def board_job(args):
 
 
 PLUG_END = 12.0                       # per plug: housing 3.5 + the wires' first bend
+
+
+def dead_end_run():
+    """v4.1: the board -> shoulder cable's FIXED run (base / pedestal frame): over the ring + rib top at the dead end
+    (-X), down the rib's outer face, through the pedestal's guide slot onto the board's top edge. 0.05 mm off the
+    surfaces it lies on (so it only reports real contacts)."""
+    rt = -LD.BEAM_Z - LD.SUP['gap']; hw = CW / 2 + 0.1; xo = -LD.RIB['ro'] - 0.05
+    top = LD.BOARD['top'] + 1.0                                                # the plug sits on the board's top edge
+    return union([box(xo - CT, -LD.SUP['ri'] + 0.05, -hw, hw, rt + 0.05, rt + 0.05 + CT),       # over ring + rib top
+                  box(xo - CT, xo, -hw, hw, top, rt + 0.05 + CT)])                              # down the rib, to the board
+
+
+def dead_end_check(q1s=None):
+    """Which parts touch the fixed run over the shoulder's range (other joints at a few positions)."""
+    run = dead_end_run(); hits = {}
+    q1s = np.arange(-173.0, 173.01, 1.0) if q1s is None else q1s
+    for q1 in q1s:
+        for q2, q3, qp in ((0, 0, 0), (60, -60, 90), (-60, 60, 90), (120, 0, 0), (-120, 0, 0), (0, 127, 120), (0, -127, 120)):
+            for nm, sol, c, body in LD.world((float(q1), q2, q3, qp, 0.0), 0.0, variant='mono'):
+                if body in ('desk', 'base'): continue
+                if overlap(run, sol) > TOL: hits.setdefault(nm, []).append(float(q1))
+    return {nm: (min(v, key=abs), len(set(v))) for nm, v in hits.items()}
 
 
 def _wrap_len(ra, rb, phi, r0):
@@ -192,7 +215,19 @@ def cable_lengths():
     B = LD.BOARD
     s1 = (14.25, 0.0)                                                    # S1 socket in link 1 (rear toward +X)
     out = {}
-    out['board -> shoulder (on link 1, over S1)'] = (abs(B['face_x'] - 4.0 - B['comp'] / 2 - s1[0]) + (B['zc'] + 21.0 - 19.4)) + 2 * PLUG_END
+    # v4.1: from S1's top socket (link frame (14.25, 0), plug + bend to z 24.4) over S1's back end and down to the ring
+    # top at the dead end, over the ring + rib, down the rib's face to the plug on the board. Longest at q1 = 0 (the
+    # socket faces away from the dead end); over S1's back-top corner when the straight line would cut through S1.
+    rt = -LD.BEAM_Z - LD.SUP['gap']; E = np.array([-LD.SUP['ri'], 0.0, rt + CT / 2])
+    worst = 0.0
+    for q1 in np.radians(np.arange(-173.0, 173.01, 1.0)):
+        c, s_ = math.cos(q1), math.sin(q1)
+        P_ = np.array([14.25 * c, 14.25 * s_, 24.4]); Bk = np.array([-12.0 * c, -12.0 * s_, 21.0])
+        straight = np.linalg.norm(E - P_)
+        via = np.linalg.norm(Bk - P_) + np.linalg.norm(E - Bk)
+        worst = max(worst, via if np.dot(P_[:2] - Bk[:2], E[:2] - Bk[:2]) < 0 else straight)
+    fixed = (LD.RIB['ro'] - LD.SUP['ri']) + (rt - (LD.BOARD['top'] + 1.0))
+    out['board -> shoulder (over the top, down the stop rib, board under the cap)'] = worst + fixed + 2 * PLUG_END
     out['shoulder -> elbow (along link 1 top, down its side, under S2)'] = (LD.LINK1_CLIP['x'] - s1[0]) + (LD.CL['y'] + 2 * LD.CL['z'] + 4.0) + (LD.L1 - 14.25 - LD.LINK1_CLIP['x']) + 2 * PLUG_END
     post = math.hypot(48.0 - ex[0], side - ex[1]) + math.hypot(LD.L2 - 14.25 - 48.0, side) + 3.0
     out['elbow -> wrist pan (gap under S2, out at -60, along link 2)'] = crossing(ra, rb, LD.CABLE_EXIT, LIM['J2'][1], r0) + post + 2 * PLUG_END
@@ -209,7 +244,7 @@ def cable_lengths():
     return out
 
 
-PLATE, BOARD_ENV = board_in_link1_frame()
+PLATE, BOARD_ENV = board_in_ped_frame()
 
 
 if __name__ == '__main__':
@@ -234,14 +269,23 @@ if __name__ == '__main__':
             print(f'   {n}:', 'clear' if not hits else '')
             for nm, v in hits.items(): print('      HIT', nm, len(v), 'poses, e.g.', v[0])
     # 3. board
-    ped = LD.PARTS['link1']['solid']
-    print('3. board plate in link 1\'s socket: overlap at rest %.2f mm3 (must be ~0)' % (PLATE ^ ped).volume())
+    ped = LD.BASE_PARTS['pedestal']['solid']
+    hub = LD.PARTS['shoulder_hub']['solid']
+    print('3. board plate in the pedestal\'s socket: overlap at rest %.2f mm3 (must be ~0)' % (PLATE ^ ped).volume())
     held = {d: round((PLATE.translate(v) ^ ped).volume(), 1) for d, v in
-            (('out -X 0.5', (-0.5, 0, 0)), ('sideways +Y 0.5', (0, 0.5, 0)), ('sideways -Y 0.5', (0, -0.5, 0)),
-             ('down 0.5', (0, 0, -0.5)))}
+            (('out -X 0.5', (-0.5, 0, 0)), ('up 0.5', (0, 0, 0.5)), ('down 0.5', (0, 0, -0.5)),
+             ('+Y (closed end) 0.5', (0, 0.5, 0)))}
     print('   held (overlap mm3 if pushed, must be > 0):', held)
-    up = [dz for dz in np.arange(0.0, 45.1, 3.0) if (PLATE.translate((0, 0, dz)) ^ ped).volume() > 0.05]
-    print('   slides out upward:', 'yes' if not up else f'blocked at {up}')
+    side = [dy for dy in np.arange(0.0, 60.1, 3.0) if (PLATE.translate((0, -dy, 0)) ^ (ped + hub)).volume() > 0.05]
+    print('   slides out sideways (-Y):', 'yes' if not side else f'blocked at {side}')
+    benv = BOARD_ENV
+    # 5. the shoulder cable's fixed run at the dead end vs the arm over the shoulder's whole range
+    print('5. dead-end cable run (over the ring + rib, down the rib, guide, board) vs the arm, J1 -173..173:')
+    de = dead_end_check()
+    print('   clear at every angle' if not de else '')
+    for nm, (qa, n) in sorted(de.items(), key=lambda kv: abs(kv[1][0])):
+        print(f'   {nm}: touches from J1 {qa:+.0f} deg outward ({n} angles)')
+    print('   board envelope vs pedestal / hub: %.2f / %.2f mm3' % ((benv ^ ped).volume(), (benv ^ hub).volume()))
     rng = np.random.default_rng(1)
     qs = []
     for _ in range(1500):
