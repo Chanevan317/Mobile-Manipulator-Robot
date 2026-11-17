@@ -11,7 +11,7 @@ and goes back to its resting place. Pass: it rose >= 85 mm (the rest is arm sag)
 within 15 mm of where it was picked, upright (< 5 deg).
 
 Run from the package folder (Isaac Sim 5.1; ask the user before running, CLAUDE.md):
-    OMNI_KIT_ACCEPT_EULA=YES PYTHONUNBUFFERED=1 conda run --no-capture-output -n env_isaaclab python scenes/scene_v0/check_scene.py --headless
+    OMNI_KIT_ACCEPT_EULA=YES PYTHONUNBUFFERED=1 conda run --no-capture-output -n env_isaaclab python scripts/scenes/scene_v0/check_scene.py --headless
     ... --only ketchup,chocolate      only products whose name contains one of these
     ... --no_grasp                    reach + scene check only (with a window: then it stays open to look at, physics
                                       paused, at the screen's resolution; prints the frame rate; --res WxH to override)
@@ -19,7 +19,8 @@ Run from the package folder (Isaac Sim 5.1; ask the user before running, CLAUDE.
 import argparse, math, os, sys
 ap = argparse.ArgumentParser()
 here = os.path.dirname(os.path.abspath(__file__))
-ap.add_argument('--urdf', default=os.path.join(here, '..', '..', 'mobile_manipulator_description', 'urdf', 'mobile_manipulator_prototype_mono_arm.urdf'))
+sys.path.insert(0, os.path.join(here, '..', '..', 'common')); import repo_paths as RP   # every script folder + repo paths
+ap.add_argument('--urdf', default=RP.urdf('prototype_mono_arm'))
 ap.add_argument('--headless', action='store_true')
 ap.add_argument('--no_grasp', action='store_true')
 ap.add_argument('--only', default='')
@@ -57,7 +58,6 @@ import omni.usd
 from pxr import UsdGeom, Gf
 from isaacsim.core.prims import SingleRigidPrim
 sys.path.insert(0, here)
-sys.path.insert(1, os.path.normpath(os.path.join(here, '..', '..', 'mobile_manipulator_description', 'scripts')))   # robot task helpers
 from proto_task import Task
 import assets as SA
 import scene as SC

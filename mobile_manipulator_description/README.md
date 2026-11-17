@@ -6,6 +6,9 @@ The arm links use the real CAD parts from `../CAD/SCARA_arm/`, with their real m
 
 ## Files
 
+The scripts are in the repository's `scripts/` folder (see `../scripts/README.md`), so this package holds only the
+robot itself. Run them from the repository root, for example `python scripts/robot_tests/isaac_joint_test.py`.
+
 | Path | Use it for |
 |---|---|
 | `urdf/mobile_manipulator_prototype.urdf` | **Prototype layout** (the current design): Isaac Sim, PyBullet, MuJoCo (`compile`), Gazebo. Mesh paths are relative (`../meshes/...`). |
@@ -13,27 +16,27 @@ The arm links use the real CAD parts from `../CAD/SCARA_arm/`, with their real m
 | `urdf/mobile_manipulator_prototype_mono_arm.urdf` (+ `_ros`) | **Experiment:** one arm whose shoulder is a ring around the lift column. See [Mono-arm experiment](#mono-arm-experiment-prototype_mono_arm). |
 | `meshes/visual/` | STL files in metres. Shared by both arms. |
 | `meshes/collision/` | Convex pieces of every part, about 350 per arm. Each one is ready for PhysX. |
-| `scripts/drives.py` | The motor gains, in one place. Both Isaac scripts use it. |
-| `scripts/isaac_view.py` | Opens Isaac Sim with both robots side by side (two-arm and one-arm, `--layout` for one of them) and nothing else: no motion, every joint holds its zero pose (`--paused`, `--fix_base`, `--self_collision`). |
-| `scripts/isaac_arm_view.py` | One arm alone on a fixed stand (no base or lift), opening and closing its gripper slowly (`--period S`, default 20 s per cycle; `--layout prototype_mono_arm` for the one-arm robot's arm with its ring). |
+| `../scripts/common/drives.py` | The motor gains, in one place. Both Isaac scripts use it. |
+| `../scripts/viewers/isaac_view.py` | Opens Isaac Sim with both robots side by side (two-arm and one-arm, `--layout` for one of them) and nothing else: no motion, every joint holds its zero pose (`--paused`, `--fix_base`, `--self_collision`). |
+| `../scripts/viewers/isaac_arm_view.py` | One arm alone on a fixed stand (no base or lift), opening and closing its gripper slowly (`--period S`, default 20 s per cycle; `--layout prototype_mono_arm` for the one-arm robot's arm with its ring). |
 | `../scenes/scene_v0/` | The store scene (outside this robot package, in the repository's `scenes/` folder) for the one-arm (mono) prototype, from free NVIDIA SimReady assets: a room with three walls and store lighting, a table, two racks, two shelves, 15 task products the arm can reach and random filler products. Its own README: download the assets, look at it, check it, save it as `scene_v0.usda`. |
-| `scripts/isaac_import_and_test.py` | Imports the robot into Isaac Sim, sets the motor drives, adds a floor, and plays a looping motion demo (`--duration S` stops it, `--save` writes a USD). |
-| `scripts/isaac_joint_test.py` | Tests every joint one at a time, or holds poses under gravity (`--hold`). |
-| `scripts/isaac_base_test.py` | Drives the mecanum base forward, sideways and turning, and measures how well it moves. |
-| `scripts/isaac_grasp_test.py` | Each arm picks a cube from a table, lifts it, swings it and puts it back. |
-| `scripts/isaac_shelf_task.py` | Full task: drive to shelf A, pick a product, put it in the tote, drive to shelf B, place it there (`--layout prototype` uses `shelf_task_prototype.py`). |
-| `scripts/isaac_table_task.py` | Prototype: drive to table A, both arms pick a product each (top-down) at the same time into the tote, drive to table B, place both there (`--table_h`, `--sequential`). |
-| `scripts/reach_test.py` | No simulator: maps which spots on tables and shelf boards each arm can reach (IK + collision checks), writes a CSV and a PNG. |
-| `scripts/isaac_mono_task.py`, `isaac_mono_table_task.py`, `isaac_mono_shelf_task.py` | Mono-arm experiment: table → tote → table without driving, and the table and shelf tasks above done with one arm. |
-| `scripts/mono_poses.py` | Mono-arm experiment: the planned poses and moves for those tasks. |
-| `scripts/smooth_path.py` | Mono-arm experiment: blends the planned moves into smooth, time-optimal motions (TOPP-RA; `pip install toppra`). On by default in the stationary and shelf tasks (`--no_smooth` turns it off); off in the table task since 2026-11-13 (`--smooth` turns it on). |
-| `scripts/isaac_dual_load_test.py` | Two-arm robot: the forces and torques both arm bases put on the dual-arm holder (for `generator/dual_holder_strength.py`). |
-| `scripts/isaac_mono_load_test.py` | Mono arm: the forces and torques through the ring while the arm works with a payload (for `generator/mono_ring_strength.py`). |
-| `scripts/proto_task.py`, `scripts/proto_poses.py` | Prototype task helpers (time-synchronised moves, IK lines, reporting) and the planned poses and routes. |
-| `scripts/scara_ik.py` | Inverse kinematics for one arm plus the lift (gripper position, heading and tilt to joint angles). |
-| `scripts/self_collision.py` | Turns on self-collision (`--self_collision` in the other scripts). |
+| `../scripts/robot_tests/isaac_import_and_test.py` | Imports the robot into Isaac Sim, sets the motor drives, adds a floor, and plays a looping motion demo (`--duration S` stops it, `--save` writes a USD). |
+| `../scripts/robot_tests/isaac_joint_test.py` | Tests every joint one at a time, or holds poses under gravity (`--hold`). |
+| `../scripts/robot_tests/isaac_base_test.py` | Drives the mecanum base forward, sideways and turning, and measures how well it moves. |
+| `../scripts/robot_tests/isaac_grasp_test.py` | Each arm picks a cube from a table, lifts it, swings it and puts it back. |
+| `../scripts/tasks/dual/isaac_shelf_task.py` | Full task: drive to shelf A, pick a product, put it in the tote, drive to shelf B, place it there (`--layout prototype` uses `shelf_task_prototype.py`). |
+| `../scripts/tasks/dual/isaac_table_task.py` | Prototype: drive to table A, both arms pick a product each (top-down) at the same time into the tote, drive to table B, place both there (`--table_h`, `--sequential`). |
+| `../scripts/planning/reach_test.py` | No simulator: maps which spots on tables and shelf boards each arm can reach (IK + collision checks), writes a CSV and a PNG. |
+| `../scripts/tasks/mono/isaac_mono_task.py`, `isaac_mono_table_task.py`, `isaac_mono_shelf_task.py` | Mono-arm experiment: table → tote → table without driving, and the table and shelf tasks above done with one arm. |
+| `../scripts/tasks/mono/lib/mono_poses.py` | Mono-arm experiment: the planned poses and moves for those tasks. |
+| `../scripts/common/smooth_path.py` | Mono-arm experiment: blends the planned moves into smooth, time-optimal motions (TOPP-RA; `pip install toppra`). On by default in the stationary and shelf tasks (`--no_smooth` turns it off); off in the table task since 2026-11-13 (`--smooth` turns it on). |
+| `../scripts/robot_tests/isaac_dual_load_test.py` | Two-arm robot: the forces and torques both arm bases put on the dual-arm holder (for `generator/dual_holder_strength.py`). |
+| `../scripts/robot_tests/isaac_mono_load_test.py` | Mono arm: the forces and torques through the ring while the arm works with a payload (for `generator/mono_ring_strength.py`). |
+| `../scripts/common/proto_task.py`, `../scripts/tasks/dual/lib/proto_poses.py` | Prototype task helpers (time-synchronised moves, IK lines, reporting) and the planned poses and routes. |
+| `../scripts/common/scara_ik.py` | Inverse kinematics for one arm plus the lift (gripper position, heading and tilt to joint angles). |
+| `../scripts/common/self_collision.py` | Turns on self-collision (`--self_collision` in the other scripts). |
 | `launch/display.launch.py`, `rviz/display.rviz`, `package.xml`, `CMakeLists.txt` | ROS 2 package: `ros2 launch mobile_manipulator_description display.launch.py` opens RViz with the robot and a slider for every joint |
-| `scripts/ros_joint_check.py` | ROS 2: checks joint limits, the zero pose and the direction of every joint, through TF |
+| `../scripts/ros/ros_joint_check.py` | ROS 2: checks joint limits, the zero pose and the direction of every joint, through TF |
 | `arm_link_masses.json` | Mass and centre of mass of each arm link |
 | `preview_prototype_dual.png`, `preview_prototype_mono.png` | Pictures of the two-arm prototype and of the mono-arm experiment (two views: facing the front / turned 150° toward the tote). `generator/render_robot.py` draws any layout from its URDF |
 | `preview_piper_mono.png`, `preview_piper_dual.png` | Pictures only: our body with AgileX PiPER arms instead of the SCARA arms. Mono: one PiPER on a plate on our shoulder ring, so it turns around the column (facing the front / turned 150° toward the tote). Dual: one on each side bracket, each base on a 30° wedge so the arm leans out to its side, away from the lift, each in a different pose (≥ 49 mm from the column and carriage, 136 mm between the arms). PiPER model from agilexrobotics/piper_ros (MIT); not part of this package |
@@ -63,23 +66,23 @@ The moment, tote and collision numbers come from the layout study of 2026-11-06 
 
 ```
 cd mobile_manipulator_description
-<isaac-sim>/python.sh scripts/isaac_import_and_test.py
+<isaac-sim>/python.sh ../scripts/robot_tests/isaac_import_and_test.py
 #   --save mobile_manipulator.usd   converts to USD and exits
 #   --headless                 no window
 ```
 
 `<isaac-sim>/python.sh` is for a standalone Isaac Sim install. If Isaac Sim is installed with pip in a conda
 environment (as in `env_isaaclab`), use `python` from that environment instead:
-`conda activate env_isaaclab && python scripts/isaac_import_and_test.py`.
+`conda activate env_isaaclab && python ../scripts/robot_tests/isaac_import_and_test.py`.
 
 **Use the script (or a USD it saved), not the GUI import.** The URDF importer makes *acceleration* drives with
 its own stiffness (625 per degree) and ignores our gains. The script replaces them with the force drives from
-`scripts/drives.py`. If you do import by hand (File → Import → `urdf/mobile_manipulator_prototype.urdf`), use:
+`../scripts/common/drives.py`. If you do import by hand (File → Import → `urdf/mobile_manipulator_prototype.urdf`), use:
 fix base off, merge fixed joints off, self-collision off, collider type convex hull (the collision meshes are
 already convex pieces), joint drive position. Then set every drive to type *force* with the gains in the table
 below, and set the 36 `*_roller_*` joints to stiffness 0 and damping 0.
 
-### Motor gains (`scripts/drives.py`)
+### Motor gains (`../scripts/common/drives.py`)
 
 These are force drives: torque = kp × position error + kd × speed error, capped at the max force.
 The max force and the speed limit come from the URDF `<limit>` values.
@@ -103,16 +106,16 @@ while the base is free, it crawls at about 5 mm/s instead (found with the demo; 
 ## Testing each joint
 
 ```
-<isaac-sim>/python.sh scripts/isaac_joint_test.py                          # every joint, base fixed
-<isaac-sim>/python.sh scripts/isaac_joint_test.py --joint left_wrist --slow  # just one arm's wrist, slowly
-<isaac-sim>/python.sh scripts/isaac_joint_test.py --wheels                  # also spin the wheels (base free)
-<isaac-sim>/python.sh scripts/isaac_joint_test.py --hold                    # hold 3 poses for 30 s each
-<isaac-sim>/python.sh scripts/isaac_joint_test.py --usd mobile_manipulator.usd   # the same tests on a saved USD
-<isaac-sim>/python.sh scripts/isaac_base_test.py                            # drive the mecanum base
-<isaac-sim>/python.sh scripts/isaac_grasp_test.py                           # pick, lift, swing and place a cube
-<isaac-sim>/python.sh scripts/isaac_shelf_task.py                           # shelf A -> tote -> shelf B (about 2 min)
-<isaac-sim>/python.sh scripts/isaac_table_task.py                           # prototype: table A -> tote -> table B, both arms
-python scripts/reach_test.py                                                # no Isaac: reach maps for tables and shelves
+<isaac-sim>/python.sh ../scripts/robot_tests/isaac_joint_test.py                          # every joint, base fixed
+<isaac-sim>/python.sh ../scripts/robot_tests/isaac_joint_test.py --joint left_wrist --slow  # just one arm's wrist, slowly
+<isaac-sim>/python.sh ../scripts/robot_tests/isaac_joint_test.py --wheels                  # also spin the wheels (base free)
+<isaac-sim>/python.sh ../scripts/robot_tests/isaac_joint_test.py --hold                    # hold 3 poses for 30 s each
+<isaac-sim>/python.sh ../scripts/robot_tests/isaac_joint_test.py --usd mobile_manipulator.usd   # the same tests on a saved USD
+<isaac-sim>/python.sh ../scripts/robot_tests/isaac_base_test.py                            # drive the mecanum base
+<isaac-sim>/python.sh ../scripts/robot_tests/isaac_grasp_test.py                           # pick, lift, swing and place a cube
+<isaac-sim>/python.sh ../scripts/tasks/dual/isaac_shelf_task.py                           # shelf A -> tote -> shelf B (about 2 min)
+<isaac-sim>/python.sh ../scripts/tasks/dual/isaac_table_task.py                           # prototype: table A -> tote -> table B, both arms
+python ../scripts/planning/reach_test.py                                                # no Isaac: reach maps for tables and shelves
 ```
 
 ### Lift (real C-Beam XLarge kit)
@@ -278,12 +281,12 @@ those parts directly; the L bracket bolts through four of the real gantry plate'
 **Run it** (from this folder, with `conda activate env_isaaclab`):
 
 ```bash
-python scripts/isaac_mono_task.py               # stationary: table in front -> tote behind -> table
-python scripts/isaac_mono_table_task.py         # the table-to-table task, 2 products, one arm
-python scripts/isaac_mono_shelf_task.py         # the shelf task, 1 product, one arm
-python scripts/isaac_joint_test.py --layout prototype_mono_arm [--hold]
-python scripts/isaac_import_and_test.py --layout prototype_mono_arm
-python scripts/reach_test.py --layout prototype_mono_arm
+python ../scripts/tasks/mono/isaac_mono_task.py               # stationary: table in front -> tote behind -> table
+python ../scripts/tasks/mono/isaac_mono_table_task.py         # the table-to-table task, 2 products, one arm
+python ../scripts/tasks/mono/isaac_mono_shelf_task.py         # the shelf task, 1 product, one arm
+python ../scripts/robot_tests/isaac_joint_test.py --layout prototype_mono_arm [--hold]
+python ../scripts/robot_tests/isaac_import_and_test.py --layout prototype_mono_arm
+python ../scripts/planning/reach_test.py --layout prototype_mono_arm
 ```
 Add `--headless` for no window. In RViz: `ros2 launch mobile_manipulator_description display.launch.py layout:=prototype_mono_arm`.
 
@@ -325,7 +328,7 @@ Then, in each new terminal:
 ```
 source /opt/ros/jazzy/setup.bash && source ~/ros2_ws/install/setup.bash
 ros2 launch mobile_manipulator_description display.launch.py     # RViz + a slider for every joint
-python3 scripts/ros_joint_check.py                          # automated check (don't run it with the launch file open)
+python3 ../scripts/ros/ros_joint_check.py                          # automated check (don't run it with the launch file open)
 ```
 
 `ros_joint_check.py` checks that the joint limits match the table below, that both TCPs sit where `scara_ik.py`
@@ -476,6 +479,6 @@ The files in `../CAD/SCARA_arm/print_ready_stl/` are already in the print orient
 - **Gripper pinion:** the pinion is shown fixed to the hand. The fingers move on their own prismatic joints, which is how the real rack and pinion behaves.
 - **No mimic joint.** Both jaws are separate driven joints, and you send them the same target. A `<mimic>` joint on top of a position drive makes the jaws fight, and in Isaac Sim one of them can fly off. Franka's gripper in Isaac Sim is set up this way for the same reason.
 - **Mecanum wheels:** they use 9 passive rollers per wheel, each a chain of 3 spheres. In the test above they drive smoothly. If you ever need to skip wheel physics (for example, navigation-only training), a holonomic base controller acting on `base_link` is fine, as long as the commands and observations use the same `vx, vy, wz` convention as the wheel mixing above.
-- **Servo gains:** the values in `scripts/drives.py` pass every test, but they are not measured from the servos.
+- **Servo gains:** the values in `../scripts/common/drives.py` pass every test, but they are not measured from the servos.
 - **Joint friction:** the URDF `friction` values are meant as N·m (or N), but Isaac Sim reads them as a unitless PhysX friction coefficient. Setting them all to 0 changed the test results very little, so they are left as they are.
 - **Frame links** (`*_tcp`, `*_wrist_camera`, `*_wrist_camera_optical`, `scene_camera_optical`, `base_link`) have a tiny 1 g mass. Without an explicit mass, Isaac Sim gives each one 1 kg, which put 3 kg of phantom mass on each hand.

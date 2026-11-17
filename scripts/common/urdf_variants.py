@@ -8,7 +8,8 @@ import os, tempfile
 import xml.etree.ElementTree as ET
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-URDF_DIR = os.path.normpath(os.path.join(HERE, '..', 'urdf'))
+import repo_paths as RP
+URDF_DIR = RP.URDF_DIR
 
 
 def layout_urdf(layout):

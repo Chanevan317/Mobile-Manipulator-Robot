@@ -1,7 +1,7 @@
 """Import the robot into Isaac Sim (5.x), set up drives, and play a looping motion demo.
 
 Run with Isaac Sim's Python, from this package folder (or pass --urdf PATH):
-    <isaac-sim>/python.sh scripts/isaac_import_and_test.py
+    <isaac-sim>/python.sh scripts/robot_tests/isaac_import_and_test.py
 Options:
     --headless
     --save robot.usd     write the converted USD (drives included) and exit
@@ -16,6 +16,7 @@ Every 5 s it prints where the base is, the lift height against its target, and t
 import argparse, math, os, sys
 ap = argparse.ArgumentParser()
 here = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(here, '..', 'common')); import repo_paths as RP   # every script folder + repo paths
 ap.add_argument('--layout', default='prototype', choices=('prototype', 'prototype_mono_arm'), help='robot layout (urdf/mobile_manipulator_<layout>.urdf)')
 ap.add_argument('--urdf', default=None, help='URDF path (overrides --layout)')
 ap.add_argument('--headless', action='store_true')
@@ -24,7 +25,7 @@ ap.add_argument('--self_collision', action='store_true', help='robot parts colli
 ap.add_argument('--duration', type=float, default=0.0, help='stop after this many seconds (0 = run until the window is closed)')
 args = ap.parse_args()
 if args.urdf is None:
-    args.urdf = os.path.join(here, '..', 'urdf', f'mobile_manipulator_{args.layout}.urdf')
+    args.urdf = os.path.join(RP.URDF_DIR, f'mobile_manipulator_{args.layout}.urdf')
 
 from isaacsim import SimulationApp
 app = SimulationApp({'headless': args.headless})

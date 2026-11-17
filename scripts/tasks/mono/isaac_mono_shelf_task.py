@@ -11,13 +11,14 @@ release wide, out; stow.
 Plan: mono_poses.shelf_pick_steps / shelf_place_steps (checked offline: 224 samples clear, incl. the carried product
 upright and lying), aimed at the product's measured position and axis.
 
-    python scripts/isaac_mono_shelf_task.py [--headless] [--no_smooth]
+    python scripts/tasks/mono/isaac_mono_shelf_task.py [--headless] [--no_smooth]
 """
 import argparse, math, os, sys
 
 ap = argparse.ArgumentParser()
 here = os.path.dirname(os.path.abspath(__file__))
-ap.add_argument('--urdf', default=os.path.join(here, '..', 'urdf', 'mobile_manipulator_prototype_mono_arm.urdf'))
+sys.path.insert(0, os.path.join(here, '..', '..', 'common')); import repo_paths as RP   # every script folder + repo paths
+ap.add_argument('--urdf', default=os.path.join(RP.URDF_DIR, 'mobile_manipulator_prototype_mono_arm.urdf'))
 ap.add_argument('--headless', action='store_true')
 ap.add_argument('--no_self_collision', action='store_true')
 ap.add_argument('--no_smooth', action='store_true', help='step-by-step moves instead of the TOPP-RA blended ones (smooth_path.py)')

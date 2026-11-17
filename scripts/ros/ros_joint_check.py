@@ -3,7 +3,7 @@
 Starts its own robot_state_publisher with urdf/mobile_manipulator_<layout>_ros.urdf, sends /joint_states, reads TF back.
 Run with ROS 2 sourced and conda deactivated (do NOT run display.launch.py at the same time):
     source /opt/ros/jazzy/setup.bash && source ~/ros2_ws/install/setup.bash
-    python3 scripts/ros_joint_check.py                  # prototype layout
+    python3 scripts/ros/ros_joint_check.py                  # prototype layout
 """
 import math, os, signal, subprocess, tempfile, time, xml.etree.ElementTree as ET
 import yaml
@@ -12,15 +12,16 @@ from rclpy.node import Node
 from sensor_msgs.msg import JointState
 from rcl_interfaces.srv import GetParameters
 import tf2_ros
-import sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import sys
 import argparse
+here = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(here, '..', 'common')); import repo_paths as RP   # every script folder + repo paths
 import scara_ik as K
 _ap = argparse.ArgumentParser(); _ap.add_argument('--layout', default='prototype', choices=('prototype',))
 LAYOUT = _ap.parse_args().layout
 K.use(LAYOUT)
 
-here = os.path.dirname(os.path.abspath(__file__))
-urdf_text = open(os.path.join(here, '..', 'urdf', K.urdf_name(LAYOUT, ros=True))).read()
+urdf_text = open(os.path.join(RP.URDF_DIR, K.urdf_name(LAYOUT, ros=True))).read()
 print('layout', LAYOUT)
 # The URDF is too long for a command-line argument, so pass it through a parameters file.
 params = os.path.join(tempfile.mkdtemp(), 'rsp.yaml')

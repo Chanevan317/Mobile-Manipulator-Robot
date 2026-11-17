@@ -10,13 +10,14 @@ commands body speeds through standard mecanum wheel mixing for a few seconds, th
   tilt     largest roll/pitch of the base (deg)
 
 Run with Isaac Sim's Python, from the package folder:
-    <isaac-sim>/python.sh scripts/isaac_base_test.py --headless
-    <isaac-sim>/python.sh scripts/isaac_base_test.py --speed 0.2 --seconds 5
+    <isaac-sim>/python.sh scripts/robot_tests/isaac_base_test.py --headless
+    <isaac-sim>/python.sh scripts/robot_tests/isaac_base_test.py --speed 0.2 --seconds 5
 """
 import argparse, math, os, sys
 
 ap = argparse.ArgumentParser()
 here = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(here, '..', 'common')); import repo_paths as RP   # every script folder + repo paths
 ap.add_argument('--layout', default='prototype', choices=('prototype',), help='robot layout (urdf/mobile_manipulator_<layout>.urdf)')
 ap.add_argument('--urdf', default=None, help='URDF path (overrides --layout)')
 ap.add_argument('--headless', action='store_true')
@@ -26,7 +27,7 @@ ap.add_argument('--self_collision', action='store_true', help='robot parts colli
 ap.add_argument('--seconds', type=float, default=4.0, help='seconds per motion')
 args = ap.parse_args()
 if args.urdf is None:
-    args.urdf = os.path.join(here, '..', 'urdf', f'mobile_manipulator_{args.layout}.urdf')
+    args.urdf = os.path.join(RP.URDF_DIR, f'mobile_manipulator_{args.layout}.urdf')
 
 from isaacsim import SimulationApp
 app = SimulationApp({'headless': args.headless})

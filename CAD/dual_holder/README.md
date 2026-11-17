@@ -7,7 +7,7 @@ It replaces the two aluminium brackets the robot model used to guess at.
 ![dual holder](preview_dual_holder.png)
 
 Made by `mobile_manipulator_description/generator/dual_holder.py` (shape, checks, these files, the preview);
-`dual_holder_strength.py` checks its strength with the loads from the Isaac load test (`scripts/isaac_dual_load_test.py`).
+`dual_holder_strength.py` checks its strength with the loads from the Isaac load test (`scripts/robot_tests/isaac_dual_load_test.py`).
 
 ## What it is (heights above the gantry plate's top)
 

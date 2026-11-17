@@ -20,17 +20,20 @@ A small store room for testing the mono (one-arm) robot in Isaac Sim 5.1, built 
 All commands from the repository root, in the `env_isaaclab` conda environment
 (add `OMNI_KIT_ACCEPT_EULA=YES` for Isaac Sim).
 
+The scripts that build, check and save this scene are in `scripts/scenes/scene_v0/` (run them from the repository
+root); this folder holds the scene's data: the saved `scene_v0.usda`, `stations.json`, the preview and the credits.
+
 ## 1. Download the assets (once, ~500 MB)
 
 ```bash
-python scenes/scene_v0/fetch_assets.py            # into scenes/assets/simready/ (not in git)
-python scenes/scene_v0/fetch_assets.py --check    # what is there
+python scripts/scenes/scene_v0/fetch_assets.py            # into scenes/assets/simready/ (not in git)
+python scripts/scenes/scene_v0/fetch_assets.py --check    # what is there
 ```
 
 ## 2. Look at it
 
 ```bash
-python scenes/scene_v0/check_scene.py --no_grasp
+python scripts/scenes/scene_v0/check_scene.py --no_grasp
 ```
 
 Opens a full-screen window with the robot, checks the scene (below), then pauses physics so the view moves smoothly
@@ -42,7 +45,7 @@ Options: `--fill 0.5` (fewer filler products; `0` = only the 15 task products), 
 ## 3. Check it
 
 ```bash
-python scenes/scene_v0/check_scene.py --headless --no_grasp
+python scripts/scenes/scene_v0/check_scene.py --headless --no_grasp
 ```
 
 - reach: the arm can pick each task product from some spot in front of its furniture (arm geometry only);
@@ -54,7 +57,7 @@ Without `--no_grasp` it also picks up each task product with the arm (not run wi
 ## 4. Save it
 
 ```bash
-python scenes/scene_v0/save_scene.py              # -> scenes/scene_v0/scene_v0.usda (also --fill, --seed, --out)
+python scripts/scenes/scene_v0/save_scene.py              # -> scenes/scene_v0/scene_v0.usda (also --fill, --seed, --out)
 ```
 
 The file refers to the downloaded assets by relative path; it holds none of NVIDIA's files.
@@ -75,10 +78,12 @@ They are on the floor as flat marks: **blue** = home, **green** = a task product
 product run. The small **orange** square is the station's turning point.
 
 ```bash
-python scenes/scene_v0/stations.py              # works out the stations -> stations.json (no simulator; rerun after a layout change)
-python scenes/scene_v0/drive_stations.py --list                       # names and coordinates
-python scenes/scene_v0/drive_stations.py --route home,rack_b0_box_cracker_a01,shelf_b1_milk_b01,home
-python scenes/scene_v0/drive_stations.py --tour                       # every station once (add --headless for no window)
+python scripts/scenes/scene_v0/stations.py              # works out the stations -> stations.json (no simulator; rerun after a layout change)
+python scripts/scenes/scene_v0/drive_stations.py --list                       # names and coordinates
+python scripts/scenes/scene_v0/drive_stations.py --route home,rack_b0_box_cracker_a01,shelf_b1_milk_b01,home
+python scripts/scenes/scene_v0/drive_stations.py --tour                       # every station once (add --headless for no window)
+python scripts/scenes/scene_v0/random_drive.py                       # random stations, 3 s at each, until you close the window
+python scripts/scenes/scene_v0/random_drive.py --stay 5 --only task --seed 1   # options: stay time, which stations, sequence
 ```
 
 How the robot drives: it backs straight out to the station's turning point, crosses the aisle (through the middle of
@@ -93,17 +98,25 @@ while turning. Not checked: the arm against the furniture (the grasp test does t
 
 | File | What |
 |---|---|
-| `scene.py` | builds the scene (layout, walls, lights, products, every physics fix) |
-| `assets.py` | the asset list, sizes and our product weights |
-| `grasp_plan.py` | where and how the mono arm can grasp each product (no simulator) |
+| `scene_v0.usda` | the saved scene (refers to the downloaded assets by relative path) |
+| `stations.json` | the robot stations: name, x, y, heading, turning point, product, how it is grasped |
+| `CREDITS.md` | attribution for the NVIDIA assets |
+| `preview_scene_v0.png` | picture of the scene (rendered with `check_scene.py --shot`, 4 views) |
+
+Scripts, in `../../scripts/scenes/scene_v0/`:
+
+| Script | What |
+|---|---|
+| `lib/scene.py` | builds the scene (layout, sections, walls, lights, products, station marks, every physics fix) |
+| `lib/assets.py` | the asset list, sizes and our product weights |
+| `lib/grasp_plan.py` | where and how the mono arm can grasp each product (no simulator) |
 | `fetch_assets.py` | downloads the assets |
 | `check_scene.py` | reach + scene checks with the robot; viewing window |
 | `save_scene.py` | writes `scene_v0.usda` |
 | `stations.py` | works out the robot stations and routes -> `stations.json` (no simulator) |
-| `stations.json` | the stations: name, x, y, heading, turning point, product, how it is grasped |
-| `drive_stations.py` | drives the robot between stations in Isaac Sim |
-| `CREDITS.md` | attribution for the NVIDIA assets |
-| `preview_scene_v0.png` | picture of the scene (rendered with `check_scene.py --shot`, 4 views) |
+| `lib/scene_robot.py` | the robot in the scene and one drive between stations (used by the two below) |
+| `drive_stations.py` | drives the robot along a route of stations (`--route`, `--tour`) |
+| `random_drive.py` | drives to random stations and stays at each for 3 s (`--stay`, `--count`, `--only`, `--seed`) |
 
 ## Changes made to the assets in our scene (the downloaded files stay untouched)
 

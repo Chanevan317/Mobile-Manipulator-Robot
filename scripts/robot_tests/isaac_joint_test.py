@@ -5,18 +5,19 @@ and record how closely it follows (tracking error), the range it actually reache
 anything blew up (NaN / runaway). Prints a table and writes joint_test_report.csv.
 
 Run with Isaac Sim's Python, from the package folder:
-    <isaac-sim>/python.sh scripts/isaac_joint_test.py                 # all joints, base fixed
-    <isaac-sim>/python.sh scripts/isaac_joint_test.py --joint left_wrist_roll --slow
-    <isaac-sim>/python.sh scripts/isaac_joint_test.py --headless
-    <isaac-sim>/python.sh scripts/isaac_joint_test.py --wheels      # also spin the 4 wheels, base free
-    <isaac-sim>/python.sh scripts/isaac_joint_test.py --hold        # hold 3 poses 30 s each, report drift
-    <isaac-sim>/python.sh scripts/isaac_joint_test.py --usd robot.usd   # same tests on a saved USD
-    <isaac-sim>/python.sh scripts/isaac_joint_test.py --self_collision  # robot parts collide with each other
+    <isaac-sim>/python.sh scripts/robot_tests/isaac_joint_test.py                 # all joints, base fixed
+    <isaac-sim>/python.sh scripts/robot_tests/isaac_joint_test.py --joint left_wrist_roll --slow
+    <isaac-sim>/python.sh scripts/robot_tests/isaac_joint_test.py --headless
+    <isaac-sim>/python.sh scripts/robot_tests/isaac_joint_test.py --wheels      # also spin the 4 wheels, base free
+    <isaac-sim>/python.sh scripts/robot_tests/isaac_joint_test.py --hold        # hold 3 poses 30 s each, report drift
+    <isaac-sim>/python.sh scripts/robot_tests/isaac_joint_test.py --usd robot.usd   # same tests on a saved USD
+    <isaac-sim>/python.sh scripts/robot_tests/isaac_joint_test.py --self_collision  # robot parts collide with each other
 """
 import argparse, csv, math, os, sys
 
 ap = argparse.ArgumentParser()
 here = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(here, '..', 'common')); import repo_paths as RP   # every script folder + repo paths
 ap.add_argument('--layout', default='prototype', choices=('prototype', 'prototype_mono_arm'), help='robot layout (urdf/mobile_manipulator_<layout>.urdf)')
 ap.add_argument('--urdf', default=None, help='URDF path (overrides --layout)')
 ap.add_argument('--joint', default='', help='test only joints whose name contains this text')
@@ -28,10 +29,10 @@ ap.add_argument('--hold_s', type=float, default=30.0, help='seconds per pose for
 ap.add_argument('--self_collision', action='store_true', help='robot parts collide with each other (see self_collision.py)')
 ap.add_argument('--usd', default='', help='test a USD saved by isaac_import_and_test.py --save instead of the URDF '
                                          '(drives are NOT re-applied; the base is free, as saved)')
-ap.add_argument('--out', default='joint_test_report.csv')
+ap.add_argument('--out', default=os.path.join(RP.PKG, 'joint_test_report.csv'))
 args = ap.parse_args()
 if args.urdf is None:
-    args.urdf = os.path.join(here, '..', 'urdf', f'mobile_manipulator_{args.layout}.urdf')
+    args.urdf = os.path.join(RP.URDF_DIR, f'mobile_manipulator_{args.layout}.urdf')
 
 try:
     from isaacsim import SimulationApp

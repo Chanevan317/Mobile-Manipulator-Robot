@@ -1,7 +1,7 @@
 """Download the NVIDIA SimReady assets listed in assets.py into scenes/assets/simready/ (git-ignored).
 
-    python scenes/scene_v0/fetch_assets.py            # download / update (skips files already there)
-    python scenes/scene_v0/fetch_assets.py --check    # only report what is present / missing
+    python scripts/scenes/scene_v0/fetch_assets.py            # download / update (skips files already there)
+    python scripts/scenes/scene_v0/fetch_assets.py --check    # only report what is present / missing
 
 Needs `huggingface_hub` (in env_isaaclab). The dataset is public (no login needed; a login raises the rate limit).
 Each package is downloaded whole except its thumbnails (about 525 MB for the current list).
@@ -9,10 +9,11 @@ License: CC-BY-4.0 (attribution in CREDITS.md).
 """
 import argparse, os, sys
 here = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(here, '..', '..', 'common')); import repo_paths as RP   # every script folder + repo paths
 sys.path.insert(0, here)
 import assets as SA
 
-ROOT = os.path.normpath(os.path.join(here, '..', 'assets', 'simready'))
+ROOT = RP.SIMREADY
 
 
 def check():

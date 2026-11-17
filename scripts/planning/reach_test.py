@@ -12,9 +12,9 @@ so a straight-in grasp cannot reach close to the robot; the shelf task stops wit
 Collision shapes are the URDF collision meshes, so the result matches Isaac Sim's geometry.
 
 Run from the package folder with a Python that has numpy + manifold3d (env_isaaclab):
-    python scripts/reach_test.py                                   # prototype, tables 0.45/0.60/0.75/0.90, shelves 0.30/0.70/1.10
-    python scripts/reach_test.py --tables 0.75 --shelves "" --step 0.02
-    python scripts/reach_test.py --layout prototype_mono_arm         # the one-arm experiment (shoulder ring around the column)
+    python scripts/planning/reach_test.py                                   # prototype, tables 0.45/0.60/0.75/0.90, shelves 0.30/0.70/1.10
+    python scripts/planning/reach_test.py --tables 0.75 --shelves "" --step 0.02
+    python scripts/planning/reach_test.py --layout prototype_mono_arm         # the one-arm experiment (shoulder ring around the column)
 The tote behind the column is tested too (hand down, TCP 20 mm over its floor); --no_tote skips it.
 Writes reach_test_<layout>.csv and reach_test_<layout>.png next to the package (or --out PREFIX).
 """
@@ -22,7 +22,8 @@ import argparse, math, os, sys, csv, time, collections
 import numpy as np
 
 here = os.path.dirname(os.path.abspath(__file__))
-pkg = os.path.normpath(os.path.join(here, '..'))
+sys.path.insert(0, os.path.join(here, '..', 'common')); import repo_paths as RP   # every script folder + repo paths
+pkg = RP.PKG
 ap = argparse.ArgumentParser()
 ap.add_argument('--layout', default='prototype', choices=('prototype', 'prototype_mono_arm'))
 ap.add_argument('--tables', default='0.45,0.60,0.75,0.90', help='table heights (m), comma separated; "" for none')

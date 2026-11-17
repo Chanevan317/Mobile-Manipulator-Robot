@@ -10,7 +10,7 @@ Each plan = approach start a, grasp b, lifted c (TCP x, y, z, yaw, pitch in the 
 """
 import math, os, sys
 import numpy as np
-sys.path.insert(0, os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "mobile_manipulator_description", "scripts")))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', 'common')); import repo_paths as RP
 import scara_ik as K
 import assets as SA
 

@@ -9,13 +9,14 @@ Moves (base fixed, payload = extra mass at each TCP, both arms stretched, mirror
   shoulder both shoulders swing -110 -> +110 deg at full speed, then a HARD STOP
   lift     lift 0.05 -> 0.75 -> 0.05 m at full speed, arms out sideways
 
-    python scripts/isaac_dual_load_test.py --headless --payload 0.5      # -> dual_load_test_<payload>.json
+    python scripts/robot_tests/isaac_dual_load_test.py --headless --payload 0.5      # -> dual_load_test_<payload>.json
 """
 import argparse, json, math, os, sys
 
 ap = argparse.ArgumentParser()
 here = os.path.dirname(os.path.abspath(__file__))
-ap.add_argument('--urdf', default=os.path.join(here, '..', 'urdf', 'mobile_manipulator_prototype.urdf'))
+sys.path.insert(0, os.path.join(here, '..', 'common')); import repo_paths as RP   # every script folder + repo paths
+ap.add_argument('--urdf', default=os.path.join(RP.URDF_DIR, 'mobile_manipulator_prototype.urdf'))
 ap.add_argument('--headless', action='store_true')
 ap.add_argument('--payload', type=float, default=0.5, help='kg held at the TCP')
 ap.add_argument('--out', default=None)
@@ -112,7 +113,7 @@ go(dict(ARM, shoulder_pan=HEAD['out'], lift=0.05), 'move', 0.5)
 go(dict(ARM, shoulder_pan=HEAD['out'], lift=0.75), 'lift_up', 0.5)
 go(dict(ARM, shoulder_pan=HEAD['out'], lift=0.05), 'lift_down', 0.5)
 
-out = args.out or os.path.join(here, '..', f'dual_load_test_{args.payload:g}kg.json')
+out = args.out or os.path.join(RP.PKG, f'dual_load_test_{args.payload:g}kg.json')
 log.pop('move', None); log.pop('move_effort', None); log.pop('settle', None); log.pop('settle_effort', None)
 json.dump(dict(payload_kg=args.payload, hand_mass_kg=m0, frames='each joint wrench in its child joint frame (N, N m)', log=log),
           open(out, 'w'), indent=1)

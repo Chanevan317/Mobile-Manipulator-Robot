@@ -19,15 +19,16 @@ move is time-synchronised (proto_task.Task.joint_move). Hand-down picks need tab
 vertical approach shrinks to fit (0.10 m on a 0.75 m table).
 
 Run with Isaac Sim's Python, from the package folder:
-    python scripts/isaac_table_task.py               # window
-    python scripts/isaac_table_task.py --headless
-    python scripts/isaac_table_task.py --headless --table_h 0.60
+    python scripts/tasks/dual/isaac_table_task.py               # window
+    python scripts/tasks/dual/isaac_table_task.py --headless
+    python scripts/tasks/dual/isaac_table_task.py --headless --table_h 0.60
 """
 import argparse, math, os, sys
 
 ap = argparse.ArgumentParser()
 here = os.path.dirname(os.path.abspath(__file__))
-ap.add_argument('--urdf', default=os.path.join(here, '..', 'urdf', 'mobile_manipulator_prototype.urdf'))
+sys.path.insert(0, os.path.join(here, '..', '..', 'common')); import repo_paths as RP   # every script folder + repo paths
+ap.add_argument('--urdf', default=os.path.join(RP.URDF_DIR, 'mobile_manipulator_prototype.urdf'))
 ap.add_argument('--headless', action='store_true')
 ap.add_argument('--table_h', type=float, default=0.75, help='height of both tables (m), <= 0.84')
 ap.add_argument('--no_self_collision', action='store_true')

@@ -3,7 +3,7 @@
 Not real navigation: drive_stations.py moves the base between these marked coordinates on a fixed route. Run this file
 to (re)compute them after a layout change; it writes stations.json (kept in git) and prints the table.
 
-    python scenes/scene_v0/stations.py           # no simulator needed
+    python scripts/scenes/scene_v0/stations.py           # no simulator needed
 
 Stations (world frame = the robot's start pose, metres / degrees):
   home                      the start pose (0, 0, 0)
@@ -21,6 +21,7 @@ Checked: kinematics (scara_ik, joint limits) and footprints (2-D boxes). NOT che
 import json, math, os, sys
 import numpy as np
 here = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(here, '..', '..', 'common')); import repo_paths as RP   # every script folder + repo paths
 sys.path.insert(0, here)
 import assets as SA
 import scene as SC
@@ -30,7 +31,7 @@ FOOT = dict(back=0.25, front=0.34, side=0.25)   # robot frame: base 0.50 x 0.50,
 MARGIN = 0.02
 TURN_R = math.hypot(FOOT['front'], FOOT['side']) + 0.03     # clearance needed to turn on the spot
 HUB = (-1.20, 0.0)
-OUT = os.path.join(here, 'stations.json')
+OUT = os.path.join(RP.scene_dir('scene_v0'), 'stations.json')
 
 
 def obstacles():

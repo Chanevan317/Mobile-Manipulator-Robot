@@ -147,7 +147,7 @@ In Isaac Sim (the robot model with this ring):
 
 ## Strength
 
-Isaac Sim's parts are rigid, so the sim can't show a printed part failing. `scripts/isaac_mono_load_test.py`
+Isaac Sim's parts are rigid, so the sim can't show a printed part failing. `scripts/robot_tests/isaac_mono_load_test.py`
 records the **loads** through the ring while the arm works with 0 / 0.25 / 0.5 kg in the gripper:
 - arm stretched out, hand level and hand down;
 - the ring swinging 300° at full speed, then a hard stop;

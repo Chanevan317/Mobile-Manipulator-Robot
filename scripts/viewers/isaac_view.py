@@ -10,8 +10,8 @@ into one stage does not work: the importer puts every robot's meshes and collisi
 robot's collision shapes (it was thrown off the floor) (2026-11-16).
 
 Run from this package folder:
-    <isaac-sim>/python.sh scripts/isaac_view.py
-    (this machine: OMNI_KIT_ACCEPT_EULA=YES conda run --no-capture-output -n env_isaaclab python scripts/isaac_view.py)
+    <isaac-sim>/python.sh scripts/viewers/isaac_view.py
+    (this machine: OMNI_KIT_ACCEPT_EULA=YES conda run --no-capture-output -n env_isaaclab python scripts/viewers/isaac_view.py)
 Options:
     --layout both | prototype | prototype_mono_arm   which robot(s) (default both)
     --paused             open with the simulation stopped (press Play in the window to start physics)
@@ -23,6 +23,7 @@ See isaac_arm_view.py for one arm alone.
 import argparse, os, sys, tempfile
 ap = argparse.ArgumentParser()
 here = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(here, '..', 'common')); import repo_paths as RP   # every script folder + repo paths
 ap.add_argument('--layout', default='both', choices=('both', 'prototype', 'prototype_mono_arm'))
 ap.add_argument('--paused', action='store_true')
 ap.add_argument('--fix_base', action='store_true')

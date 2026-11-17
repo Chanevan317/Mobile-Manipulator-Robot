@@ -12,14 +12,15 @@ It reports how far the cube slipped relative to the TCP, the jaw opening while i
 grip force, and where the cube ended up. All materials use PhysX's default friction (0.5).
 
 Run with Isaac Sim's Python, from the package folder:
-    <isaac-sim>/python.sh scripts/isaac_grasp_test.py                    # window: watch it
-    <isaac-sim>/python.sh scripts/isaac_grasp_test.py --headless
-    <isaac-sim>/python.sh scripts/isaac_grasp_test.py --mass 0.5 --size 0.05 --no_self_collision
+    <isaac-sim>/python.sh scripts/robot_tests/isaac_grasp_test.py                    # window: watch it
+    <isaac-sim>/python.sh scripts/robot_tests/isaac_grasp_test.py --headless
+    <isaac-sim>/python.sh scripts/robot_tests/isaac_grasp_test.py --mass 0.5 --size 0.05 --no_self_collision
 """
 import argparse, math, os, sys
 
 ap = argparse.ArgumentParser()
 here = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(here, '..', 'common')); import repo_paths as RP   # every script folder + repo paths
 ap.add_argument('--layout', default='prototype', choices=('prototype',), help='robot layout (urdf/mobile_manipulator_<layout>.urdf)')
 ap.add_argument('--urdf', default=None, help='URDF path (overrides --layout)')
 ap.add_argument('--headless', action='store_true')
@@ -28,7 +29,7 @@ ap.add_argument('--mass', type=float, default=0.15, help='cube mass (kg)')
 ap.add_argument('--no_self_collision', action='store_true', help='robot parts do not collide with each other')
 args = ap.parse_args()
 if args.urdf is None:
-    args.urdf = os.path.join(here, '..', 'urdf', f'mobile_manipulator_{args.layout}.urdf')
+    args.urdf = os.path.join(RP.URDF_DIR, f'mobile_manipulator_{args.layout}.urdf')
 
 from isaacsim import SimulationApp
 app = SimulationApp({'headless': args.headless})

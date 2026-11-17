@@ -46,10 +46,11 @@ except ImportError:
     Usd = None
 
 here = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(here, '..', '..', '..', 'common')); import repo_paths as RP   # every script folder + repo paths
 sys.path.insert(0, here)
 import assets as SA
 
-ROOT = os.path.normpath(os.path.join(here, '..', 'assets', 'simready'))   # scenes/assets/simready (git-ignored)
+ROOT = RP.SIMREADY   # scenes/assets/simready (git-ignored)
 TABLE_TOP = 0.85
 TABLE_EDGE = 0.36
 RACK_FRONT, RACK_X = 1.10, -0.6
@@ -332,7 +333,7 @@ def _markers(stage, root):
     """A flat square + a heading bar on the floor at every station in stations.json (visual only, no collision):
     blue = home, green = a task product's station, yellow = another product run, orange dot = the turning (approach) point."""
     import json
-    f = os.path.join(here, 'stations.json')
+    f = os.path.join(RP.scene_dir('scene_v0'), 'stations.json')
     if not os.path.exists(f):
         return
     st = json.load(open(f))['stations']

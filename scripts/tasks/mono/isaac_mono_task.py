@@ -8,8 +8,8 @@ Plan: mono_poses.py (checked offline against the URDF meshes, the table and the 
 Moves: time-synchronised joint moves (proto_task.Task.joint_move) and straight TCP lines (cart_move), every command
 rate-limited as on the real servos.
 
-    python scripts/isaac_mono_task.py               # window
-    python scripts/isaac_mono_task.py --headless
+    python scripts/tasks/mono/isaac_mono_task.py               # window
+    python scripts/tasks/mono/isaac_mono_task.py --headless
     add --no_smooth for step-by-step moves instead of the TOPP-RA blended ones
     MONO_DEBUG=1: per step, joint errors, base tilt and the PhysX contacts (found the scene camera hitting the table)
 """
@@ -17,7 +17,8 @@ import argparse, math, os, sys
 
 ap = argparse.ArgumentParser()
 here = os.path.dirname(os.path.abspath(__file__))
-ap.add_argument('--urdf', default=os.path.join(here, '..', 'urdf', 'mobile_manipulator_prototype_mono_arm.urdf'))
+sys.path.insert(0, os.path.join(here, '..', '..', 'common')); import repo_paths as RP   # every script folder + repo paths
+ap.add_argument('--urdf', default=os.path.join(RP.URDF_DIR, 'mobile_manipulator_prototype_mono_arm.urdf'))
 ap.add_argument('--headless', action='store_true')
 ap.add_argument('--table_h', type=float, default=0.75)
 ap.add_argument('--no_self_collision', action='store_true')

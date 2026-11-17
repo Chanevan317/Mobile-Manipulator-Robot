@@ -6,8 +6,8 @@ same target (no mimic): closed -> fully open (45 mm each, 90 mm gap) -> closed, 
 Close the window to quit.
 
 Run from this package folder:
-    <isaac-sim>/python.sh scripts/isaac_arm_view.py
-    (this machine: OMNI_KIT_ACCEPT_EULA=YES conda run --no-capture-output -n env_isaaclab python scripts/isaac_arm_view.py)
+    <isaac-sim>/python.sh scripts/viewers/isaac_arm_view.py
+    (this machine: OMNI_KIT_ACCEPT_EULA=YES conda run --no-capture-output -n env_isaaclab python scripts/viewers/isaac_arm_view.py)
 Options:
     --period S        seconds per open + close cycle (default 20: about 4.5 mm/s per jaw at the fastest)
     --layout prototype | prototype_mono_arm   which robot's arm (default prototype; the mono one includes its ring)
@@ -15,6 +15,7 @@ Options:
 import argparse, math, os, sys
 ap = argparse.ArgumentParser()
 here = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(here, '..', 'common')); import repo_paths as RP   # every script folder + repo paths
 ap.add_argument('--period', type=float, default=20.0)
 ap.add_argument('--layout', default='prototype', choices=('prototype', 'prototype_mono_arm'))
 args = ap.parse_args()

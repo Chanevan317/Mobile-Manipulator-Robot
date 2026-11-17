@@ -10,13 +10,14 @@ table B; both products back out of the tote onto table B; stow.
 Plan: mono_poses.table_steps (checked offline: 320 samples, robot / table / tote products / carried product all clear),
 aimed at the products' measured positions.
 
-    python scripts/isaac_mono_table_task.py [--headless] [--table_h 0.75] [--smooth]
+    python scripts/tasks/mono/isaac_mono_table_task.py [--headless] [--table_h 0.75] [--smooth]
 """
 import argparse, math, os, sys
 
 ap = argparse.ArgumentParser()
 here = os.path.dirname(os.path.abspath(__file__))
-ap.add_argument('--urdf', default=os.path.join(here, '..', 'urdf', 'mobile_manipulator_prototype_mono_arm.urdf'))
+sys.path.insert(0, os.path.join(here, '..', '..', 'common')); import repo_paths as RP   # every script folder + repo paths
+ap.add_argument('--urdf', default=os.path.join(RP.URDF_DIR, 'mobile_manipulator_prototype_mono_arm.urdf'))
 ap.add_argument('--headless', action='store_true')
 ap.add_argument('--table_h', type=float, default=0.75)
 ap.add_argument('--no_self_collision', action='store_true')

@@ -1,6 +1,6 @@
 """Save scene_v0 as a USD file you can open straight in Isaac Sim (File > Open): scene_v0.usda next to this script.
 
-    OMNI_KIT_ACCEPT_EULA=YES conda run --no-capture-output -n env_isaaclab python scenes/scene_v0/save_scene.py
+    OMNI_KIT_ACCEPT_EULA=YES conda run --no-capture-output -n env_isaaclab python scripts/scenes/scene_v0/save_scene.py
     ... --fill 0.5 --seed 3 --out other.usda
 
 The file is the scene only (no robot): room (3 walls + a floor), lights, furniture, the 15 task products and the filler
@@ -10,10 +10,11 @@ itself holds no NVIDIA geometry or textures. The robot scripts build the same sc
 """
 import argparse, os, sys
 here = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(here, '..', '..', 'common')); import repo_paths as RP   # every script folder + repo paths
 ap = argparse.ArgumentParser()
 ap.add_argument('--fill', type=float, default=1.0)
 ap.add_argument('--seed', type=int, default=0)
-ap.add_argument('--out', default=os.path.join(here, 'scene_v0.usda'))
+ap.add_argument('--out', default=os.path.join(RP.scene_dir('scene_v0'), 'scene_v0.usda'))
 args = ap.parse_args()
 
 from isaacsim import SimulationApp            # Isaac's pxr only loads inside a running Kit app

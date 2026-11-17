@@ -20,21 +20,22 @@ the simulation; a real robot would get them from its cameras). Every joint comma
 The poses were checked collision-free with generator/urdf_selfcol.py (left arm, right arm parked).
 
 Run with Isaac Sim's Python, from the package folder:
-    <isaac-sim>/python.sh scripts/isaac_shelf_task.py               # window (the task code is in shelf_task_prototype.py)
-    <isaac-sim>/python.sh scripts/isaac_shelf_task.py --headless
+    <isaac-sim>/python.sh scripts/tasks/dual/isaac_shelf_task.py               # window (the task code is in shelf_task_prototype.py)
+    <isaac-sim>/python.sh scripts/tasks/dual/isaac_shelf_task.py --headless
     TASK_DEBUG=1 ... isaac_shelf_task.py      # also print the item position relative to the gripper
 """
 import argparse, math, os, sys
 
 ap = argparse.ArgumentParser()
 here = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(here, '..', '..', 'common')); import repo_paths as RP   # every script folder + repo paths
 ap.add_argument('--layout', default='prototype', choices=('prototype',), help='robot layout (only prototype since 2026-11-09)')
 ap.add_argument('--urdf', default=None, help='URDF path (overrides --layout)')
 ap.add_argument('--headless', action='store_true')
 ap.add_argument('--no_self_collision', action='store_true')
 args = ap.parse_args()
 if args.urdf is None:
-    args.urdf = os.path.join(here, '..', 'urdf', f'mobile_manipulator_{args.layout}.urdf')
+    args.urdf = os.path.join(RP.URDF_DIR, f'mobile_manipulator_{args.layout}.urdf')
 
 from isaacsim import SimulationApp
 app = SimulationApp({'headless': args.headless})
