@@ -167,6 +167,18 @@ print(f'fillers: {len(fill_dyn) - len(fill_bad)}/{len(fill_dyn)} with physics st
       f'  {"OK" if not fill_bad else "FAIL"}'); ok1.append(not fill_bad)
 for b in fill_bad[:10]:
     print('   ', b)
+gaps = []                                          # task product <-> nearest filler on the same board (planned spots)
+for n, it in items.items():
+    if it['role'] != 'product' or it['rest'][3] == 0.0:
+        continue
+    z, x, y, hd = it['rest']; wt = min(SA.size(it['pkg'])[:2]) / 1000
+    for m, f in items.items():
+        if f['role'] == 'filler' and abs(f['rest'][0] - z) < 0.01 and f['rest'][3] == hd and abs(f['rest'][2] - y) < 0.3:
+            gaps.append((abs(f['rest'][1] - x) - wt / 2 - min(SA.size(f['pkg'])[:2]) / 2000, n))
+if gaps:
+    g, gn = min(gaps); okg = g >= SC.TASK_GAP - 0.006           # fillers turn up to 5 deg
+    print(f'task products: nearest filler {g*1000:.0f} mm from the side of {gn} (want >= {SC.TASK_GAP*1000:.0f})  {"OK" if okg else "FAIL"}')
+    ok1.append(okg)
 print(f'scene: {sum(ok1)}/{len(ok1)} OK')
 
 if args.shot:

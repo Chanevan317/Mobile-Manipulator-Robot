@@ -1,0 +1,427 @@
+{
+ "note": "scene_v0 robot stations (stations.py); world frame = robot start; yaw deg; approach = turning point",
+ "footprint": {
+  "back": 0.25,
+  "front": 0.34,
+  "side": 0.25
+ },
+ "margin": 0.02,
+ "turn_r": 0.452,
+ "hub": [
+  -1.2,
+  0.0
+ ],
+ "stations": {
+  "home": {
+   "x": 0.0,
+   "y": 0.0,
+   "yaw": 0.0,
+   "product": null,
+   "board": "start",
+   "note": "start pose",
+   "approach": [
+    -0.1,
+    0.0
+   ]
+  },
+  "rack_b0_boxedCereal_l01": {
+   "x": -1.224,
+   "y": 0.74,
+   "yaw": 90.0,
+   "grasp": "side",
+   "reach": 0.47,
+   "offset": 0.2,
+   "product": "food_processed_boxedCereal_l01",
+   "board": "rack_b0",
+   "surface": 0.761,
+   "section": "breakfast and dry goods",
+   "target": [
+    -1.424,
+    1.21
+   ],
+   "task": true,
+   "approach": [
+    -1.224,
+    0.64
+   ]
+  },
+  "rack_b0_box_cracker_a01": {
+   "x": -0.812,
+   "y": 0.732,
+   "yaw": 90.0,
+   "grasp": "side",
+   "reach": 0.49,
+   "offset": 0.2,
+   "product": "food_box_cracker_a01",
+   "board": "rack_b0",
+   "surface": 0.761,
+   "section": "breakfast and dry goods",
+   "target": [
+    -1.012,
+    1.222
+   ],
+   "task": true,
+   "approach": [
+    -0.812,
+    0.632
+   ]
+  },
+  "rack_b0_boxedFood_b01": {
+   "x": -0.4,
+   "y": 0.734,
+   "yaw": 90.0,
+   "grasp": "side",
+   "reach": 0.47,
+   "offset": 0.2,
+   "product": "food_processed_boxedFood_b01",
+   "board": "rack_b0",
+   "surface": 0.761,
+   "section": "breakfast and dry goods",
+   "target": [
+    -0.6,
+    1.205
+   ],
+   "task": true,
+   "approach": [
+    -0.4,
+    0.634
+   ]
+  },
+  "rack_b0_boxedFood_c01": {
+   "x": 0.012,
+   "y": 0.737,
+   "yaw": 90.0,
+   "grasp": "side",
+   "reach": 0.47,
+   "offset": 0.2,
+   "product": "food_processed_boxedFood_c01",
+   "board": "rack_b0",
+   "surface": 0.761,
+   "section": "breakfast and dry goods",
+   "target": [
+    -0.188,
+    1.208
+   ],
+   "task": true,
+   "approach": [
+    -0.188,
+    0.637
+   ]
+  },
+  "rack_b0_boxedFood_d01": {
+   "x": 0.024,
+   "y": 0.732,
+   "yaw": 90.0,
+   "grasp": "side",
+   "reach": 0.46,
+   "offset": -0.2,
+   "product": "food_processed_boxedFood_d01",
+   "board": "rack_b0",
+   "surface": 0.761,
+   "section": "breakfast and dry goods",
+   "target": [
+    0.224,
+    1.192
+   ],
+   "task": true,
+   "approach": [
+    -0.176,
+    0.632
+   ]
+  },
+  "shelf_b1_milk_b01": {
+   "x": -1.145,
+   "y": -0.779,
+   "yaw": -90.0,
+   "grasp": "side",
+   "reach": 0.46,
+   "offset": 0.2,
+   "product": "food_processed_milk_b01",
+   "board": "shelf_b1",
+   "surface": 0.667,
+   "section": "dairy",
+   "target": [
+    -0.945,
+    -1.239
+   ],
+   "task": true,
+   "approach": [
+    -1.145,
+    -0.679
+   ]
+  },
+  "shelf_b1_yogurt_a01": {
+   "x": -0.255,
+   "y": -0.777,
+   "yaw": -90.0,
+   "grasp": "top",
+   "reach": 0.45,
+   "offset": 0.0,
+   "product": "food_processed_yogurt_a01",
+   "board": "shelf_b1",
+   "surface": 0.667,
+   "section": "dairy",
+   "target": [
+    -0.255,
+    -1.227
+   ],
+   "task": false,
+   "approach": [
+    -0.255,
+    -0.677
+   ]
+  },
+  "shelf_b2_yogurt_c01": {
+   "x": -1.145,
+   "y": -0.78,
+   "yaw": -90.0,
+   "grasp": "side",
+   "reach": 0.45,
+   "offset": 0.2,
+   "product": "food_processed_yogurt_c01",
+   "board": "shelf_b2",
+   "surface": 1.07,
+   "section": "dairy",
+   "target": [
+    -0.945,
+    -1.23
+   ],
+   "task": false,
+   "approach": [
+    -1.145,
+    -0.68
+   ]
+  },
+  "shelf_b2_milk_c01": {
+   "x": -0.455,
+   "y": -0.775,
+   "yaw": -90.0,
+   "grasp": "side",
+   "reach": 0.46,
+   "offset": 0.2,
+   "product": "food_processed_milk_c01",
+   "board": "shelf_b2",
+   "surface": 1.07,
+   "section": "dairy",
+   "target": [
+    -0.255,
+    -1.235
+   ],
+   "task": true,
+   "approach": [
+    -0.455,
+    -0.675
+   ]
+  },
+  "rack2_b0_cannedFood_h01": {
+   "x": -3.265,
+   "y": 0.737,
+   "yaw": 90.0,
+   "grasp": "top",
+   "reach": 0.44,
+   "offset": 0.0,
+   "product": "food_processed_cannedFood_h01",
+   "board": "rack2_b0",
+   "surface": 0.761,
+   "section": "snacks and canned",
+   "target": [
+    -3.265,
+    1.177
+   ],
+   "task": false,
+   "approach": [
+    -3.265,
+    0.637
+   ]
+  },
+  "rack2_b0_chocolate_e01": {
+   "x": -2.235,
+   "y": 0.732,
+   "yaw": 90.0,
+   "grasp": "top",
+   "reach": 0.49,
+   "offset": 0.0,
+   "product": "food_processed_chocolate_e01",
+   "board": "rack2_b0",
+   "surface": 0.761,
+   "section": "snacks and canned",
+   "target": [
+    -2.235,
+    1.223
+   ],
+   "task": true,
+   "approach": [
+    -2.235,
+    0.632
+   ]
+  },
+  "shelf2_b1_ketchup_c01": {
+   "x": -2.695,
+   "y": -0.782,
+   "yaw": -90.0,
+   "grasp": "side",
+   "reach": 0.45,
+   "offset": 0.2,
+   "product": "food_processed_ketchup_c01",
+   "board": "shelf2_b1",
+   "surface": 0.667,
+   "section": "sauces",
+   "target": [
+    -2.495,
+    -1.232
+   ],
+   "task": true,
+   "approach": [
+    -2.695,
+    -0.682
+   ]
+  },
+  "shelf2_b1_ketchup_i01": {
+   "x": -2.005,
+   "y": -0.782,
+   "yaw": -90.0,
+   "grasp": "side",
+   "reach": 0.45,
+   "offset": 0.2,
+   "product": "food_processed_ketchup_i01",
+   "board": "shelf2_b1",
+   "surface": 0.667,
+   "section": "sauces",
+   "target": [
+    -1.805,
+    -1.232
+   ],
+   "task": true,
+   "approach": [
+    -2.005,
+    -0.682
+   ]
+  },
+  "shelf2_b2_ketchup_a02": {
+   "x": -2.695,
+   "y": -0.782,
+   "yaw": -90.0,
+   "grasp": "side",
+   "reach": 0.46,
+   "offset": 0.2,
+   "product": "food_condiment_ketchup_a02",
+   "board": "shelf2_b2",
+   "surface": 1.07,
+   "section": "sauces",
+   "target": [
+    -2.495,
+    -1.242
+   ],
+   "task": true,
+   "approach": [
+    -2.695,
+    -0.682
+   ]
+  },
+  "shelf2_b2_ketchup_c01": {
+   "x": -2.005,
+   "y": -0.783,
+   "yaw": -90.0,
+   "grasp": "side",
+   "reach": 0.44,
+   "offset": 0.2,
+   "product": "food_processed_ketchup_c01",
+   "board": "shelf2_b2",
+   "surface": 1.07,
+   "section": "sauces",
+   "target": [
+    -1.805,
+    -1.223
+   ],
+   "task": false,
+   "approach": [
+    -2.005,
+    -0.683
+   ]
+  },
+  "table_yogurt_a01": {
+   "x": -0.01,
+   "y": -0.45,
+   "yaw": 0.0,
+   "grasp": "top",
+   "reach": 0.43,
+   "offset": 0.0,
+   "product": "food_processed_yogurt_a01",
+   "board": "table",
+   "surface": 0.85,
+   "section": "table",
+   "target": [
+    0.42,
+    -0.45
+   ],
+   "task": true,
+   "approach": [
+    -0.11,
+    -0.45
+   ]
+  },
+  "table_cannedFood_h01": {
+   "x": -0.01,
+   "y": -0.57,
+   "yaw": 0.0,
+   "grasp": "top",
+   "reach": 0.43,
+   "offset": 0.0,
+   "product": "food_processed_cannedFood_h01",
+   "board": "table",
+   "surface": 0.85,
+   "section": "table",
+   "target": [
+    0.42,
+    -0.57
+   ],
+   "task": true,
+   "approach": [
+    -0.11,
+    -0.57
+   ]
+  },
+  "table_coffeeCup_b01": {
+   "x": -0.01,
+   "y": -0.49,
+   "yaw": 0.0,
+   "grasp": "side",
+   "reach": 0.43,
+   "offset": -0.2,
+   "product": "food_beverage_coffeeCup_b01",
+   "board": "table",
+   "surface": 0.85,
+   "section": "table",
+   "target": [
+    0.42,
+    -0.69
+   ],
+   "task": true,
+   "approach": [
+    -0.11,
+    -0.49
+   ]
+  },
+  "table_yogurt_c01": {
+   "x": -0.01,
+   "y": -0.61,
+   "yaw": 0.0,
+   "grasp": "side",
+   "reach": 0.43,
+   "offset": -0.2,
+   "product": "food_processed_yogurt_c01",
+   "board": "table",
+   "surface": 0.85,
+   "section": "table",
+   "target": [
+    0.42,
+    -0.81
+   ],
+   "task": true,
+   "approach": [
+    -0.11,
+    -0.61
+   ]
+  }
+ }
+}

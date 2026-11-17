@@ -17,6 +17,10 @@ Layout (metres):
   shelf  storage_shelf_basic_b01 on the robot's right: front at y -1.165, centred on x -0.6; products on 0.667 / 1.070.
          Its own collision mesh tipped standing bottles over (Isaac 2026-11-16), so it collides through invisible boxes
          instead: a flat plate on each board (top 0.264 + k 0.403, just over the board mesh) + its 4 corner posts
+  Store sections (SECTIONS): blue rack 1 breakfast and dry goods, blue rack 2 snacks and canned, grey shelf 1 dairy,
+  grey shelf 2 sauces; each board holds runs of one product side by side (facings), each run with its own random stock
+  level; the 11 shelf task products sit mid-run on boards the arm reaches (TASK_BOARD). The table is the work /
+  staging area: 4 short task products at its edge, the crate, a mixed back row.
   Products face the robot's approach with their narrow side across it (the jaws close across the approach).
 
 Physics changes made in OUR stage only (the downloaded files are untouched):
@@ -36,7 +40,10 @@ shelf boards ~0.265 + k 0.405 (ridged: the products settle ~0.668 / 1.071; 0.675
 """
 import math, os, sys
 import random
-from pxr import Usd, UsdGeom, UsdPhysics, UsdLux, UsdShade, Sdf, Gf
+try:                                  # the layout (REST, SECTIONS, FURNITURE, ...) also loads without Isaac (stations.py)
+    from pxr import Usd, UsdGeom, UsdPhysics, UsdLux, UsdShade, Sdf, Gf
+except ImportError:
+    Usd = None
 
 here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, here)
@@ -51,6 +58,8 @@ RACK_BOARDS = RACK_PLATES[:2]
 SHELF_FRONT, SHELF_X, SHELF_BOARDS = -1.165, -0.6, (0.667, 1.070)
 SHELF_PLATES = [0.264 + 0.403 * k for k in range(5)]   # tops of the shelf's box colliders (board mesh tops ~0.257 + k 0.405)
 DROP = 0.003                       # products start this far above their surface
+TASK_GAP = 0.05                    # free space each side of a task product: the open jaws' outer faces reach ~29 mm out
+                                   # (finger 14 mm + 15 mm opening margin); 30 mm left ~1 mm to a filler neighbour
 
 # furniture: package, (x, y) of the bounding-box centre, yaw (deg), z of the bounding-box bottom
 FURNITURE = {
@@ -71,17 +80,27 @@ STRIPS = [(x, y) for x in (-3.0, -1.6, -0.2) for y in (-1.0, 1.0)] + [(0.7, -0.6
 #   table: the hand comes along +x;  rack: along +y;  shelf: along -y
 _T = [('food_processed_yogurt_a01', 0.42, -0.45), ('food_processed_cannedFood_h01', 0.42, -0.57),
       ('food_beverage_coffeeCup_b01', 0.42, -0.69), ('food_processed_yogurt_c01', 0.42, -0.81)]
-_R = [('food_processed_boxedFood_b01', RACK_BOARDS[0], -1.05), ('food_processed_boxedFood_c01', RACK_BOARDS[0], -0.87),
-      ('food_processed_boxedFood_d01', RACK_BOARDS[0], -0.69), ('food_box_cracker_a01', RACK_BOARDS[0], -0.51),
-      ('food_processed_boxedCereal_l01', RACK_BOARDS[0], -0.33), ('food_processed_milk_b01', RACK_BOARDS[0], -0.15)]
-_S = [('food_processed_milk_c01', SHELF_BOARDS[0], -0.90), ('food_processed_ketchup_c01', SHELF_BOARDS[0], -0.75),
-      ('food_processed_ketchup_i01', SHELF_BOARDS[0], -0.60), ('food_processed_chocolate_e01', SHELF_BOARDS[0], -0.40),
-      ('food_condiment_ketchup_a02', SHELF_BOARDS[1], -0.60)]
-REST = {}
-for p, x, y in _T: REST[p] = (TABLE_TOP, x, y, 0.0)
-for p, z, x in _R: REST[p] = (z, x, None, 90.0)      # y: 40 mm in from the front edge, set in build() from the product's depth
-for p, z, x in _S: REST[p] = (z, x, None, -90.0)
-
+# store sections (user 2026-11-17: "organize the shelves by products and sections"): board key -> runs of one product
+# each, side by side along the board (equal lengths), like shelf facings. Each run gets its own random stock level.
+_P, _F = 'food_processed_', 'food_'
+CEREAL, CRACKER, BOX_B, BOX_C, BOX_D = _P + 'boxedCereal_l01', _F + 'box_cracker_a01', _P + 'boxedFood_b01', _P + 'boxedFood_c01', _P + 'boxedFood_d01'
+CAN, CHOC, CUP = _P + 'cannedFood_h01', _P + 'chocolate_e01', _F + 'beverage_coffeeCup_b01'
+MILK_B, MILK_C, YOG_A, YOG_C = _P + 'milk_b01', _P + 'milk_c01', _P + 'yogurt_a01', _P + 'yogurt_c01'
+KET_C, KET_I, KET_A = _P + 'ketchup_c01', _P + 'ketchup_i01', _F + 'condiment_ketchup_a02'
+SECTION_NAMES = {'rack': 'breakfast and dry goods', 'rack2': 'snacks and canned', 'shelf': 'dairy', 'shelf2': 'sauces'}
+SECTIONS = {
+    'rack_b0': [CEREAL, CRACKER, BOX_B, BOX_C, BOX_D], 'rack_b1': [CEREAL, CRACKER, BOX_D], 'rack_b2': [CEREAL, CRACKER],
+    'rack2_b0': [CAN, CHOC], 'rack2_b1': [CUP, CAN], 'rack2_b2': [CHOC, CUP],
+    'shelf_b0': [MILK_B, MILK_C], 'shelf_b1': [MILK_B, YOG_A], 'shelf_b2': [YOG_C, MILK_C], 'shelf_b3': [YOG_C, MILK_C],
+    'shelf_b4': [YOG_A],                                   # top board: 0.144 m under the shelf top
+    'shelf2_b0': [KET_I, KET_A], 'shelf2_b1': [KET_C, KET_I], 'shelf2_b2': [KET_A, KET_C], 'shelf2_b3': [KET_I, KET_A],
+    'shelf2_b4': [],                                       # top board: too low for the bottles
+}
+# the 11 shelf task products: in the middle of their own run on a board the mono arm reaches. Short products (<= 70 mm,
+# picked from above) only on boards <= ~0.8 m: from above at 1.07 m needs lift 0.87 > 0.81 (stations.py found it)
+TASK_BOARD = {CEREAL: 'rack_b0', CRACKER: 'rack_b0', BOX_B: 'rack_b0', BOX_C: 'rack_b0', BOX_D: 'rack_b0',
+              CHOC: 'rack2_b0', MILK_B: 'shelf_b1', MILK_C: 'shelf_b2', KET_C: 'shelf2_b1', KET_I: 'shelf2_b1',
+              KET_A: 'shelf2_b2'}
 
 def product_yaw(pkg, heading_deg):
     """Yaw (deg) that puts the product's narrow horizontal side across the hand heading (along the jaw axis)."""
@@ -217,15 +236,20 @@ def _fix_joints(stage, asset):
         J.CreateJointEnabledAttr().Set(True)
 
 
-def build(stage, root='/World/store', products=True, fill=1.0, seed=0, room=True, floor=False):
+def build(stage, root='/World/store', products=True, fill=1.0, seed=0, room=True, floor=True, markers=True):
     """Add the scene. Returns {name: dict(pkg, role, slot, bodies, rest=(surface z, x, y, heading), yaw, range)}.
     fill: filler-product density scale (0 = none; each board gets a random fill 10..100 % times this); seed: their layout."""
+    global Usd, UsdGeom, UsdPhysics, UsdLux, UsdShade, Sdf, Gf
+    if Usd is None:                    # imported before Isaac started (e.g. through stations.py): load pxr now
+        from pxr import Usd, UsdGeom, UsdPhysics, UsdLux, UsdShade, Sdf, Gf
     UsdGeom.Xform.Define(stage, Sdf.Path(root))
     out = {}
     if room:
         _walls(stage, root); _lights(stage, root)
-    if floor:                                      # the saved scene file (save_scene.py); the robot scripts use Isaac's ground plane
+    if floor:                                      # grey floor (the robot scripts and the saved file both use it)
         _floor(stage, root)
+    if markers:                                    # the robot stations (stations.json) as floor marks
+        _markers(stage, root)
     for name, (pkg, xy, yaw, zb) in FURNITURE.items():
         slot, asset, rng = _slot(stage, f'{root}/{name}', pkg, xy, yaw, zb)
         if name == 'crate':
@@ -296,6 +320,38 @@ def _floor(stage, root):
     c.AddTranslateOp().Set(Gf.Vec3d((R['x0'] + R['x1']) / 2, (R['y0'] + R['y1']) / 2, -0.05))
     c.AddScaleOp().Set(Gf.Vec3f(R['x1'] - R['x0'] + 2 * R['t'] + 2.0, R['y1'] - R['y0'] + 2 * R['t'], 0.10))
     UsdPhysics.CollisionAPI.Apply(c.GetPrim()); UsdShade.MaterialBindingAPI.Apply(c.GetPrim()).Bind(mat)
+    # Isaac's own ground plane (robot scripts) stays for collision; its grid visual is hidden so it doesn't show through
+    g = stage.GetPrimAtPath('/World/defaultGroundPlane')
+    if g and g.IsValid():
+        for p in Usd.PrimRange(g):
+            if p.IsA(UsdGeom.Gprim):
+                UsdGeom.Imageable(p).MakeInvisible()
+
+
+def _markers(stage, root):
+    """A flat square + a heading bar on the floor at every station in stations.json (visual only, no collision):
+    blue = home, green = a task product's station, yellow = another product run, orange dot = the turning (approach) point."""
+    import json
+    f = os.path.join(here, 'stations.json')
+    if not os.path.exists(f):
+        return
+    st = json.load(open(f))['stations']
+    looks = {k: _material(stage, f'{root}/looks/mark_{k}', rgb, rough=0.5) for k, rgb in
+             (('home', (0.10, 0.35, 0.95)), ('task', (0.10, 0.75, 0.25)), ('run', (0.95, 0.80, 0.10)), ('turn', (0.95, 0.45, 0.10)))}
+
+    def mark(nm, x, y, yaw, sx, sy, look, dx=0.0):
+        c = UsdGeom.Cube.Define(stage, Sdf.Path(f'{root}/marks/{nm}')); c.CreateSizeAttr(1.0)
+        a = math.radians(yaw)
+        c.AddTranslateOp().Set(Gf.Vec3d(x + dx * math.cos(a), y + dx * math.sin(a), 0.0015)); c.AddRotateZOp().Set(yaw)
+        c.AddScaleOp().Set(Gf.Vec3f(sx, sy, 0.003)); UsdShade.MaterialBindingAPI.Apply(c.GetPrim()).Bind(looks[look])
+    for name, s_ in st.items():
+        if 'x' not in s_:
+            continue
+        look = 'home' if name == 'home' else ('task' if s_.get('task') else 'run')
+        mark(name, s_['x'], s_['y'], s_['yaw'], 0.10, 0.10, look)
+        mark(name + '_heading', s_['x'], s_['y'], s_['yaw'], 0.16, 0.025, look, dx=0.13)
+        if s_.get('approach'):
+            mark(name + '_turn', s_['approach'][0], s_['approach'][1], 0.0, 0.04, 0.04, 'turn')
 
 
 def _lights(stage, root):
@@ -324,12 +380,32 @@ def _surfaces():
             tops = list(SHELF_PLATES) + [2.03]
             for k, z in enumerate(SHELF_PLATES):
                 out.append((f'{name}_b{k}', z, (xy[0] - 0.69, xy[0] + 0.69), SHELF_FRONT, -90.0, tops[k + 1] - z - 0.01, k in (1, 2)))
-    out.append(('table_back', TABLE_TOP, (-0.85, 0.85), TABLE_EDGE + 0.698, 180.0, 1.0, True))   # along the back edge
+    # along the back edge, x 0.95..1.04: out of the mono arm's reach (~0.5-0.7 m into the table) -> fixed in place
+    out.append(('table_back', TABLE_TOP, (-0.85, 0.85), TABLE_EDGE + 0.698, 180.0, 1.0, False))
     return out
 
 
+def _segments(key, u0, u1):
+    """The board's product runs: (u start, u end, package), equal lengths in the SECTIONS order."""
+    prods = SECTIONS.get(key, [])
+    L = (u1 - u0) / max(1, len(prods))
+    return [(u0 + i * L, u0 + (i + 1) * L, p) for i, p in enumerate(prods)]
+
+
+def _task_rest():
+    """Resting place (surface z, x, y, approach heading) of every task product: the table ones from _T, the shelf ones
+    in the middle of their run on TASK_BOARD (y is set in build() from the product's depth: 40 mm in from the front)."""
+    rest = {p: (TABLE_TOP, x, y, 0.0) for p, x, y in _T}
+    surf = {sf[0]: sf for sf in _surfaces()}
+    for pkg, key in TASK_BOARD.items():
+        _, z, (u0, u1), front, hd, clr, dyn = surf[key]
+        assert dyn, f'{pkg}: task board {key} must be one the arm reaches'
+        a, b, _ = [sg for sg in _segments(key, u0, u1) if sg[2] == pkg][0]
+        rest[pkg] = (z, (a + b) / 2, None, hd)
+    return rest
+
+
 def _fillers(stage, root, out, fill, seed):
-    rnd = random.Random(seed)
     pk = list(SA.PRODUCTS)
     taken = {}                                     # board key -> reserved (u0, u1) intervals of the task products
     for n, it in out.items():
@@ -340,48 +416,55 @@ def _fillers(stage, root, out, fill, seed):
             along_x = h in (90.0, -90.0)
             if abs(zt - z) < 0.01 and (u0 <= (x if along_x else y) <= u1) and abs((y if along_x else x) - front) < 0.3:
                 c = x if along_x else y
-                taken.setdefault(key, []).append((c - w / 2 - 0.03, c + w / 2 + 0.03))
+                taken.setdefault(key, []).append((c - w / 2 - TASK_GAP, c + w / 2 + TASK_GAP))
     n_dyn = n_fix = 0
     for key, zt, (u0, u1), front, hd, clr, dyn in _surfaces():
-        f = min(1.0, rnd.uniform(0.10, 1.0) * fill)
-        u = u0 + rnd.uniform(0.0, 0.03); i = 0
-        while True:
-            pkg = rnd.choice(pk); nar, dep, hh = (v / 1000 for v in sorted(SA.size(pkg)[:2]) + [SA.size(pkg)[2]])
-            if hh > clr:
-                continue
-            w = nar + 0.008                        # yaw jitter margin
-            if u + w > u1:
-                break
-            hit = [b for (a, b) in taken.get(key, []) if a < u + w and u < b]
-            if hit:
-                u = max(hit) + 0.005; continue
-            if rnd.random() < f:
-                c = u + w / 2; inset = rnd.uniform(0.02, 0.05) + dep / 2
-                if hd == 90.0: xy = (c, front + inset)
-                elif hd == -90.0: xy = (c, front - inset)
-                else: xy = (front - inset, c)      # table back row: the products face the robot (-x side)
-                yaw = product_yaw(pkg, 0.0 if hd == 180.0 else hd) + rnd.uniform(-5.0, 5.0)
-                nm = f'{key}_{i:02d}_{pkg.replace("food_", "").replace("processed_", "")}'
-                slot, asset, rng = _slot(stage, f'{root}/fill/{nm}', pkg, xy, yaw, zt + DROP, lay=SA.PRODUCTS[pkg].get('lay', False))
-                if dyn:
-                    for c_ in _colliders(asset):
-                        UsdPhysics.MeshCollisionAPI.Apply(c_).CreateApproximationAttr('convexDecomposition')
-                    _set_product_mass(asset, SA.PRODUCTS[pkg]['mass']); _fix_joints(stage, asset); n_dyn += 1
-                else:
-                    for b in _bodies(asset):
-                        UsdPhysics.RigidBodyAPI(b).CreateRigidBodyEnabledAttr(False)
-                    for j in Usd.PrimRange(asset):
-                        if j.IsA(UsdPhysics.Joint):
-                            UsdPhysics.Joint(j).CreateJointEnabledAttr().Set(False)
-                    for c_ in _colliders(asset):
-                        UsdPhysics.MeshCollisionAPI.Apply(c_).CreateApproximationAttr('convexHull')
-                    n_fix += 1
-                out[f'fill/{nm}'] = dict(pkg=pkg, role='filler', dynamic=dyn, slot=str(slot.GetPath()),
-                                         bodies=[str(b.GetPath()) for b in _bodies(asset)], rest=(zt, xy[0], xy[1], hd), yaw=yaw, range=rng)
-                i += 1
-            u += w + rnd.uniform(0.004, 0.012)
+        rnd = random.Random(f'{seed}/{key}')     # one stream per board: a change on one board leaves the others as they were
+        # shelves: runs of one product (store sections); the table's back row: a mixed staging pile ("to put away")
+        runs = [(u0, u1, None)] if key == 'table_back' else _segments(key, u0, u1)
+        i = 0
+        for a, b, run in runs:
+            if run and SA.size(run)[2] / 1000 > clr:
+                print(f'scene_v0: {key}: {run} too tall for the board, run left empty', flush=True); continue
+            f = min(1.0, rnd.uniform(0.25 if run else 0.10, 1.0) * fill)      # this run's stock level
+            u = a + 0.01
+            while True:
+                pkg = run or rnd.choice(pk); nar, dep, hh = (v / 1000 for v in sorted(SA.size(pkg)[:2]) + [SA.size(pkg)[2]])
+                if hh > clr:
+                    continue
+                w = nar + (0.004 if run else 0.008)          # yaw jitter margin
+                if u + w > b - 0.01:
+                    break
+                hit = [e for (s_, e) in taken.get(key, []) if s_ < u + w and u < e]
+                if hit:
+                    u = max(hit) + 0.005; continue
+                if rnd.random() < f:
+                    c = u + w / 2
+                    inset = (0.03 if run else rnd.uniform(0.02, 0.05)) + dep / 2   # facings line up at the front
+                    if hd == 90.0: xy = (c, front + inset)
+                    elif hd == -90.0: xy = (c, front - inset)
+                    else: xy = (front - inset, c)      # table back row: the products face the robot (-x side)
+                    yaw = product_yaw(pkg, 0.0 if hd == 180.0 else hd) + rnd.uniform(-1.5, 1.5) * (1 if run else 3)
+                    nm = f'{key}_{i:02d}_{pkg.replace("food_", "").replace("processed_", "")}'
+                    slot, asset, rng = _slot(stage, f'{root}/fill/{nm}', pkg, xy, yaw, zt + DROP, lay=SA.PRODUCTS[pkg].get('lay', False))
+                    if dyn:
+                        for c_ in _colliders(asset):
+                            UsdPhysics.MeshCollisionAPI.Apply(c_).CreateApproximationAttr('convexDecomposition')
+                        _set_product_mass(asset, SA.PRODUCTS[pkg]['mass']); _fix_joints(stage, asset); n_dyn += 1
+                    else:
+                        for bd in _bodies(asset):
+                            UsdPhysics.RigidBodyAPI(bd).CreateRigidBodyEnabledAttr(False)
+                        for j in Usd.PrimRange(asset):
+                            if j.IsA(UsdPhysics.Joint):
+                                UsdPhysics.Joint(j).CreateJointEnabledAttr().Set(False)
+                        for c_ in _colliders(asset):
+                            UsdPhysics.MeshCollisionAPI.Apply(c_).CreateApproximationAttr('convexHull')
+                        n_fix += 1
+                    out[f'fill/{nm}'] = dict(pkg=pkg, role='filler', dynamic=dyn, slot=str(slot.GetPath()), section=key,
+                                             bodies=[str(bd.GetPath()) for bd in _bodies(asset)], rest=(zt, xy[0], xy[1], hd), yaw=yaw, range=rng)
+                    i += 1
+                u += w + (0.006 if run else rnd.uniform(0.004, 0.012))
     print(f'scene_v0: {n_dyn} filler products with physics, {n_fix} fixed in place (fill {fill}, seed {seed})', flush=True)
-
 
 def slot_matrix(xy, yaw_deg, z_bottom, rng):
     """World matrix (row-vector convention) of a slot that puts the bounding box `rng` (min, max in the slot frame,
@@ -391,3 +474,6 @@ def slot_matrix(xy, yaw_deg, z_bottom, rng):
     t = Gf.Vec3d(xy[0] - (ca * c[0] - sa * c[1]), xy[1] - (sa * c[0] + ca * c[1]), z_bottom - rng[0][2])
     m = Gf.Matrix4d().SetRotate(Gf.Rotation(Gf.Vec3d(0, 0, 1), yaw_deg)); m.SetTranslateOnly(t)
     return m
+
+
+REST = _task_rest()          # after _surfaces(): the shelf task products' spots come from the sections
