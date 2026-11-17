@@ -44,7 +44,12 @@ PT = 8.0                                # prong / plate thickness
 BOSS = 8.0                              # idler-side prong boss height (2026-11-12: was 2.2, which sat on the cable sockets;
                                         # now the plug (3.5 mm) + its wires' bend (5 mm) fit under the idler prong)
 BOSS_R = 9.7                            # boss radius: inside the plugs (>= 10 mm from the axis), M3 shanks at r 7
-IDL_SCREW = 14                          # M3 length into the idler through the tall boss (head at the prong top)
+# screws = the SO-100's own set (user, 2026-11-17: "we use the same screws as the so100 arm"): M2 x 6 self-tap into the
+# servo cases, M3 x 6 into the horns. SO-100 horn plates leave 3.4 mm of plastic under the head (measured from its print
+# files); here 3.5 (HORN_SCREW - HORN_ENGAGE), the head sits in a dia 6.2 pocket down to that seat.
+HORN_SCREW, HORN_ENGAGE = 6, 2.5        # M3 length / thread into the horn disc (2.8 mm thick)
+IDL_SCREW = HORN_SCREW                  # idler horn too: the head sits 3.5 mm over the disc, deep in the tall boss
+                                        # (boss section 609 -> 404 mm3, ~0.9 MPa at a 10 N push on the grip: SF ~16)
 # cable plug on every servo's socket face (+Z servo frame, x PLUG['x'], |y| <= PLUG['y']): housing sticks out 3.5 mm,
 # then the wires need ~5 mm before they can bend sideways (both modelled for the checks)
 PLUG_ENV = dict(housing=3.5, wires=5.0)
@@ -145,7 +150,7 @@ def seat_cut():
 def horn_cut(face, thick, screw_len, side=-1):
     """Cut (servo frame) for a plate on a disc: side -1 = output (face -OUT_F), +1 = idler (+IDL_F); 4 x M3 on 9.9 mm."""
     z_face = side * face
-    seat = z_face + side * (screw_len - 2.5)
+    seat = z_face + side * (screw_len - HORN_ENGAGE)
     outer = z_face + side * thick
     cut = [cyl(CTR_D / 2, -60, 60, hole=True)]
     for (x, y) in HORN_HOLES:
@@ -220,7 +225,7 @@ def fork(beam_to=None):
     parts = [cyl(13.0, *PR_B), box(0, WEB[1], -W, W, *PR_B),                     # bottom prong on the output horn
              cyl(13.0, *PR_T), cyl(BOSS_R, IDL_F, PR_T[0] + 0.01), box(0, WEB[1], -W, W, *PR_T),   # top prong on the idler
              box(WEB[0], WEB[1], -W, W, PR_B[0], PR_T[1])]                       # web
-    cut = [horn_cut(OUT_F, PT, 8), horn_cut(IDL_F, PT + BOSS, IDL_SCREW, side=+1)]
+    cut = [horn_cut(OUT_F, PT, HORN_SCREW), horn_cut(IDL_F, PT + BOSS, IDL_SCREW, side=+1)]
     if beam_to is not None:
         parts += [box(WEB[1] - 0.01, beam_to + CL['x'][0] + 0.01, -W, W, -BEAM_Z, BEAM_Z)] + clamp_block(beam_to)
         cut += clamp_cut(beam_to)
@@ -264,18 +269,21 @@ def build():
     # ---- link 1: plate on S1's horn (z -4 .. 4, above everything fixed: +-180) + beam + clamp on S2's rear end
     zp = (ZC1 + OUT_F, ZC1 + OUT_F + PT)
     peg = box(PEG['r'][0], PEG['r'][1], -PEG['hw'], PEG['hw'], PEG['z'], zp[0] + 0.01)           # end stop peg (into the clamp)
-    l1 = union([cyl(14.0, *zp), box(0, L1 + CL['x'][0] + 0.01, -W, W, zp[0], BEAM_Z), peg, clip_z(CLIP1)] + clamp_block(L1))
-    l1 = l1 - union([xf(horn_cut(OUT_F, PT, 8), S1_IN_BASE)] + clamp_cut(L1))
+    # the 2 front horn screws are under the beam (2026-11-17: only 2 of 4 could be reached): their head pockets run up
+    # through the beam top, and the beam root is a r 14 column so it keeps 15.6 of its 20 mm width between the pockets
+    l1 = union([cyl(14.0, *zp), cyl(14.0, zp[0], BEAM_Z), box(0, L1 + CL['x'][0] + 0.01, -W, W, zp[0], BEAM_Z), peg,
+                clip_z(CLIP1)] + clamp_block(L1))
+    l1 = l1 - union([xf(horn_cut(OUT_F, BEAM_Z - zp[0], HORN_SCREW), S1_IN_BASE)] + clamp_cut(L1))
     add('link1', l1, 'link1', (0.30, 0.55, 0.85), f'upper arm {L1:.0f} mm: plate on the shoulder horn, clamp on the elbow servo; '
         'rides on the support ring, stop peg underneath')
-    fast('SHCS', 'M3', 8, 4, 'shoulder horn'); fast('selftap', 'M2', 6, 4, 'elbow servo case (link 1 clamp)')
+    fast('SHCS', 'M3', HORN_SCREW, 4, 'shoulder horn (heads down the pockets)'); fast('selftap', 'M2', 6, 4, 'elbow servo case (link 1 clamp)')
 
     # ---- link 2: fork around S2 + beam + clamp on S3 (+ an arch on the clamp top for the S2 -> S3 cable)
     p, c = fork(beam_to=L2)
     p += [arch_x(L2 + CL['x'][0] + 4.5, L2 + CL['x'][0] + 10.5, CL['z'])]
     add('link2', union(p) - union(c), 'link2', (0.30, 0.55, 0.85),
         f'forearm {L2:.0f} mm: fork on the elbow servo (horn + idler), clamp on the wrist-pan servo; prints on its side')
-    fast('SHCS', 'M3', 8, 4, 'elbow horn'); fast('SHCS', 'M3', IDL_SCREW, 4, 'elbow idler (through the tall boss)'); fast('selftap', 'M2', 6, 4, 'wrist-pan servo case (link 2 clamp)')
+    fast('SHCS', 'M3', HORN_SCREW, 4, 'elbow horn'); fast('SHCS', 'M3', IDL_SCREW, 4, 'elbow idler (head deep in the boss)'); fast('selftap', 'M2', 6, 4, 'wrist-pan servo case (link 2 clamp)')
 
     # ---- wrist: fork around S3 + clamp under the bottom prong holding S4's rear (top) end
     p, c = fork()
@@ -285,7 +293,7 @@ def build():
     c += [xf(clamp_pocket(), S4_IN_WRIST), xf(clamp_screws(), S4_IN_WRIST), xf(plug_room(), S4_IN_WRIST)]
     add('wrist', union(p) - union(c), 'wrist', (0.93, 0.70, 0.25),
         'fork on the wrist-pan servo (horn + idler) + clamp holding the pitch servo')
-    fast('SHCS', 'M3', 8, 4, 'wrist-pan horn'); fast('SHCS', 'M3', IDL_SCREW, 4, 'wrist-pan idler (through the tall boss)'); fast('selftap', 'M2', 6, 4, 'pitch servo case (wrist clamp)')
+    fast('SHCS', 'M3', HORN_SCREW, 4, 'wrist-pan horn'); fast('SHCS', 'M3', IDL_SCREW, 4, 'wrist-pan idler (head deep in the boss)'); fast('selftap', 'M2', 6, 4, 'pitch servo case (wrist clamp)')
 
     # ---- pitch fork (frame: origin on the pitch axis, X forward, Y = axis): prongs on S4's discs + back plate for S5
     xb1 = XR - RIM; xb0 = xb1 - 4.0
@@ -298,9 +306,9 @@ def build():
                xf(cyl(br, b0, b1), Rx(-90))]
     gus = [box(xb0 - 3.0, xb0 + 0.01, y0, y1, -36.0, 0.0) for (y0, y1) in ((13.5, 16.5), (-16.5, -13.5))]
     pf = union(pr + [box(xb0, xb1, -(25.2 + PFY), 25.2, -36.0, 12.0)] + gus)
-    pf = pf - union([xf(horn_cut(OUT_F, 6.5, 8), S4_ROT), xf(horn_cut(IDL_F, 7.5 + PFY, IDL_SCREW, side=+1), S4_ROT), xf(seat_cut(), S5_IN_PITCH)])
+    pf = pf - union([xf(horn_cut(OUT_F, 6.5, HORN_SCREW), S4_ROT), xf(horn_cut(IDL_F, 7.5 + PFY, IDL_SCREW, side=+1), S4_ROT), xf(seat_cut(), S5_IN_PITCH)])
     add('pitch_fork', pf, 'pitch', (0.80, 0.35, 0.35), 'pitch fork (output horn + idler) + back plate holding the roll servo')
-    fast('SHCS', 'M3', 8, 4, 'pitch horn'); fast('SHCS', 'M3', IDL_SCREW, 4, 'pitch idler (through the tall boss)'); fast('selftap', 'M2', 6, 4, 'roll servo case')
+    fast('SHCS', 'M3', HORN_SCREW, 4, 'pitch horn'); fast('SHCS', 'M3', IDL_SCREW, 4, 'pitch idler (head deep in the boss)'); fast('selftap', 'M2', 6, 4, 'roll servo case')
 
     # ---- pinch gripper: frame (back plate on the roll horn + top plate + clamp on S6's front end), fixed jaw, moving jaw
     J, Lp = JAW, LOOP
@@ -319,7 +327,17 @@ def build():
     clamp = box(cx[0], cx[1], -CL['y'], CLAMP_YP, -CL['z'], 24.0)
     fr = union([back, top, clamp, arch_x(3.0, 9.0, 24.0)])                     # arch: S5 -> S6 cable along the top
     S = SO100
-    cut = [xf(horn_cut(OUT_F, 4.0, 6), S5_IN_GRIP), xf(clamp_pocket(), S6_IN_GRIP), xf(clamp_screws(), S6_IN_GRIP),
+    # S6 slides in SIDEWAYS from -Y (2026-11-17): the closed clamp let it move in no direction, so it could only go in before
+    # the frame was on the roll horn, and then S6 covered the frame's 4 horn screws. Order now: frame onto the roll horn,
+    # then S6 in from -Y, then its 3 case screws. Cuts: the -Y wall over the case height; a groove in the top wall for the
+    # case's raised top panel (servo x -29.9..-18, |y| <= 9.2, 1.8 mm high); the bottom wall's -Y quarter is open for the
+    # bottom panel (x -34.8..-18, |y| <= 7, 1.0 mm): a groove there would leave 0.7 mm under that case screw, so S6 keeps
+    # 3 case screws (2 top + the bottom +Y one, reached through the fixed jaw)
+    pk = xf(clamp_pocket(), S6_IN_GRIP).bounding_box()
+    side_open = union([box(pk[0] - 0.01, pk[3] + 0.01, -CL['y'] - 1.0, 0.0, -RIM - SO100['cz_idler'], RIM),
+                       box(pk[0] - 0.01, PX + 29.9 + 0.3, -CL['y'] - 1.0, -9.2 + 0.2, RIM - 0.01, RIM + 1.8 + 0.2),
+                       box(pk[0] - 0.01, pk[3] + 0.01, -CL['y'] - 1.0, -7.0 + 0.2, -CL['z'] - 1.0, -RIM - 0.05)])
+    cut = [xf(horn_cut(OUT_F, 4.0, HORN_SCREW), S5_IN_GRIP), xf(clamp_pocket(), S6_IN_GRIP), side_open, xf(clamp_screws(), S6_IN_GRIP),
            cyl(4.0, 20.0, 25.0, PX, 0, hole=True),                                               # over the idler / centre screw
            box(PX - PLUG['x'][1] - 0.5, PX - PLUG['x'][0] + 0.5, -PLUG['y'], PLUG['y'], 15.0, 25.0)]   # plug slot (socket face up; S6's x -> -X)
     nuts = [(cx[0] + 5.0, 17.5), (cx[1] - 5.0, 17.5)]
@@ -328,25 +346,28 @@ def build():
                 box(x - 3.0, x + 3.0, y, CLAMP_YP + 1, -2.0, 1.0)]                               # nut slides in from +Y
     add('gripper_frame', fr - union(cut), 'grip', (0.25, 0.25, 0.28),
         'pinch gripper frame on the roll horn: holds the gripper servo (horn down, body forward); prints top plate down')
-    fast('SHCS', 'M3', 6, 4, 'roll horn (gripper frame back plate)'); fast('selftap', 'M2', 6, 4, 'gripper servo case')
+    fast('SHCS', 'M3', HORN_SCREW, 4, 'roll horn (gripper frame back plate)'); fast('selftap', 'M2', 6, 3, 'gripper servo case (2 top + 1 bottom through the fixed jaw)')
     # fixed jaw (+Y): block under the clamp's thick wall + blade + loop; 2 x M3 up into the frame's nut traps
     blk = box(cx[0], cx[1], yi, CLAMP_YP, J['z'][0], -CL['z'])
     fj = union([blk, box(cx[0], x_tip, yi, yo, J['z'][0], -CL['z']), loop(+1)])
     fcut = [cyl(1.7, J['z'][0] - 1, -CL['z'] + 1, x, y, hole=True) for (x, y) in nuts]
     fcut += [cyl(3.2, J['z'][0] - 1, -CL['z'] - 6.0, x, y, hole=True) for (x, y) in nuts]       # heads recessed from below
-    for (x, y) in S['horn']:                                                                     # driver access: output-face case screws
+    for (x, y) in S['idler']:                                                                    # driver access: S6's -Z face case screws (face the jaw)
         px_, py_ = PX - x, -y
         if py_ > yi: fcut.append(cyl(2.6, J['z'][0] - 1, -CL['z'] + 0.5, px_, py_, hole=True))
     add('gripper_fixed_jaw', fj - union(fcut), 'grip', (0.20, 0.20, 0.22),
         'fixed jaw with its finger loop (+Y), bolted under the gripper frame (2 x M3); prints standing on its loop')
     fast('SHCS', 'M3', 30, 2, 'fixed jaw to the gripper frame (nuts in the frame)'); fast('nut', 'M3', None, 2, 'fixed jaw')
     # moving jaw (frame: on S6's axis): plate on the output horn + blade (-Y) + loop
+    # below the horn plate the blade starts at x 8.4, past the (+4.95, -4.95) horn screw's head pocket (r 3.1): it
+    # covered that screw (2026-11-17); in the plate band it still runs from x 0
     mj = union([cyl(11.0, -OUT_F - PT, -OUT_F), box(-6.0, 6.0, -yo, 0, -OUT_F - PT, -OUT_F),
-                box(0, x_tip - PX, -yo, -yi, J['z'][0], -OUT_F), loop(-1, PX)])
-    mj = mj - xf(horn_cut(OUT_F, PT, 8), basis((-1, 0, 0), (0, -1, 0), (0, 0, 1)))
+                box(0, x_tip - PX, -yo, -yi, -OUT_F - PT, -OUT_F), box(8.4, x_tip - PX, -yo, -yi, J['z'][0], -OUT_F - PT + 0.01),
+                loop(-1, PX)])
+    mj = mj - xf(horn_cut(OUT_F, PT, HORN_SCREW), basis((-1, 0, 0), (0, -1, 0), (0, 0, 1)))
     add('gripper_jaw', mj, 'jaw', (0.20, 0.20, 0.22), 'moving jaw on the gripper servo horn, with its finger loop (-Y); '
         'opens 0..40 deg; prints upside down (horn plate on the bed)')
-    fast('SHCS', 'M3', 8, 4, 'gripper servo horn')
+    fast('SHCS', 'M3', HORN_SCREW, 4, 'gripper servo horn')
 
     build_bases()
 

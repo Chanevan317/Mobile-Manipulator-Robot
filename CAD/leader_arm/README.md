@@ -73,14 +73,17 @@ Sizes are in `printed_parts.csv`; screws in `fasteners.csv` (per arm module).
 | Servo cables (3-pin 5264) | 6 | lengths in **Cables** below: 1 × ~15 cm (stock), 3 × 30 cm, 1 × 35 cm, 1 × 40 cm |
 | Gamepad (USB / Bluetooth) | 1 | drives the base and the lift between picks (one for both leaders) |
 | USB foot pedal (optional) | 1 | clutch, if you'd rather keep it off the gamepad |
-| M2 × 6 self-tapping | 24 | servo cases (4 per servo) |
-| M3 × 8 | 20 | output horns: shoulder, elbow, wrist pan, pitch, gripper servo |
-| M3 × 14 | 12 | idler horns of the elbow, wrist pan and pitch (through the tall boss that leaves room for the cable plug) |
-| M3 × 6 | 4 | roll horn (gripper frame) |
+| M2 × 6 self-tapping | 23 | servo cases (4 per servo, 3 on the gripper servo): **the SO-100's own case screws** |
+| M3 × 6 | 36 | every horn, output and idler: **the SO-100's own horn screws**. The heads sit in Ø 6.2 pockets, 3.5 mm
+  of plastic over the horn (the SO-100's parts leave 3.4 mm); on the idler side the pockets are deep inside the tall boss |
 | M3 × 20 + nut | 4 + 4 | shoulder mount to pedestal (nuts in the pedestal cap's underside) |
 | M3 × 30 + 2 nuts | 2 | fixed jaw to the gripper frame (nuts slide into the frame's side wall) |
 | M5 × 12 + nut | 3 + 3 | pedestal to foot (nuts in the hex pockets under the foot; the bolt ends flush) |
 | C-clamps | 2 | hold the foot on the desk |
+
+**Screws = the SO-100 set (2026-11-17).** Every servo screw is one the SO-100 uses (M2 × 6 self-tapping, M3 × 6). Only the
+base and jaw bolts (M3 × 20, M3 × 30, M5 × 12 and their nuts) are extra. The idler bosses are about a third weaker with
+the short screws in deep pockets, still ~16 × under PLA's strength across the layers at a 10 N push on the gripper.
 
 **Which servo goes where.** Gravity acts only on the wrist pitch, so put the stiffest servo there.
 
@@ -94,18 +97,22 @@ Never put a C044 or C046 in the follower: it can't hold the follower's load.
 
 ## Assembly
 
-1. Screw the shoulder servo into the shoulder mount, horn up (4 × M2 through the bottom).
+1. Screw the shoulder servo into the shoulder mount, horn up (4 × M2 through the bottom), **before** the mount goes on
+   the pedestal (the pedestal covers these screws). The two inner screws need a short (stubby) screwdriver.
 2. Elbow and wrist-pan servos: slide each one's rear end into the clamp at the end of the link before it, and screw
    it (4 × M2). **Plug in both of its cables now** (the sockets are under the next fork's top prong). Then fit the next
-   fork: bottom prong on the output horn (4 × M3 × 8), top prong on the idler (4 × M3 × 14).
-3. Link 1 goes on the shoulder horn (4 × M3 × 8). Its beam rides 0.3 mm over the support ring (it may touch once
+   fork: bottom prong on the output horn (4 × M3 × 6), top prong on the idler (4 × M3 × 6, dropped down the deep
+   pockets in the boss: a magnetic or ball-end driver helps).
+3. Link 1 goes on the shoulder horn (4 × M3 × 6; the two front ones go down the pockets through the beam). Its beam rides 0.3 mm over the support ring (it may touch once
    the arm's weight is on it); turn it both ways by hand to the stops (±174°) and check it doesn't rub anywhere else.
 4. Pitch servo: rear end up into the wrist's clamp (4 × M2); plug in its cables; pitch fork on its two horns
-   (4 × M3 × 8 on the output, 4 × M3 × 14 on the idler); roll servo into the fork's back plate (4 × M2), its cables
-   through the slot in the plate.
-5. Gripper servo into the gripper frame's clamp, horn down, body forward (4 × M2); frame on the roll horn
-   (4 × M3 × 6); fixed jaw under the frame (2 × M3 × 30 into the nuts in the frame's side wall); moving jaw on the
-   gripper servo's horn (4 × M3 × 8) with the blades just touching.
+   (4 × M3 × 6 on each); roll servo into the fork's back plate (4 × M2, **before** the fork goes on the pitch servo;
+   the two inner screws need a stubby driver), its cables through the slot in the plate.
+5. **Frame first:** gripper frame on the roll horn (4 × M3 × 6; the gripper servo would cover these screws). Then slide
+   the gripper servo into the frame's clamp **sideways from the open side** (horn down, body forward) and screw it
+   (3 × M2: 2 on top, 1 underneath on the fixed jaw's side). Fixed jaw under the frame (2 × M3 × 30 into the nuts in
+   the frame's side wall; its hole lets you reach that bottom case screw later). Moving jaw on the gripper servo's horn
+   (4 × M3 × 6) with the blades just touching.
 6. Pedestal onto the foot (3 × M5 × 12 into the nuts under the foot), its **board socket side**: to the **front** on
    the mono foot (the side the arm points to), to the **back** of the prototype foot (away from the robot's front).
 7. Shoulder servo's cables: one down through the hole in the pedestal's top and out of the window at its foot (to
