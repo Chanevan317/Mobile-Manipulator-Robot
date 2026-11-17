@@ -25,6 +25,7 @@ ap.add_argument('--headless', action='store_true')
 ap.add_argument('--no_grasp', action='store_true')
 ap.add_argument('--only', default='')
 ap.add_argument('--no_self_collision', action='store_true')
+ap.add_argument('--physics_hz', type=int, default=240, help='PhysX steps per second (scene_robot.SIM uses the arm-training rate)')
 ap.add_argument('--res', default='', help='render / window size WxH (default: the screen size, from xrandr)')
 ap.add_argument('--fill', type=float, default=1.0, help='filler-product density scale (0 = only the 15 task products)')
 ap.add_argument('--seed', type=int, default=0, help='filler layout')
@@ -56,7 +57,7 @@ app = SimulationApp(cfg)
 import numpy as np
 import omni.usd
 from pxr import UsdGeom, Gf
-from isaacsim.core.prims import SingleRigidPrim
+from isaacsim.core.prims import SingleXFormPrim
 sys.path.insert(0, here)
 from proto_task import Task
 import assets as SA
@@ -65,12 +66,17 @@ import grasp_plan as G
 import mono_poses as MP
 
 LAYOUT = 'prototype_mono_arm'
-task = Task(app, args.urdf, args.headless, fix_base=True, self_collision=not args.no_self_collision, layout=LAYOUT)
+task = Task(app, args.urdf, args.headless, fix_base=True, self_collision=not args.no_self_collision, layout=LAYOUT,
+            physics_hz=args.physics_hz)
 task.profile, task.settle_mode = 'trap', 'still'
 stage = omni.usd.get_context().get_stage()
 items = SC.build(stage, fill=args.fill, seed=args.seed)
-bodies = {n: [task.world.scene.add(SingleRigidPrim(b, name=f'b{k}_{i}')) for i, b in enumerate(it['bodies'])]
-          for k, (n, it) in enumerate(items.items()) if it['role'] in ('product', 'basket') or it.get('dynamic')}
+# plain prims, NOT physics objects: any rigid-body view on these bodies (SingleRigidPrim / RigidPrim, registered or not,
+# even deleted again) made every physics step ~5-7x slower (2026-11-17). Poses are read / written through USD (PhysX
+# writes its poses back and takes our writes as teleports), velocities zeroed with PhysX sleep / wake, masses from
+# PhysX's property query.
+bodies = {n: [SingleXFormPrim(b) for b in it['bodies']]
+          for n, it in items.items() if it['role'] in ('product', 'basket') or it.get('dynamic')}
 FURN = [n for n, it in items.items() if it['role'] in ('shelf', 'table')]
 task.start()
 # Isaac resets to the zero pose, where the mono arm's hand points straight ahead under the table top: start stowed
@@ -108,11 +114,31 @@ def bottom_and_tilt(n):
     return np.array([p[0], p[1], p[2]]), tilt
 
 
+from pxr import PhysicsSchemaTools
+from omni.physx import get_physx_simulation_interface, get_physx_property_query_interface
+STAGE_ID = omni.usd.get_context().get_stage_id()
+
+
+def body_id(b):
+    return PhysicsSchemaTools.sdfPathToInt(b.prim_path)
+
+
 def teleport(n, xy, yaw, z_bottom):
     S = SC.slot_matrix(xy, yaw, z_bottom, items[n]['range'])
+    sim = get_physx_simulation_interface()
     for b, rel in zip(bodies[n], REL[n]):
         p, q = pq(rel * S); b.set_world_pose(position=p, orientation=q)
-        b.set_linear_velocity(np.zeros(3)); b.set_angular_velocity(np.zeros(3))
+        sim.put_to_sleep(STAGE_ID, body_id(b)); sim.wake_up(STAGE_ID, body_id(b))     # sleeping zeroes the velocities
+
+
+def mass(b):
+    """The mass PhysX uses for this body (property query: no physics view needed)."""
+    from omni.physx.bindings._physx import PhysxPropertyQueryMode
+    out = {}
+    get_physx_property_query_interface().query_prim(
+        stage_id=STAGE_ID, prim_id=body_id(b), query_mode=PhysxPropertyQueryMode.QUERY_RIGID_BODY_WITH_COLLIDERS,
+        rigid_body_fn=lambda r: out.setdefault('m', r.mass), timeout_ms=2000)
+    return out['m']
 
 
 products = [n for n, it in items.items() if it['role'] == 'product']
@@ -141,7 +167,7 @@ print('\n=== Part 1: scene (dropped from 3 mm, 3 s) ===')
 ok1 = []
 for n in products:
     it = items[n]; z, x, y, _ = it['rest']; p, tilt = bottom_and_tilt(n)
-    m = sum(b.get_mass() for b in bodies[n]); want = SA.PRODUCTS[it['pkg']]['mass']
+    m = sum(mass(b) for b in bodies[n]); want = SA.PRODUCTS[it['pkg']]['mass']
     v = np.linalg.norm(p - P25[n]) / 0.5          # over the last 0.5 s (PhysX reports ~8 mm/s on resting bodies)
     ok = abs(p[2] - z) < 0.005 and tilt < 5 and math.hypot(p[0] - x, p[1] - y) < 0.010 and abs(m - want) < 0.01 * want + 1e-4 and v < 0.002
     ok1.append(ok)

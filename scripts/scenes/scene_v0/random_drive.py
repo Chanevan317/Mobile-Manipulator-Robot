@@ -22,6 +22,9 @@ ap.add_argument('--count', type=int, default=None, help='stations to visit (defa
 ap.add_argument('--seed', type=int, default=None, help='random sequence (default: different every run)')
 ap.add_argument('--only', choices=('all', 'task', 'shelves', 'table'), default='all')
 ap.add_argument('--headless', action='store_true')
+ap.add_argument('--physics_hz', type=int, default=240, help='240 = grasp fidelity (default); 120 = about 2x faster, fine for driving')
+ap.add_argument('--render_every', type=int, default=1, help='window: draw every Nth frame only (3 = 20 fps on screen, faster sim)')
+ap.add_argument('--wheels', action='store_true', help='full mecanum robot (roller simulation) instead of the planar arm-training base')
 ap.add_argument('--fill', type=float, default=1.0)
 ap.add_argument('--scene_seed', type=int, default=0, help="the scene's filler layout (as check_scene.py --seed)")
 args = ap.parse_args()
@@ -40,10 +43,12 @@ print(f'random_drive: {len(pool)} stations ({args.only}, incl. home), stay {args
 
 app = R.start_app(args.headless)
 import numpy as np
-task, items, watch = R.load(app, args.headless, fill=args.fill, seed=args.scene_seed)
-p0 = {n: np.array(w.get_world_pose()[0]) for n, w in watch.items()}
+task, items, watch = R.load(app, args.headless, fill=args.fill, seed=args.scene_seed, wheels=args.wheels, physics_hz=args.physics_hz, render_every=args.render_every)
+p0 = R.positions(watch)
 
+import time
 here_at, n_moves, times = 'home', 0, []
+wall0, sim0 = time.perf_counter(), task.t
 try:
     while not count or n_moves < count:
         nxt = rng.choice([n for n in pool if n != here_at])
@@ -51,6 +56,7 @@ try:
         print(f'\n[{task.t:7.1f} s] {here_at} -> {nxt}   ({s.get("section", "start")}'
               f'{", " + s["product"].replace("food_", "") if s.get("product") else ""})', flush=True)
         times.append(R.leg(task, st, here_at, nxt))
+        print(f'    speed so far: {(task.t - sim0) / (time.perf_counter() - wall0):.2f} x real time', flush=True)
         here_at = nxt; n_moves += 1
         task.wait(args.stay)                          # parked: the wheels hold the base (proto_task.hold_base)
 except SystemExit:                                    # window closed (proto_task.tick raises it)

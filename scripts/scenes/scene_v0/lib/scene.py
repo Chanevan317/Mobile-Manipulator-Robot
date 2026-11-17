@@ -237,7 +237,7 @@ def _fix_joints(stage, asset):
         J.CreateJointEnabledAttr().Set(True)
 
 
-def build(stage, root='/World/store', products=True, fill=1.0, seed=0, room=True, floor=True, markers=True):
+def build(stage, root='/World/store', products=True, fill=1.0, seed=0, room=True, floor=True, markers=True, dynamic_fillers=True):
     """Add the scene. Returns {name: dict(pkg, role, slot, bodies, rest=(surface z, x, y, heading), yaw, range)}.
     fill: filler-product density scale (0 = none; each board gets a random fill 10..100 % times this); seed: their layout."""
     global Usd, UsdGeom, UsdPhysics, UsdLux, UsdShade, Sdf, Gf
@@ -291,7 +291,7 @@ def build(stage, root='/World/store', products=True, fill=1.0, seed=0, room=True
         out[name] = dict(pkg=pkg, role='product', slot=str(slot.GetPath()), bodies=[str(b.GetPath()) for b in _bodies(asset)],
                          rest=(z, x, y, hd), yaw=yaw, range=rng)
     if fill > 0:
-        _fillers(stage, root, out, fill, seed)
+        _fillers(stage, root, out, fill, seed, dynamic_fillers)
     return out
 
 
@@ -406,7 +406,7 @@ def _task_rest():
     return rest
 
 
-def _fillers(stage, root, out, fill, seed):
+def _fillers(stage, root, out, fill, seed, dynamic_fillers=True):
     pk = list(SA.PRODUCTS)
     taken = {}                                     # board key -> reserved (u0, u1) intervals of the task products
     for n, it in out.items():
@@ -424,6 +424,7 @@ def _fillers(stage, root, out, fill, seed):
         # shelves: runs of one product (store sections); the table's back row: a mixed staging pile ("to put away")
         runs = [(u0, u1, None)] if key == 'table_back' else _segments(key, u0, u1)
         i = 0
+        dyn = dyn and dynamic_fillers                # False: every filler fixed in place (only the task products move)
         for a, b, run in runs:
             if run and SA.size(run)[2] / 1000 > clr:
                 print(f'scene_v0: {key}: {run} too tall for the board, run left empty', flush=True); continue

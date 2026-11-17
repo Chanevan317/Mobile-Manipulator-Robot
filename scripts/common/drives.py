@@ -22,6 +22,9 @@ def set_layout(layout):
 def gains(name):
     """Return (kind, kp, kd, max_force) in SI units for a joint name."""
     if 'roller' in name:                       return ('angular', 0.0, 0.0, 0.0)       # passive mecanum rollers
+    # planar base (urdf_variants.planar_base, arm training): stiff, ~25 kg moving; critically damped-ish
+    if name in ('base_x', 'base_y'):           return ('linear', 100000.0, 3000.0, 1000.0)
+    if name == 'base_yaw':                     return ('angular', 20000.0, 400.0, 500.0)
     if name.startswith('wheel'):               return ('angular', 0.0, 2.0, 6.0)       # velocity-driven wheels
     if name == 'lift':                         return ('linear', 100000.0, 2000.0, 300.0)  # lead-screw lift: stiff
     if 'finger' in name:                       return ('linear', 2000.0, 100.0, 80.0)

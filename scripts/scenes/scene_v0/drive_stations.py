@@ -20,6 +20,9 @@ ap.add_argument('--route', default='home,rack_b0_boxedCereal_l01,rack2_b0_chocol
 ap.add_argument('--tour', action='store_true')
 ap.add_argument('--list', action='store_true')
 ap.add_argument('--headless', action='store_true')
+ap.add_argument('--physics_hz', type=int, default=240, help='240 = grasp fidelity (default); 120 = about 2x faster, fine for driving')
+ap.add_argument('--render_every', type=int, default=1, help='window: draw every Nth frame only (3 = 20 fps on screen, faster sim)')
+ap.add_argument('--wheels', action='store_true', help='full mecanum robot (roller simulation) instead of the planar arm-training base')
 ap.add_argument('--fill', type=float, default=1.0)
 ap.add_argument('--seed', type=int, default=0)
 args = ap.parse_args()
@@ -39,8 +42,8 @@ if names[0] != 'home':
 import scene_robot as R
 app = R.start_app(args.headless)
 import numpy as np
-task, items, watch = R.load(app, args.headless, fill=args.fill, seed=args.seed, urdf=args.urdf)
-p0 = {n: np.array(w.get_world_pose()[0]) for n, w in watch.items()}
+task, items, watch = R.load(app, args.headless, fill=args.fill, seed=args.seed, urdf=args.urdf, wheels=args.wheels, physics_hz=args.physics_hz, render_every=args.render_every)
+p0 = R.positions(watch)
 
 print(f'\nroute: {" -> ".join(names)}', flush=True)
 for a, b in zip(names[:-1], names[1:]):

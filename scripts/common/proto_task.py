@@ -50,10 +50,18 @@ def _profile(kind, base):
 
 
 class Task:
-    def __init__(self, app, urdf, headless, fix_base, self_collision=True, layout='prototype'):
+    def __init__(self, app, urdf, headless, fix_base, self_collision=True, layout='prototype', physics_hz=240, gpu=False, render_every=1):
+        """physics_hz: PhysX steps per second (240 tested everywhere; arm training uses scene_robot's default).
+        gpu: PhysX GPU dynamics. A URDF from urdf_variants.planar_base (no wheels, base on base_x / base_y / base_yaw
+        joints, import with fix_base=True) switches drive_to / base_pose to those joints.
+        render_every: in a window, draw only every Nth control frame (the others step physics only): drawing the
+        viewport costs far more than the physics (0.22 x real time in a window vs 1.8 x headless, 2026-11-17)."""
         K.use(layout); self.layout = layout
         self.app, self.headless = app, headless
-        self.world = World(stage_units_in_meters=1.0, physics_dt=1 / 240.0, rendering_dt=DT)
+        self.render_every, self._frame = max(1, int(render_every)), 0
+        self.world = World(stage_units_in_meters=1.0, physics_dt=1.0 / physics_hz, rendering_dt=DT)
+        if gpu:
+            self.world.get_physics_context().enable_gpu_dynamics(True)
         self.world.scene.add_ground_plane()
         stage = omni.usd.get_context().get_stage()
         UsdLux.DistantLight.Define(stage, Sdf.Path('/DistantLight')).CreateIntensityAttr(3000)
@@ -83,17 +91,20 @@ class Task:
         self.names = list(self.robot.dof_names); n = len(self.names)
         self.idx = {nm: i for i, nm in enumerate(self.names)}
         self.vmax = np.array(self.robot.dof_properties['maxVelocity'], dtype=float)
-        self.wheel = [self.idx[f'wheel_{w}_joint'] for w in ('fl', 'fr', 'rl', 'rr')]
+        self.planar = 'base_x' in self.idx                  # planar_base variant: base moved by joints, no wheels
+        self.wheel = [] if self.planar else [self.idx[f'wheel_{w}_joint'] for w in ('fl', 'fr', 'rl', 'rr')]
+        self.base_idx = [self.idx[n] for n in ('base_x', 'base_y', 'base_yaw')] if self.planar else []
         self.driven = [i for i, nm in enumerate(self.names) if 'roller' not in nm and not nm.startswith('wheel')]
         self.still_idx = [i for i in self.driven if 'finger' not in self.names[i]]
         self.still_v = np.array([STILL_V_LIFT if self.names[i] == 'lift' else STILL_V for i in self.still_idx])
         self.substeps = max(1, round(DT / self.world.get_physics_dt()))
-        self.q_goal = np.zeros(n); self.q_cmd = np.zeros(n); self.wheel_v = np.zeros(4)
+        self.q_goal = np.zeros(n); self.q_cmd = np.zeros(n); self.wheel_v = np.zeros(len(self.wheel))
         self.hold = None           # parked base pose (x, y, yaw) the wheels hold while the arms work (set by drive_to)
 
     # ------------------------------------------------------------ low level
     def tick(self):
-        if self.headless:
+        self._frame += 1
+        if self.headless or self._frame % self.render_every:
             for _ in range(self.substeps):
                 self.world.step(render=False)
         else:
@@ -120,7 +131,8 @@ class Task:
         d = self.driven
         self.q_cmd[d] = rate_limit(self.q_cmd[d], self.q_goal[d], self.vmax[d], DT)
         self.robot.apply_action(ArticulationAction(joint_positions=self.q_cmd[d], joint_indices=np.array(d)))
-        self.robot.apply_action(ArticulationAction(joint_velocities=self.wheel_v, joint_indices=np.array(self.wheel)))
+        if self.wheel:
+            self.robot.apply_action(ArticulationAction(joint_velocities=self.wheel_v, joint_indices=np.array(self.wheel)))
         self.tick(); self.t += DT
 
     def wait(self, seconds):
@@ -186,9 +198,10 @@ class Task:
     def joint_move2(self, qL, qR, lift=None):
         """Time-synchronised move of both arms (and the lift to `lift`, or None to keep it): one straight joint-space
         line for all of them, as checked offline."""
-        a = {s: self.arm_now(s) for s in ('left', 'right')}
-        tgt = {'left': {k: qL[k] for k in qL if k in ARM_KEYS}, 'right': {k: qR[k] for k in qR if k in ARM_KEYS}}
-        l0 = a['left']['lift']; l1 = l0 if lift is None else lift
+        sides = [s for s in ('left', 'right') if f'{s}_shoulder_pan' in self.idx]   # the mono layout has only 'left'
+        a = {s: self.arm_now(s) for s in sides}
+        tgt = {s: {k: q[k] for k in q if k in ARM_KEYS} for s, q in (('left', qL), ('right', qR)) if s in sides}
+        l0 = a[sides[0]]['lift']; l1 = l0 if lift is None else lift
         Ts = [0.05, abs(l1 - l0) / (0.88 * self.vmax[self.idx['lift']])]
         for s in tgt:
             Ts += [abs(tgt[s][k] - a[s][k]) / (0.88 * self.vmax[self.idx[f'{s}_{k}']]) for k in tgt[s]]
@@ -258,6 +271,9 @@ class Task:
 
     # ------------------------------------------------------------ base and objects
     def base_pose(self):
+        if self.planar:                                     # the articulation root is the floor anchor: read the joints
+            q = self.robot.get_joint_positions(); x, y, yaw = (float(q[i]) for i in self.base_idx)
+            return np.array([x, y, 0.0]), math.atan2(math.sin(yaw), math.cos(yaw))
         p, quat = self.robot.get_world_pose()
         w, x, y, z = [float(v) for v in quat]
         return np.array(p, dtype=float), math.atan2(2 * (w * z + x * y), 1 - 2 * (y * y + z * z))
@@ -274,6 +290,8 @@ class Task:
 
     def drive_to(self, goal, label, timeout=45.0):
         """Closed-loop base move to (x, y, yaw) in the world with mecanum wheel mixing ."""
+        if self.planar:
+            return self._planar_move(goal, label)
         R, LX, LY = 0.05, 0.17, 0.222
         self.hold = None
         for _ in range(int(timeout * CTRL_HZ)):
@@ -291,6 +309,34 @@ class Task:
             self.wheel_v[:] = [(vx - vy - kk * wz) / R, (vx + vy + kk * wz) / R, (vx + vy - kk * wz) / R, (vx - vy + kk * wz) / R]
             self.step_once()
         self.wheel_v[:] = 0; self.hold = np.array(goal, dtype=float); self.wait(1.0)
+        p, yaw = self.base_pose()
+        err = (math.hypot(goal[0] - p[0], goal[1] - p[1]) * 1000, math.degrees(math.atan2(math.sin(goal[2] - yaw), math.cos(goal[2] - yaw))))
+        self.report(label, f'stopped {err[0]:.1f} mm, {err[1]:+.2f} deg from the goal', ok=err[0] < 15 and abs(err[1]) < 1.0)
+
+    def _planar_move(self, goal, label, speed=1.0, turn=1.5, accel=1.5, alpha=3.0, settle=0.3):
+        """Base move on the planar joints: straight line + turn together on a trapezoid profile (user 2026-11-17: max
+        1 m/s): accelerate at `accel` m/s2 (`alpha` rad/s2) to `speed` (`turn`), cruise, brake. The slower of the two
+        (line, turn) sets the time; the other follows the same profile. Shortest way round for the heading."""
+        ix, iy, iw = self.base_idx
+        q0 = self.q_goal[[ix, iy, iw]].copy()
+        dyaw = math.atan2(math.sin(goal[2] - q0[2]), math.cos(goal[2] - q0[2]))
+        q1 = np.array([goal[0], goal[1], q0[2] + dyaw])
+
+        def trap(d, v, a):                                   # (total time, ramp time) for distance d
+            if d < 1e-9: return 0.0, 0.0
+            if d >= v * v / a: return d / v + v / a, v / a
+            tr = math.sqrt(d / a); return 2 * tr, tr
+        T, tr = max(trap(math.hypot(*(q1[:2] - q0[:2])), speed, accel), trap(abs(dyaw), turn, alpha), (0.3, 0.15))
+        tr = min(tr, T / 2); vp = 1.0 / (T - tr)            # peak rate of the path parameter s (0 -> 1)
+        n = max(1, int(round(T * CTRL_HZ)))
+        for i in range(1, n + 1):
+            t = T * i / n
+            if t < tr: s = 0.5 * vp / tr * t * t
+            elif t > T - tr: s = 1.0 - 0.5 * vp / tr * (T - t) ** 2
+            else: s = vp * (t - tr / 2)
+            self.q_goal[[ix, iy, iw]] = q0 + (q1 - q0) * min(1.0, s)
+            self.step_once()
+        self.wait(settle)
         p, yaw = self.base_pose()
         err = (math.hypot(goal[0] - p[0], goal[1] - p[1]) * 1000, math.degrees(math.atan2(math.sin(goal[2] - yaw), math.cos(goal[2] - yaw))))
         self.report(label, f'stopped {err[0]:.1f} mm, {err[1]:+.2f} deg from the goal', ok=err[0] < 15 and abs(err[1]) < 1.0)
