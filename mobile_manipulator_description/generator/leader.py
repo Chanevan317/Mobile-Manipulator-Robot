@@ -59,6 +59,9 @@ WEB = (41.0, 46.0)                      # fork web, beyond the case's rear corne
 W = 10.0                                # fork arm / web / beam half width
 BEAM_Z = 15.0                           # beam half height
 CL = dict(x=(-37.5, -18.0), y=14.5, z=17.9)   # clamp on a servo's rear end (servo frame)
+CLAMP_LEAD = 0.8                        # lead-in chamfer at each sleeve's mouth
+ROOF_PLAY = 0.5                         # on the side that prints as a bridge (sags into the pocket; user: part 02 never let the servo in)
+CLAMP_PLAY = 0.2                        # play around the case in every clamp sleeve, each side (printed sleeves come out undersize)
 XP = 40.0 * SCALE                       # 28: pitch axis forward of the wrist-pan axis (follower 40)
 ROOF = 2.8
 # v4: S2 and S3 are turned over (output UP, sockets DOWN) so their cable loops sit UNDER the joints: the wrist's bottom
@@ -129,15 +132,29 @@ S6_IN_GRIP = T(PX, 0, 0) @ basis((-1, 0, 0), (0, -1, 0), (0, 0, 1))         # sh
 _cache = {}
 
 
-def clamp_pocket():
+def clamp_pocket(roof=None):
     """Space the servo's rear end needs in a clamp block it slides into along -X (servo frame).
     Line-to-line around the case, plus the follower's SO100['cz_idler'] play (0.1 mm) over the -Z case face (2026-11-16,
     user: same fit as the follower's tongue pockets; the clamp_screws seats already assume that gap)."""
-    if 'clamp' not in _cache:
+    key = ('clamp', roof)
+    if key not in _cache:
         M = basis((0, 0, 1), (0, 1, 0), (-1, 0, 0))
         sw = xf(sweep(xf(SERVO, M), +1, -42.0, -18.0, c=0.0, cz=0.0), np.linalg.inv(M))
-        _cache['clamp'] = union([sw, xf(sw, T(0, 0, -SO100['cz_idler']))])
-    return _cache['clamp']
+        c, r = CLAMP_PLAY, ROOF_PLAY       # 2026-11-18, user: the printed sleeves were too tight
+        sh = {'+y': (c, 0), '-y': (-c, 0), '+z': (0, c), '-z': (0, -SO100['cz_idler'] - c)}
+        if roof:                           # roof = the servo-frame side that is UP when the part prints
+            sh[roof] = {'+y': (r, 0), '-y': (-r, 0), '+z': (0, r), '-z': (0, -max(r, SO100['cz_idler'] + c))}[roof]
+        _cache[key] = union([xf(sw, T(0, dy, dz)) for dy, dz in sh.values()] + [clamp_lead_in()])
+    return _cache[key]
+
+
+def clamp_lead_in():
+    """0.8 mm x 45 deg chamfer around the clamp sleeve's mouth (servo x -18), so the case finds its way in."""
+    from lib import M as _M
+    hy, zt, zb, ch = 12.35 + CLAMP_PLAY, RIM + CLAMP_PLAY, -RIM - SO100['cz_idler'] - CLAMP_PLAY, CLAMP_LEAD
+    pts = [(x, y * (hy + e), z + (e if z > 0 else -e)) for x, e in ((-18.0 - ch, 0.0), (-17.9, ch + 0.1))
+           for y in (-1, 1) for z in (zt, zb)]
+    return _M.hull_points(pts)
 
 
 def clamp_screws():
@@ -157,7 +174,9 @@ def seat_cut():
         x0, x1, yy, rr = PLUG['x'][0], PLUG['x'][1], PLUG['y'], 1.5
         slot = union([box(x0 + rr, x1 - rr, -yy, yy, 14.0, 40.0), box(x0, x1, -yy + rr, yy - rr, 14.0, 40.0)] +
                      [cyl(rr, 14.0, 40.0, x, y) for x in (x0 + rr, x1 - rr) for y in (-yy + rr, yy - rr)])
-        cut = [_pocket(+1), slot, cyl(CTR_D / 2, 14.0, 40.0, hole=True)]
+        c = CLAMP_PLAY                     # 2026-11-18: same play as the clamps (the recess was line-to-line)
+        rel = union([xf(_pocket(+1), T(dx, dy, 0)) for dx, dy in ((-c, 0), (c, 0), (0, -ROOF_PLAY), (0, c))])   # -y = up in print
+        cut = [rel, slot, cyl(CTR_D / 2, 14.0, 40.0, hole=True)]
         for (x, y) in [(-32.8, 10.25), (-32.8, -10.25), (-8.3, 10.25), (-8.3, -10.25)]:
             cut.append(case_screw((x, y, RIM + S['wall']), (0, 0, -1), None, cb=30.0))
         _cache['seat'] = union(cut)
@@ -263,9 +282,9 @@ def plug_room():
     return box(PLUG['x'][0] - 0.2, PLUG['x'][1] + 0.2, -PLUG['y'] - 0.2, PLUG['y'] + 0.2, RIM - 0.01, RIM + 12.0)
 
 
-def clamp_cut(x, flip=False):
+def clamp_cut(x, flip=False, roof='-y'):
     M_ = T(x, 0, 0) @ (FLIP if flip else np.eye(4))
-    return [xf(clamp_pocket(), M_), xf(clamp_screws(), M_), xf(plug_room(), M_)]
+    return [xf(clamp_pocket(roof), M_), xf(clamp_screws(), M_), xf(plug_room(), M_)]
 
 
 def build():
@@ -298,7 +317,7 @@ def build():
     # S1 -> S2 cable: S1's sockets are on top, S2's (turned over) underneath: it runs along the top and down a clip on the
     # beam's +Y face, then under the elbow clamp
     l1 = union([s1_clamp, beam, peg, clip_z(LINK1_CLIP)] + clamp_block(L1))
-    s1_cut = [xf(clamp_pocket(), S1_IN_LINK1), xf(clamp_screws(), S1_IN_LINK1), xf(plug_room(), S1_IN_LINK1)]
+    s1_cut = [xf(clamp_pocket('-y'), S1_IN_LINK1), xf(clamp_screws(), S1_IN_LINK1), xf(plug_room(), S1_IN_LINK1)]
     l1 = l1 - union(s1_cut + clamp_cut(L1, flip=True))
     add('link1', l1, 'link1', (0.30, 0.55, 0.85), f'upper arm {L1:.0f} mm: clamps on the shoulder and elbow servos\' rear '
         'ends, rides on the support ring (stop peg underneath)')
@@ -319,7 +338,7 @@ def build():
     blk = box(XP - CL['y'], XP + CL['y'], -CL['z'], CL['z'], -ZPD + 18.0, prb[0] + 0.01)   # S4 clamp (S4 frame: y_s -> x)
     plate = box(0, WEB[1], -CL['z'], CL['z'], *prb) - xf(horn_cut(IDL_F, PT + BOSS, IDL_SCREW, side=+1), FLIP)
     wr = union([fk, blk, plate, clip_z(WRIST_CLIP)])   # v4: S3 -> S4 cable leaves the gap under S3 at CABLE_EXIT, drops down the -Y side
-    wr = wr - union([xf(clamp_pocket(), S4_IN_WRIST), xf(clamp_screws(), S4_IN_WRIST), xf(plug_room(), S4_IN_WRIST)])
+    wr = wr - union([xf(clamp_pocket('-z'), S4_IN_WRIST), xf(clamp_screws(), S4_IN_WRIST), xf(plug_room(), S4_IN_WRIST)])
     add('wrist', wr, 'wrist', (0.93, 0.70, 0.25),
         'fork on the wrist-pan servo (horn + idler) + clamp holding the pitch servo')
     fast('SHCS', 'M3', HORN_SCREW, 4, 'wrist-pan horn'); fast('SHCS', 'M3', IDL_SCREW, 4, 'wrist-pan idler (head deep in the boss)'); fast('selftap', 'M2', 6, 4, 'pitch servo case (wrist clamp)')
@@ -362,14 +381,14 @@ def build():
     # case's raised top panel (servo x -29.9..-18, |y| <= 9.2, 1.8 mm high); the bottom wall's -Y quarter is open for the
     # bottom panel (x -34.8..-18, |y| <= 7, 1.0 mm): a groove there would leave 0.7 mm under that case screw, so S6 keeps
     # 3 case screws (2 top + the bottom +Y one, reached through the fixed jaw)
-    pk = xf(clamp_pocket(), S6_IN_GRIP).bounding_box()
+    pk = xf(clamp_pocket('-z'), S6_IN_GRIP).bounding_box()
     side_open = union([box(pk[0] - 0.01, pk[3] + 0.01, -CL['y'] - 1.0, 0.0, -RIM - SO100['cz_idler'], RIM),
                        box(pk[0] - 0.01, PX + 29.9 + 0.3, -CL['y'] - 1.0, -9.2 + 0.2, RIM - 0.01, RIM + 1.8 + 0.2),
                        box(pk[0] - 0.01, pk[3] + 0.01, -CL['y'] - 1.0, -7.0 + 0.2, -CL['z'] - 1.0, -RIM - 0.05)])
     # v4 roll cable: from over the roll servo's top it enters the gripper through a NOTCH in the back plate's top, close to
     # the roll axis (it twists +-90 deg around S5's top there instead of wrapping a loop around the gripper's back)
     notch = box(-0.1, 4.1, -ROLL_NOTCH['hw'], ROLL_NOTCH['hw'], ROLL_NOTCH['z0'], 24.1)
-    cut = [xf(horn_cut(OUT_F, 4.0, HORN_SCREW), S5_IN_GRIP), xf(clamp_pocket(), S6_IN_GRIP), side_open, notch, xf(clamp_screws(), S6_IN_GRIP),
+    cut = [xf(horn_cut(OUT_F, 4.0, HORN_SCREW), S5_IN_GRIP), xf(clamp_pocket('-z'), S6_IN_GRIP), side_open, notch, xf(clamp_screws(), S6_IN_GRIP),
            cyl(4.0, 20.0, 25.0, PX, 0, hole=True),                                               # over the idler / centre screw
            box(PX - PLUG['x'][1] - 0.5, PX - PLUG['x'][0] + 0.5, -PLUG['y'], PLUG['y'], 15.0, 25.0)]   # plug slot (socket face up; S6's x -> -X)
     nuts = [(cx[0] + 5.0, 17.5), (cx[1] - 5.0, 17.5)]

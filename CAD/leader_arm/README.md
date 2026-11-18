@@ -204,6 +204,13 @@ is at most 16 mm tall with its servo connector on the top edge; the cable is a f
 - Print the gripper first and try the pinch: loop sizes and the 40° travel are first guesses.
 - Print one link and check the servo fit before printing the rest (the clamps hold the servo's rear end, as v2's
   stand did).
-- **Servo fit:** the same as the follower and the SO-100: line-to-line around the case, 0.1 mm play over the
-  servo's flat case face on the output side, M2 × 6 self-tapping case screws. If a servo is still too tight to slide
-  into a clamp, sand the clamp lightly rather than forcing it (the clamp walls are thin).
+- **Servo fit:** each clamp is a sleeve the servo's rear end slides into by hand, like the SO-100: 0.2 mm play on
+  every side of the case and **0.5 mm on the side that prints as the roof** (a bridge over the pocket sags into it) and a 0.8 mm lead-in chamfer at the mouth; the 4 × M2 × 6
+  self-tapping case screws pull it tight. (The first prints were line-to-line and too tight: 02, 03, 04 and 06 (clamps) and 05 (the roll servo's 1.5 mm recess, now 0.2 mm too) were
+  changed on 2026-11-18.) If one still sticks, sand lightly rather than force it: the clamp walls are thin.
+- **Fit test first:** `fit_test/fit_test_clamp_02mm.stl` / `_03mm.stl` are just the shoulder clamp sleeve of part 02 (0.2 /
+  0.3 mm play on the sides, 0.5 mm under the roof, ~7 cm3 each, printed lying like the real part). Mark them after printing, slide a servo into
+  each: it should go in by hand to the stop without shaving the walls. The exported parts use 0.2 mm; if only the
+  0.3 mm one fits, say so and the parts get re-exported with it (`CLAMP_PLAY` in leader.py).
+- **A printed v4 part 02 (with the board tail behind the shoulder clamp):** the tail blocks the shoulder servo's way
+  in. Cut the tail and its two rails off flush with the clamp's open end; the board now sits on the pedestal (09).
