@@ -19,7 +19,7 @@ data (saved USD, robot stations, downloaded assets) is in `scenes/`.
 | `tasks/dual/` | two-arm layout tasks: `isaac_table_task.py`, `isaac_shelf_task.py`; helpers in `lib/` (`shelf_task_prototype.py`, `proto_poses.py`) |
 | `planning/` | no simulator: `reach_test.py` (reach maps for tables, shelves, tote) |
 | `ros/` | ROS 2: `ros_joint_check.py` (joint limits, zero pose, directions through TF; run with ROS sourced, conda off) |
-| `scenes/scene_v0/` | the store scene: `fetch_assets.py`, `check_scene.py`, `save_scene.py`, `store_db.py` (location IDs + product database), `stations.py` (robot stations), `drive_stations.py` (drive a route), `random_drive.py` (random stations, stay 3 s each); helpers in `lib/` (`scene.py` builder, `assets.py`, `grasp_plan.py`, `scene_robot.py`) |
+| `scenes/scene_v0/` | the store scene: `fetch_assets.py`, `check_scene.py`, `save_scene.py`, `store_db.py` (location IDs + product database), `stations.py` (robot stations), `drive_stations.py` (drive a route), `random_drive.py` (random stations, stay 3 s each), `station_menu.py` (pick a product / location in a panel in the Isaac window, the robot drives there); helpers in `lib/` (`scene.py` builder, `assets.py`, `grasp_plan.py`, `scene_robot.py`) |
 
 The scripts you run sit directly in their topic folder; code they only import sits in that folder's `lib/` (and in
 `common/` when several topics share it). Each script's first lines say how to run it and what it reports.

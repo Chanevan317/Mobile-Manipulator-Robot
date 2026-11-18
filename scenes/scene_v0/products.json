@@ -2,7 +2,7 @@
  "note": "scene_v0 product database (user 2026-11-17): product id -> name, package (assets.py), mass, size (x, y, z mm), locations it covers (location IDs, store_db.py). Edit the locations here; mass / size are copies of assets.py (store_db.py checks them).",
  "products": {
   "P01": {
-   "name": "Boxed cereal L01",
+   "name": "Cereal box",
    "package": "food_processed_boxedCereal_l01",
    "mass_kg": 0.25,
    "size_mm": [
@@ -24,7 +24,7 @@
    ]
   },
   "P02": {
-   "name": "Cracker A01",
+   "name": "Cheese crackers box",
    "package": "food_box_cracker_a01",
    "mass_kg": 0.25,
    "size_mm": [
@@ -47,7 +47,7 @@
    ]
   },
   "P03": {
-   "name": "Boxed food B01",
+   "name": "Flat teal box",
    "package": "food_processed_boxedFood_b01",
    "mass_kg": 0.15,
    "size_mm": [
@@ -61,7 +61,7 @@
    ]
   },
   "P04": {
-   "name": "Boxed food C01",
+   "name": "Dark green box 400 g",
    "package": "food_processed_boxedFood_c01",
    "mass_kg": 0.2,
    "size_mm": [
@@ -75,7 +75,7 @@
    ]
   },
   "P05": {
-   "name": "Boxed food D01",
+   "name": "Tall cream box",
    "package": "food_processed_boxedFood_d01",
    "mass_kg": 0.2,
    "size_mm": [
@@ -92,7 +92,7 @@
    ]
   },
   "P06": {
-   "name": "Canned food H01",
+   "name": "Tin with yellow lid",
    "package": "food_processed_cannedFood_h01",
    "mass_kg": 0.16,
    "size_mm": [
@@ -115,7 +115,7 @@
    ]
   },
   "P07": {
-   "name": "Chocolate E01",
+   "name": "Chocolate bar",
    "package": "food_processed_chocolate_e01",
    "mass_kg": 0.1,
    "size_mm": [
@@ -137,7 +137,7 @@
    ]
   },
   "P08": {
-   "name": "Coffee cup B01",
+   "name": "Takeaway coffee cup",
    "package": "food_beverage_coffeeCup_b01",
    "mass_kg": 0.03,
    "size_mm": [
@@ -160,7 +160,7 @@
    ]
   },
   "P09": {
-   "name": "Milk C01",
+   "name": "Milk carton, small",
    "package": "food_processed_milk_c01",
    "mass_kg": 0.25,
    "size_mm": [
@@ -181,7 +181,7 @@
    ]
   },
   "P10": {
-   "name": "Milk B01",
+   "name": "Milk carton with cap",
    "package": "food_processed_milk_b01",
    "mass_kg": 0.25,
    "size_mm": [
@@ -199,7 +199,7 @@
    ]
   },
   "P11": {
-   "name": "Yogurt A01",
+   "name": "Greek yogurt tub",
    "package": "food_processed_yogurt_a01",
    "mass_kg": 0.13,
    "size_mm": [
@@ -221,7 +221,7 @@
    ]
   },
   "P12": {
-   "name": "Yogurt C01",
+   "name": "Yogurt cup, tall",
    "package": "food_processed_yogurt_c01",
    "mass_kg": 0.15,
    "size_mm": [
@@ -240,7 +240,7 @@
    ]
   },
   "P13": {
-   "name": "Ketchup A02",
+   "name": "Mustard squeeze bottle",
    "package": "food_condiment_ketchup_a02",
    "mass_kg": 0.2,
    "size_mm": [
@@ -261,7 +261,7 @@
    ]
   },
   "P14": {
-   "name": "Ketchup I01",
+   "name": "Red squeeze bottle",
    "package": "food_processed_ketchup_i01",
    "mass_kg": 0.22,
    "size_mm": [
@@ -282,7 +282,7 @@
    ]
   },
   "P15": {
-   "name": "Ketchup C01",
+   "name": "Dark red squeeze bottle, tall",
    "package": "food_processed_ketchup_c01",
    "mass_kg": 0.25,
    "size_mm": [

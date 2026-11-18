@@ -106,7 +106,8 @@ Every board is cut into fixed-width **locations**, each with an ID:
 
 Racks have 10 slots of 0.206 m per board, grey shelves 6 of 0.23 m: 124 locations in all.
 
-The **product database** `products.json` lists each product: id (`P01`…), name, package (the asset), weight, size and
+The **product database** `products.json` lists each product: id (`P01`…), a plain name (what it looks like, e.g.
+"Milk carton with cap"; NVIDIA's variant codes like b01 are only in the package name), package (the asset), weight, size and
 the **locations it covers**. One product can cover one location or many, on one or several boards. Neighbouring
 locations on a board form one run of that product. The scene is built from this file: fillers stock each run, and the
 task products sit in theirs. To change the store layout, edit the locations in `products.json`.
@@ -116,6 +117,10 @@ python3 scripts/scenes/scene_v0/store_db.py                        # check produ
 python3 scripts/scenes/scene_v0/store_db.py --product cereal       # where a product is (id, package or part of its name)
 python3 scripts/scenes/scene_v0/store_db.py --at S1-B2-05          # what is at a location, and which station serves it
 ```
+
+To drive there from inside Isaac Sim instead of the terminal: `python scripts/scenes/scene_v0/station_menu.py` opens the
+scene with a **Robot stations** panel: the product (grouped by section, with its size, weight and friction), the
+location (nearest, or unit / board / slot), the station that serves them, and Go / Home / Stop / Random.
 
 The check fails if a location is unknown or claimed by two products, a task product has no location on its board, or
 a table spot is empty. After an edit: `store_db.py`, then `stations.py` (each station lists the locations it serves),
@@ -142,6 +147,7 @@ Scripts, in `../../scripts/scenes/scene_v0/`:
 | `fetch_assets.py` | downloads the assets |
 | `check_scene.py` | reach + scene checks with the robot; viewing window |
 | `save_scene.py` | writes `scene_v0.usda` |
+| `station_menu.py` | opens the scene with a "Robot stations" panel: pick a product and / or a location, Go drives the robot to the station that serves it (Home, Stop too) |
 | `store_db.py` | checks the product database, writes `locations.json`, looks up products and locations (no simulator) |
 | `stations.py` | works out the robot stations and routes -> `stations.json` (no simulator) |
 | `lib/scene_robot.py` | the robot in the scene and one drive between stations (used by the two below) |
