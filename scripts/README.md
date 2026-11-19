@@ -12,14 +12,14 @@ data (saved USD, robot stations, downloaded assets) is in `scenes/`.
 
 | Folder | What is in it |
 |---|---|
-| `common/` | shared code, not run on its own: `repo_paths.py` (repo locations, import path), `drives.py` (motor gains), `scara_ik.py` (arm + lift inverse kinematics), `self_collision.py`, `urdf_variants.py`, `proto_task.py` (task helpers: moves, driving, reports), `smooth_path.py` (TOPP-RA motion blending) |
+| `common/` | shared code, not run on its own: `repo_paths.py` (repo locations, import path), `drives.py` (motor gains), `scara_ik.py` (arm + lift inverse kinematics), `self_collision.py`, `urdf_variants.py`, `collide.py` (offline collision check + move planning around furniture / products), `proto_task.py` (task helpers: moves, driving, reports), `smooth_path.py` (TOPP-RA motion blending), `cameras.py` (the scene + wrist cameras at the real specs, added in every Isaac script; `MM_CAMERAS=0` turns them off) |
 | `robot_tests/` | Isaac tests of the robot model: `isaac_joint_test.py` (every joint, `--hold`), `isaac_base_test.py` (mecanum drive), `isaac_grasp_test.py`, `isaac_import_and_test.py` (looping demo, `--save` a USD), `isaac_mono_load_test.py` / `isaac_dual_load_test.py` (forces for the strength checks) |
-| `viewers/` | just look at the robot: `isaac_view.py` (both layouts side by side), `isaac_arm_view.py` (one arm on a stand) |
+| `viewers/` | just look at the robot: `isaac_view.py` (both layouts side by side), `isaac_arm_view.py` (one arm on a stand), `camera_view.py` (drive to a station, save what the robot's cameras see) |
 | `tasks/mono/` | one-arm (official prototype) tasks: `isaac_mono_task.py` (table → tote → table), `isaac_mono_table_task.py`, `isaac_mono_shelf_task.py`; their plans in `lib/mono_poses.py` |
 | `tasks/dual/` | two-arm layout tasks: `isaac_table_task.py`, `isaac_shelf_task.py`; helpers in `lib/` (`shelf_task_prototype.py`, `proto_poses.py`) |
 | `planning/` | no simulator: `reach_test.py` (reach maps for tables, shelves, tote) |
 | `ros/` | ROS 2: `ros_joint_check.py` (joint limits, zero pose, directions through TF; run with ROS sourced, conda off) |
-| `scenes/scene_v0/` | the store scene: `fetch_assets.py`, `check_scene.py`, `save_scene.py`, `store_db.py` (location IDs + product database), `stations.py` (robot stations), `drive_stations.py` (drive a route), `random_drive.py` (random stations, stay 3 s each), `station_menu.py` (pick a product / location in a panel in the Isaac window, the robot drives there); helpers in `lib/` (`scene.py` builder, `assets.py`, `grasp_plan.py`, `scene_robot.py`) |
+| `scenes/scene_v0/` | the store scene: `fetch_assets.py`, `check_scene.py`, `save_scene.py`, `store_db.py` (location IDs + product database), `stations.py` (robot stations), `drive_stations.py` (drive a route), `random_drive.py` (random stations, stay 3 s each), `station_menu.py` (pick a product / location in a panel in the Isaac window, the robot drives there), `pick_to_tote.py` (one pick from a station into the tote, scene + wrist camera views side by side); helpers in `lib/` (`scene.py` builder, `assets.py`, `grasp_plan.py`, `scene_robot.py`) |
 
 The scripts you run sit directly in their topic folder; code they only import sits in that folder's `lib/` (and in
 `common/` when several topics share it). Each script's first lines say how to run it and what it reports.

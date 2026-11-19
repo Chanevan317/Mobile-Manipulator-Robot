@@ -193,6 +193,40 @@ def _set_product_mass(asset, mass):
             api.GetDiagonalInertiaAttr().Set(Gf.Vec3f(*(v * k for v in I)))
 
 
+def _collider_boxes(name, pkg, xy):
+    """Invisible static boxes (name, world centre, size; world-aligned) that replace the collision mesh of a shelf / rack."""
+    if pkg == 'storage_shelf_basic_b01':
+        # its own collision mesh tipped standing bottles over (with or without plates; plates alone: 0.0 deg, Isaac
+        # 2026-11-16) -> mesh collision off; invisible boxes instead: one plate per board + the 4 corner posts
+        boxes = [(f'{name}_plate_{k}', (xy[0], xy[1], zt - 0.002), (1.462, 0.47, 0.004)) for k, zt in enumerate(SHELF_PLATES)]
+        boxes += [(f'{name}_post_{i}', (xy[0] + sx * 0.7193, xy[1] + sy * 0.2184, 1.015), (0.0415, 0.0432, 2.03))
+                  for i, (sx, sy) in enumerate(((-1, -1), (-1, 1), (1, -1), (1, 1)))]
+        return boxes
+    if pkg == 'rack_f04':
+        # same as the shelf: its collision mesh left boxes leaning 0.4-3.1 deg on a flat board (Isaac 2026-11-16).
+        # Cantilever rack: 3 posts at the back (local y 0.17..0.22), boards y -0.23..0.217, feet on the floor
+        boxes = [(f'{name}_board_{k}', (xy[0], xy[1] - 0.0065, zt - 0.002), (2.068, 0.447, 0.004)) for k, zt in enumerate(RACK_PLATES)]
+        for i, px in enumerate((-1.01, 0.0, 1.01)):
+            boxes += [(f'{name}_post_{i}', (xy[0] + px, xy[1] + 0.195, 0.975), (0.045, 0.05, 1.95)),
+                      (f'{name}_foot_{i}', (xy[0] + px, xy[1] - 0.002, 0.0365), (0.05, 0.438, 0.073))]
+        return boxes
+    return []
+
+
+def furniture_boxes():
+    """Collision boxes of the furniture in the world frame, world-aligned (name, centre, size), for offline planning: the
+    shelves' / racks' own collider boxes (the same list build() uses), the table top as a slab (asset 1.80 x 0.699 m, turned
+    90 deg: 0.699 along x, 1.80 along y) and the crate as its outer box."""
+    out = []
+    for name, (pkg, xy, yaw, zb) in FURNITURE.items():
+        out += _collider_boxes(name, pkg, xy)
+    tx, ty = FURNITURE['table'][1]
+    out.append(('table_top', (tx, ty, TABLE_TOP - 0.02), (0.699, 1.80, 0.04)))
+    cx, cy = FURNITURE['crate'][1]
+    out.append(('crate', (cx, cy, TABLE_TOP + 0.06), (0.254, 0.331, 0.12)))
+    return out
+
+
 def _box_colliders(stage, root, asset, boxes):
     """Turn the asset's own collision off and collide through invisible static boxes (name, centre, size) instead."""
     for c in _colliders(asset):
@@ -251,21 +285,8 @@ def build(stage, root='/World/store', products=True, fill=1.0, seed=0, room=True
                     rj = UsdPhysics.RevoluteJoint(j); rj.GetLowerLimitAttr().Set(0.0); rj.GetUpperLimitAttr().Set(0.0)
         else:
             _make_static(asset)
-        if pkg == 'storage_shelf_basic_b01':
-            # its own collision mesh tipped standing bottles over (with or without plates; plates alone: 0.0 deg, Isaac
-            # 2026-11-16) -> mesh collision off; invisible boxes instead: one plate per board + the 4 corner posts
-            boxes = [(f'{name}_plate_{k}', (xy[0], xy[1], zt - 0.002), (1.462, 0.47, 0.004)) for k, zt in enumerate(SHELF_PLATES)]
-            boxes += [(f'{name}_post_{i}', (xy[0] + sx * 0.7193, xy[1] + sy * 0.2184, 1.015), (0.0415, 0.0432, 2.03))
-                      for i, (sx, sy) in enumerate(((-1, -1), (-1, 1), (1, -1), (1, 1)))]
-            _box_colliders(stage, root, asset, boxes)
-        if pkg == 'rack_f04':
-            # same as the shelf: its collision mesh left boxes leaning 0.4-3.1 deg on a flat board (Isaac 2026-11-16).
-            # Cantilever rack: 3 posts at the back (local y 0.17..0.22), boards y -0.23..0.217, feet on the floor
-            boxes = [(f'{name}_board_{k}', (xy[0], xy[1] - 0.0065, zt - 0.002), (2.068, 0.447, 0.004)) for k, zt in enumerate(RACK_PLATES)]
-            for i, px in enumerate((-1.01, 0.0, 1.01)):
-                boxes += [(f'{name}_post_{i}', (xy[0] + px, xy[1] + 0.195, 0.975), (0.045, 0.05, 1.95)),
-                          (f'{name}_foot_{i}', (xy[0] + px, xy[1] - 0.002, 0.0365), (0.05, 0.438, 0.073))]
-            _box_colliders(stage, root, asset, boxes)
+        if pkg in ('storage_shelf_basic_b01', 'rack_f04'):
+            _box_colliders(stage, root, asset, _collider_boxes(name, pkg, xy))
         out[name] = dict(pkg=pkg, role=SA.FURNITURE[pkg]['role'], slot=str(slot.GetPath()),
                          bodies=[str(b.GetPath()) for b in _bodies(asset)], yaw=yaw, range=rng)
     if not products:

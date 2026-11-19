@@ -23,12 +23,14 @@ D = math.radians
 # per layout: side -> (shoulder x, shoulder y, arm zero-pose yaw); must match generator/urdf_build.py
 LAYOUTS = {'prototype': {'left': (0.18, 0.15, D(135)), 'right': (0.18, -0.15, -D(135))},
            # experiment (2026-11-10): one arm, shoulder = a ring around the column (shoulder axis = column axis), zero pose forward
-           'prototype_mono_arm': {'left': (0.18, 0.0, 0.0)}}
-SHOULDER_LIM = {'prototype': D(115), 'prototype_mono_arm': D(170)}   # mono: URDF +-180 (cable loop +-195, servo multi-turn: bench test pending); plans keep 10 deg margin
-ELBOW_LIM = {'prototype': D(125), 'prototype_mono_arm': D(115)}   # mono (layout B): the 'elbow' is the arm base's shoulder servo (+-115)
+           'prototype_mono_arm': {'left': (0.18, 0.0, 0.0)},
+           # TEST (2026-11-18): the same arm, column in the middle of the right side edge, tote along the left side
+           'prototype_mono_side': {'left': (0.0, -0.18, 0.0)}}
+SHOULDER_LIM = {'prototype': D(115), 'prototype_mono_arm': D(170), 'prototype_mono_side': D(170)}   # mono: URDF +-180 (cable loop +-195, servo multi-turn: bench test pending); plans keep 10 deg margin
+ELBOW_LIM = {'prototype': D(125), 'prototype_mono_arm': D(115), 'prototype_mono_side': D(115)}   # mono (layout B): the 'elbow' is the arm base's shoulder servo (+-115)
 # per layout: (L1, Z0). Mono layout B (2026-11-13): ring axis -> base shoulder 0.161 m; arm plane carriage z 0.084
 # (prototype 0.0655), so the TCP at lift 0, pitch 0 is 18.5 mm higher.
-ARM_GEOM = {'prototype': (0.13, 0.4109), 'prototype_mono_arm': (0.161, 0.4109 + 0.0185)}
+ARM_GEOM = {'prototype': (0.13, 0.4109), 'prototype_mono_arm': (0.161, 0.4109 + 0.0185), 'prototype_mono_side': (0.161, 0.4109 + 0.0185)}
 LAYOUT = 'prototype'
 ARM_Y = 0.15              # arm mount y (ARM_Y / SHOULDER / MOUNT_YAW are set by use(); see the end of this file)
 SHOULDER = {'left': (0.18, ARM_Y), 'right': (0.18, -ARM_Y)}
@@ -52,7 +54,7 @@ def urdf_name(layout=None, ros=False):
     return f"mobile_manipulator_{layout or LAYOUT}{'_ros' if ros else ''}.urdf"
 LIMITS = {'shoulder_pan': (-D(115), D(115)), 'elbow_pan': (-D(125), D(125)), 'wrist_pan': (-D(122), D(122)),
           'wrist_pitch': (-D(15), D(115)), 'wrist_roll': (-D(120), D(120)), 'lift': (0.0, 0.871)}
-LIFT_MAX = {'prototype': 0.871, 'prototype_mono_arm': 0.81}   # real C-Beam XLarge 1000 mm: 875 mm plate travel - 2 mm stops each end; mono: ring top cap meets the top end mount above 0.815
+LIFT_MAX = {'prototype': 0.871, 'prototype_mono_arm': 0.81, 'prototype_mono_side': 0.81}   # real C-Beam XLarge 1000 mm: 875 mm plate travel - 2 mm stops each end; mono: ring top cap meets the top end mount above 0.815
 
 
 def wrap(a):

@@ -28,13 +28,13 @@ def gains(name):
     if name.startswith('wheel'):               return ('angular', 0.0, 2.0, 6.0)       # velocity-driven wheels
     if name == 'lift':                         return ('linear', 100000.0, 2000.0, 300.0)  # lead-screw lift: stiff
     if 'finger' in name:                       return ('linear', 2000.0, 100.0, 80.0)
-    if 'shoulder' in name and LAYOUT == 'prototype_mono_arm':
+    if 'shoulder' in name and LAYOUT.startswith('prototype_mono'):
         # mono-arm experiment: the shoulder is a ring around the column, an STS3215 through a 4:1 gear (7.6 N m); the
         # arm swings about the column (~0.15 kg m2): kp 160 / kd 6 gives a damping ratio of ~0.6 (kp 640 / kd 12 changed
         # nothing in the shelf task: the sideways lag there came from the elbow / wrist servos, see mono_poses SLOW_IN)
         return ('angular', 160.0, 6.0, 4.56)   # 2026-11-13: drive servo at a 60 % torque limit (gear teeth; load test peak 3.5 N m)
     if 'shoulder' in name:                     return ('angular', 40.0, 1.5, 1.9)      # STS3215; stiffer: it swings the whole arm
-    if 'elbow' in name and LAYOUT == 'prototype_mono_arm':
+    if 'elbow' in name and LAYOUT.startswith('prototype_mono'):
         return ('angular', 40.0, 1.5, 1.9)     # mono layout B: the 'elbow' is the arm base's shoulder servo (swings the whole arm)
     return ('angular', 20.0, 0.8, 1.9)                                                 # STS3215 7.4 V, SO-100 version (every other arm joint)
 

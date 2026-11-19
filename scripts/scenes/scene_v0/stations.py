@@ -31,6 +31,8 @@ FOOT = dict(back=0.25, front=0.34, side=0.25)   # robot frame: base 0.50 x 0.50,
 MARGIN = 0.02
 TURN_R = math.hypot(FOOT['front'], FOOT['side']) + 0.03     # clearance needed to turn on the spot
 HUB = (-1.20, 0.0)
+HOME = (round((SC.ROOM['x0'] + SC.ROOM['x1']) / 2, 3), round((SC.ROOM['y0'] + SC.ROOM['y1']) / 2, 3))   # the middle of the room
+                                            # (2026-11-18, user: every script starts the robot there; it was the world origin at the table end)
 OUT = os.path.join(RP.scene_dir('scene_v0'), 'stations.json')
 
 
@@ -120,7 +122,7 @@ def approach_for(st):
 
 
 def compute():
-    st = {'home': dict(x=0.0, y=0.0, yaw=0.0, product=None, board='start', note='start pose')}
+    st = {'home': dict(x=HOME[0], y=HOME[1], yaw=0.0, product=None, board='start', note='start pose: the middle of the room, facing the table')}
     surf = {sf[0]: sf for sf in SC._surfaces()}
     for key, zt, (u0, u1), front, hd, clr, dyn in SC._surfaces():
         if not dyn or key == 'table_back':

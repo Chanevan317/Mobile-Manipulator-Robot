@@ -14,6 +14,12 @@ The "Robot stations" panel:
     Home      drive back to the start
     Stop      stop at the next waypoint (a Go from there goes straight on, or via the hub if the line isn't clear)
     Random    drive to a random other station
+    Up / Down arrow keys   move the lift while held, at its real speed (0.10 m/s), within 0 .. 0.81 m; also while
+              driving. Click into the viewport first if a dropdown still has the keyboard.
+    Left / Right arrow keys  tilt the scene camera up / down while held (its pitch servo, -10 .. 80 deg).
+    View      Free / Scene cam / Wrist cam: what the viewport looks through (the robot's cameras at their real specs,
+              scripts/common/cameras.py; the wrist lens is ASSUMED until calibrated). The same cameras are in the
+              viewport's own camera menu (top left).
 The arm stays folded; at a station the base is held in place. Close the window to exit.
 """
 import argparse, glob, json, math, os, random, re, sys
@@ -91,6 +97,54 @@ import numpy as np
 import omni.ui as ui
 task, items, watch = R.load(app, False, fill=args.fill, seed=args.seed, wheels=args.wheels,
                             physics_hz=args.physics_hz, render_every=args.render_every)
+import cameras as CAM
+from omni.kit.viewport.utility import get_active_viewport
+cams = task.cams                                     # added by proto_task.Task.start()
+_vp = get_active_viewport()
+VIEWS = {'Free': _vp.camera_path.pathString if hasattr(_vp.camera_path, 'pathString') else str(_vp.camera_path),
+         **{('Scene cam' if n == 'scene' else 'Wrist cam'): c.prim_path for n, c in cams.items()}}
+
+
+def set_view(name):
+    _vp.camera_path = VIEWS[name]
+
+
+# ---------------------------------------------------------------- lift on the Up / Down keys
+import carb.input, omni.appwindow
+import scara_ik as K
+import proto_task as PT
+LIFT_RANGE = (0.0, K.LIFT_MAX['prototype_mono_arm'])
+LIFT_V = 0.10 * 0.9                                    # m/s: the URDF lift speed with drives.rate_limit's margin
+keys = {'up': False, 'down': False, 'left': False, 'right': False}
+TILT_V = math.radians(30)                              # rad/s, scene camera pitch while Left / Right is held
+_pi = task.idx['scene_camera_pitch']
+TILT_RANGE = (math.radians(-10), math.radians(80))
+_KI = carb.input.KeyboardInput
+_held = (carb.input.KeyboardEventType.KEY_PRESS, carb.input.KeyboardEventType.KEY_REPEAT)
+
+
+def on_key(e, *_):
+    k = {_KI.UP: 'up', _KI.DOWN: 'down', _KI.LEFT: 'left', _KI.RIGHT: 'right'}.get(e.input)
+    if k:
+        keys[k] = e.type in _held
+    return True
+
+
+_input = carb.input.acquire_input_interface()
+_key_sub = _input.subscribe_to_keyboard_events(omni.appwindow.get_default_app_window().get_keyboard(), on_key)
+_step = task.step_once
+_li = task.idx['lift']
+
+
+def step_with_lift():
+    t = keys['right'] - keys['left']                  # right = tilt down (+ pitch)
+    if t:
+        task.q_goal[_pi] = min(TILT_RANGE[1], max(TILT_RANGE[0], task.q_goal[_pi] + t * TILT_V * PT.DT))
+    d = keys['up'] - keys['down']
+    if d:
+        task.q_goal[_li] = min(LIFT_RANGE[1], max(LIFT_RANGE[0], task.q_goal[_li] + d * LIFT_V * PT.DT))
+    _step()
+task.step_once = step_with_lift
 
 # ---------------------------------------------------------------- the panel
 state = dict(req=None, stop=False, pid=None, loc=NEAREST, station=None, busy=False)
@@ -100,7 +154,7 @@ prod_items = [ANY] + [f"{SECTION_LABEL.get(section_of(p), '?')} · {PROD[p]['nam
 INFO = {p: info_of(p) for p in pids}
 sel = dict(unit=None, level=None)                    # the location picked so far (unit, board); slot -> state['loc']
 
-win = ui.Window('Robot stations', width=600, height=280, position_x=40, position_y=90)
+win = ui.Window('Robot stations', width=600, height=345, position_x=40, position_y=90)
 with win.frame:
     with ui.VStack(spacing=6, height=0):
         with ui.HStack(height=24):
@@ -124,6 +178,13 @@ with win.frame:
             ui.Button('Home', clicked_fn=lambda: state.update(req='home', stop=False))
             ui.Button('Stop', clicked_fn=lambda: state.update(stop=True))
             ui.Button('Random', clicked_fn=lambda: state.update(req='__random__', stop=False))
+        with ui.HStack(height=22):
+            ui.Label('Lift', width=70)
+            lift_label = ui.Label('')
+        with ui.HStack(height=26, spacing=6):
+            ui.Label('View', width=70)
+            for _v in VIEWS:
+                ui.Button(_v, clicked_fn=lambda v=_v: set_view(v))
         status = ui.Label('at home', word_wrap=True)
 
 
@@ -250,6 +311,10 @@ try:
             state['req'] = None
             state['stop'] = False
             task.step_once()                          # parked: physics keeps running, the base is held
+        q = task.robot.get_joint_positions()[_li]
+        txt = f"{q:.3f} m  (target {task.q_goal[_li]:.3f}, range {LIFT_RANGE[0]:g} .. {LIFT_RANGE[1]:g})   Up / Down keys;   camera tilt {math.degrees(task.q_goal[_pi]):.0f} deg (Left / Right)"
+        if lift_label.text != txt:
+            lift_label.text = txt
 except SystemExit:                                    # window closed (proto_task.tick raises it)
     pass
 app.close()

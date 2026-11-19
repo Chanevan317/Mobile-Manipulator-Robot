@@ -69,7 +69,8 @@ This is not real navigation. The robot is driven to **fixed, marked spots** in f
 and the arm is trained there. Each station is a base position and heading `(x, y, heading)` in metres and degrees.
 The world frame is the robot's start spot: x points to the table, y to the blue racks.
 
-- `home`: the start spot.
+- `home`: the start spot, the middle of the room (x -1.375, y -0.05), facing the table. Every script that puts the robot
+  in the store starts it here (`check_scene.py` excepted: its grasp test needs the robot at the table).
 - One station per product run on every board the arm reaches, named `<board>_<product>`, for example
   `rack_b0_box_cracker_a01` or `shelf2_b1_ketchup_c01`. The base stops facing the board, and the arm can reach that
   run's middle product.
@@ -120,7 +121,9 @@ python3 scripts/scenes/scene_v0/store_db.py --at S1-B2-05          # what is at 
 
 To drive there from inside Isaac Sim instead of the terminal: `python scripts/scenes/scene_v0/station_menu.py` opens the
 scene with a **Robot stations** panel: the product (grouped by section, with its size, weight and friction), the
-location (nearest, or unit / board / slot), the station that serves them, and Go / Home / Stop / Random.
+location (nearest, or unit / board / slot), the station that serves them, and Go / Home / Stop / Random. **View**
+switches the viewport to the robot's scene or wrist camera (real specs, `scripts/common/cameras.py`). The **Up / Down** arrow keys move
+the lift while held (at its real speed, 0–0.81 m).
 
 The check fails if a location is unknown or claimed by two products, a task product has no location on its board, or
 a table spot is empty. After an edit: `store_db.py`, then `stations.py` (each station lists the locations it serves),
@@ -147,6 +150,7 @@ Scripts, in `../../scripts/scenes/scene_v0/`:
 | `fetch_assets.py` | downloads the assets |
 | `check_scene.py` | reach + scene checks with the robot; viewing window |
 | `save_scene.py` | writes `scene_v0.usda` |
+| `pick_to_tote.py` | a panel in the Isaac window: choose a product (the 16 that can be picked), the robot drives to its station, picks it (side grasp or from above) and puts it in the tote; the scene camera (Pro W by default, `--tilt 40`) and the wrist camera show side by side. Moves are checked offline against the furniture and the products (`scripts/common/collide.py`; plans cached in `~/.cache/mobile_manipulator`) |
 | `station_menu.py` | opens the scene with a "Robot stations" panel: pick a product and / or a location, Go drives the robot to the station that serves it (Home, Stop too) |
 | `store_db.py` | checks the product database, writes `locations.json`, looks up products and locations (no simulator) |
 | `stations.py` | works out the robot stations and routes -> `stations.json` (no simulator) |

@@ -21,6 +21,11 @@ MM = 0.001
 RHO_PRINT = 0.80e-3 * (1.24 / 1.27)  # PLA 1.24 vs PETG 1.27 g/cm^3, same effective fill
 # prototype layout (see the docstring): column x, arm mount y, arm zero-pose yaw (left; right is mirrored)
 PROTO_CX, PROTO_ARM_Y, PROTO_YAW = 0.18, 0.15, math.radians(135.0)
+# SIDE layout test (user, 2026-11-18: "side tote, side lift"): the one-arm robot with the column in the middle of the
+# right side edge and the tote turned lengthwise along the left side. The arm works over the front edge with a ~90 deg
+# swing to the tote (front layout: ~180), and the scene camera sits 0.18 m further back from what it looks at.
+SIDE_CX, SIDE_CY = 0.0, -0.18               # column axis in base_link (front layout: (PROTO_CX, 0))
+SIDE_TOTE = (0.0, 0.075, math.pi / 2)       # tote centre x, y and yaw (0.48 along x, y -0.10 .. 0.25)
 # lift speed limit (m/s): 0.10 since 2026-11-06 (user decision; 8 mm-lead C-Beam + closed-loop NEMA 23 at ~750 rpm).
 # Was 0.05 until then. Re-time on the real lift and keep sim and real equal (it shapes the motion policies learn).
 LIFT_SPEED = 0.10
@@ -395,7 +400,7 @@ CB_PROPS['column'].append(box_props(0.20, (CB_FOOT['t'], CB_FOOT['w'], CB_FOOT['
 MONO_LIFT_MAX = 0.81                                  # mono ring (layout B): its clamp meets the top end mount between 0.815 and 0.820
 
 
-def base_xml(mono=False):
+def base_xml(mono=False, side=False):
     o = frame_link('base_link')
     B = 0.50
     v = vprim('0 0 0.22', bx(B, B, 0.04), SHELL) + vprim('0 0 0.243', bx(B - 0.01, B - 0.01, 0.006), TRIM)
@@ -445,15 +450,15 @@ def base_xml(mono=False):
     # lidar
     o += '  <link name="lidar_link">\n' + inertial(*cyl_props(0.17, 0.035, 0.055)) + vprim('0 0 0', cy(0.035, 0.055), TRIM) + '  </link>\n'
     o += joint('lidar_fixed', 'fixed', 'base_link', 'lidar_link', '0.04 0 0.165')
-    o += lift_prototype(mono)
+    o += lift_prototype(mono, side)
     return o
 
 
-def lift_prototype(mono=False):
+def lift_prototype(mono=False, side=False):
     """Prototype: column 0.18 m toward the front (working face), arms right beside it, tote behind it,
     scene camera on a carriage bracket in front of the column. Compact carriage: gantry plate on the column's rear face + two 8 mm arm brackets."""
     o = ''
-    CX = PROTO_CX
+    CX, CY = (SIDE_CX, SIDE_CY) if side else (PROTO_CX, 0)
     # tote behind the column (x -0.245 .. 0.105), full width
     L, Wt, H, t = 0.35, 0.48, 0.12, 0.007; TX = -0.07
     tv = vprim(f'0 0 {t/2}', bx(L, Wt, t), BLUE)
@@ -462,7 +467,10 @@ def lift_prototype(mono=False):
     tc = cprim(f'0 0 {t/2}', bx(L, Wt, t)) + ''.join(cprim(f'{sx*(L/2-t/2)} 0 {H/2}', bx(t, Wt, H)) for sx in (1, -1)) + \
          ''.join(cprim(f'0 {sy*(Wt/2-t/2)} {H/2}', bx(L - 2 * t, t, H)) for sy in (1, -1))
     o += '  <link name="tote">\n' + inertial(*box_props(1.05, (L, Wt, H), (0, 0, 0.04))) + tv + tc + '  </link>\n'
-    o += joint('tote_fixed', 'fixed', 'base_link', 'tote', f'{TX} 0 0.256')
+    if side:                      # turned lengthwise along the left side, beside the column
+        o += joint('tote_fixed', 'fixed', 'base_link', 'tote', f'{SIDE_TOTE[0]} {SIDE_TOTE[1]} 0.256', f'0 0 {SIDE_TOTE[2]:.6g}')
+    else:
+        o += joint('tote_fixed', 'fixed', 'base_link', 'tote', f'{TX} 0 0.256')
     # Lift (user's hardware): OpenBuilds C-Beam XLarge actuator, 1000 mm, from the kit's STEP (cbeam_import.py ->
     # cbeam/*.stl, every part as in the kit; the 500 mm beam and lead screw stretched to 1000). NEMA 23 at the BOTTOM,
     # on 40 mm spacers under the bottom end mount: it goes through a hole in the deck (motor bottom at base z 0.205).
@@ -471,10 +479,10 @@ def lift_prototype(mono=False):
     # carriage z 0.02, lift 0 = plate LIFT_STOP above the bottom end mount -> beam bottom at base z CB_Z0.
     o += '  <link name="column">\n' + inertial(*combine(CB_PROPS['column'])) + ''.join(vis_mesh(f, c) for f, c in CB_VIS['column']) + CB_FOOT_VIS + \
          cprim(f'0 0 {CB_L/2:.6g}', bx(0.04, 0.08, CB_L)) + cprim(*CB_BOTTOM_BOX) + cprim(*CB_FOOT_BOX) + '  </link>\n'
-    o += joint('column_fixed', 'fixed', 'base_link', 'column', f'{CX} 0 {CB_Z0:.6g}')
+    o += joint('column_fixed', 'fixed', 'base_link', 'column', f'{CX} {CY} {CB_Z0:.6g}')
     o += '  <link name="top_beam">\n' + inertial(*combine(CB_PROPS['top_beam'])) + ''.join(vis_mesh(f, c) for f, c in CB_VIS['top_beam']) + \
          cprim('-0.005 0 0.006', bx(0.05, 0.08, 0.012)) + '  </link>\n'
-    o += joint('top_beam_fixed', 'fixed', 'base_link', 'top_beam', f'{CX} 0 {CB_Z0 + CB_L:.6g}')
+    o += joint('top_beam_fixed', 'fixed', 'base_link', 'top_beam', f'{CX} {CY} {CB_Z0 + CB_L:.6g}')
     o += '  <link name="estop">\n' + inertial(*cyl_props(0.03, 0.022, 0.02)) + vprim('0 0 0', cy(0.022, 0.02), RED) + '  </link>\n'
     o += joint('estop_fixed', 'fixed', 'top_beam', 'estop', '-0.005 0 0.022')
     o += SCENE_XML['prototype_mono_arm' if mono else 'prototype']
@@ -491,7 +499,7 @@ def lift_prototype(mono=False):
         cv += ''.join(vis_mesh(f, c) for f, c in HOLDER['vis']); cc_ += ''.join(col_mesh(f) for f in HOLDER['col'])
         props += HOLDER['props']
     o += '  <link name="carriage">\n' + inertial(*combine(props)) + cv + cc_ + '  </link>\n'
-    o += joint('lift', 'prismatic', 'base_link', 'carriage', f'{CX} 0 0.42', axis='0 0 1',
+    o += joint('lift', 'prismatic', 'base_link', 'carriage', f'{CX} {CY} 0.42', axis='0 0 1',
                lim=(0.0, MONO_LIFT_MAX if mono else CB_TRAVEL, 300.0, LIFT_SPEED, 50.0, 5.0))
     if mono:                      # mono: mono_mast_xml() from the ring's clamp socket (added with the arm)
         return o
@@ -578,11 +586,16 @@ for layout in ('prototype',):
     BODY[layout] = body
 # mono-arm experiment: one arm on the shoulder ring around the column (ring drive: STS3215 x 4:1 gear)
 _ab = ''.join(vis_mesh(fn, c) for fn, c in LINKS['base']['vis']) + ''.join(col_mesh(fn) for fn in LINKS['base']['col'])
-BODY['prototype_mono_arm'] = (base_xml(mono=True) + arm_xml('left', MLINKS, MINERTIA, (-D(180), D(180), RING_TORQUE,
+def _mono_body(side=False):
+    return (base_xml(mono=True, side=side) + arm_xml('left', MLINKS, MINERTIA, (-D(180), D(180), RING_TORQUE,
                                4.7 / MONO['ratio'], 0.05, 0.02), elbow=D(115), l1=MONO['l1']) +   # elbow = the base's shoulder servo: +-115 as on the prototype
                                '  <link name="left_arm_base">\n' + inertial(*INERTIA['base']) + _ab + '  </link>\n' +
                                joint('left_arm_base_fixed', 'fixed', 'left_upper_arm', 'left_arm_base', f"{MONO['l1']*MM:.6g} 0 0") +
                                joint('left_arm_mount', 'fixed', 'carriage', 'left_base', f"0 0 {MONO['az']*MM:.6g}"))
+
+
+BODY['prototype_mono_arm'] = _mono_body()
+BODY['prototype_mono_side'] = _mono_body(side=True)      # TEST layout: column on the right side, tote along the left
 
 mats = ''.join(f'  <material name="{n}"><color rgba="{f3(k)}"/></material>\n' for k, n in MATS.items())
 xml = ('<?xml version="1.0" encoding="utf-8"?>\n'

@@ -88,6 +88,8 @@ class Task:
         self.robot = self.world.scene.add(Articulation(prim_path=self.art_path, name='mobile_manipulator'))
         self.world.reset(); self.robot.initialize()
         self.tcp = {s: SingleXFormPrim(f'/mobile_manipulator/{s}_tcp') for s in K.SHOULDER}   # one arm in the mono layout
+        import cameras                                         # the robot's scene + wrist cameras (MM_CAMERAS=0: off)
+        self.cams = cameras.add(self)
         self.names = list(self.robot.dof_names); n = len(self.names)
         self.idx = {nm: i for i, nm in enumerate(self.names)}
         self.vmax = np.array(self.robot.dof_properties['maxVelocity'], dtype=float)

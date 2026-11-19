@@ -176,6 +176,31 @@ def shelf_place_steps(target, grab_yaw, grab_elbow=None, item_in_tote=None, item
     return steps
 
 
+TOTE_BOX = (-0.238, 0.098, -0.233, 0.233)   # tote inside (x0, x1, y0, y1), for the task reports
+LAYOUT = 'prototype_mono_arm'
+
+
+def use(layout):
+    """Switch the shelf-task plans between the front layout (prototype_mono_arm: column 0.18 m forward, tote behind it)
+    and the SIDE test layout (prototype_mono_side, 2026-11-18: column in the middle of the right side edge, tote along the
+    left side). The side values are the front ones turned with the column: the same arm moves relative to the column
+    (shelf reach), the tote spot 90 deg from the shelf instead of 180, and its own fold (searched offline: inside the
+    footprint, clear at lift 0 / 0.2 / 0.81)."""
+    global LAYOUT, STOW, TOTE_FLAT, TOTE_BOX
+    LAYOUT = layout; K.use(layout)
+    if layout == 'prototype_mono_side':
+        cx, cy = K.SHOULDER['left']
+        SHELF['reach'] = (cx + 0.51, cy + 0.10)          # front: (0.69, 0.10) = column + (0.51, 0.10)
+        STOW = _q(50, 40, 120, 0, 0.20)                  # arm folded over the tote, x -0.135..0.143, y -0.254..0.111
+        TOTE_FLAT = (0.0, 0.06)                          # tote centre (0, 0.075); 0.24 m from the column, on its left
+        TOTE_BOX = (-0.233, 0.233, -0.093, 0.243)
+    else:
+        SHELF['reach'] = (0.69, 0.10)
+        STOW = _q(-80, -100, -30, 0, 0.20)
+        TOTE_FLAT = (-0.043, 0.0)
+        TOTE_BOX = (-0.238, 0.098, -0.233, 0.233)
+
+
 def run(task, steps, jaw_open=JAW_OPEN, on_jaw=None, debug=None, smooth=False):
     """Execute a step list on a proto_task.Task (Isaac). on_jaw(label) is called after every jaw action;
     debug(label) after every step (MONO_DEBUG=1 prints jaw opening + TCP)."""

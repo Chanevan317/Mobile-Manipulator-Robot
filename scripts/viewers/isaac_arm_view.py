@@ -59,6 +59,7 @@ print('arm imported at', robot_path, '-', len(apply_drives(stage, robot_path, ar
 robot = world.scene.add(Articulation(prim_path=robot_path, name='arm'))
 world.reset()
 robot.initialize()
+import cameras; cams = cameras.add()                 # the robot's cameras (MM_CAMERAS=0: off)
 names = list(robot.dof_names)
 print('joints:', names)
 jaws = np.array([names.index('left_finger_right'), names.index('left_finger_left')])

@@ -7,7 +7,7 @@ the base on driven base_x / base_y / base_yaw joints), with the settings in SIM 
 wheels=True loads the full mecanum robot instead (roller simulation, the old drive_to with wheel speeds).
 
     app = start_app(headless)                   # before any omni / isaacsim import
-    task, items, watch = load(app, headless)    # robot (free base, arm folded in STOW) + the store scene
+    task, items, watch = load(app, headless)    # robot at 'home' (the middle of the room), arm folded in STOW, + the store scene
     leg(task, stations, 'home', 'rack_b0_box_cracker_a01')
 """
 import math, os, re, subprocess, sys
@@ -54,7 +54,8 @@ def load(app, headless, fill=1.0, seed=0, urdf=None, wheels=False, **sim):
     watch = {n: it['bodies'][0] for n, it in items.items() if it['role'] in ('product', 'basket')}
     task.start()
     # Isaac resets to the zero pose, where the arm's hand points straight ahead: fold it before any physics step
-    task.set_pose({'lift': MP.STOW['lift'], **{f'left_{k}': v for k, v in MP.STOW.items() if k != 'lift'}})
+    task.set_pose({'lift': MP.STOW['lift'], **{f'left_{k}': v for k, v in MP.STOW.items() if k != 'lift'}, **_home_joints(task)})
+    _place_home(task)
     if not headless:
         from isaacsim.core.utils.viewports import set_camera_view
         set_camera_view(eye=np.array(CAMERA['eye']), target=np.array(CAMERA['target']))
@@ -70,6 +71,29 @@ def load(app, headless, fill=1.0, seed=0, urdf=None, wheels=False, **sim):
     task.step_once = step_and_watch
     task.wait(1.0)
     return task, items, watch
+
+
+def _home():
+    h = ST.load()['home']
+    return float(h['x']), float(h['y']), math.radians(float(h['yaw']))
+
+
+def _home_joints(task):
+    """planar base: the start pose is just the base joints' values (the anchor stays at the world origin)"""
+    if not task.planar:
+        return {}
+    x, y, yaw = _home()
+    return {'base_x': x, 'base_y': y, 'base_yaw': yaw}
+
+
+def _place_home(task):
+    """wheeled base (--wheels): put the whole robot there instead"""
+    if task.planar:
+        return
+    import numpy as np
+    x, y, yaw = _home()
+    p, _ = task.robot.get_world_pose()
+    task.robot.set_world_pose(position=np.array([x, y, float(p[2])]), orientation=np.array([math.cos(yaw / 2), 0.0, 0.0, math.sin(yaw / 2)]))
 
 
 def leg(task, st, a, b):

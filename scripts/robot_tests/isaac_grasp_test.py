@@ -103,6 +103,7 @@ robot = world.scene.add(Articulation(prim_path=art_path, name='mobile_manipulato
 tcp = {s: SingleXFormPrim(f'/mobile_manipulator/{s}_tcp') for s in ('left', 'right')}
 world.reset()
 robot.initialize()
+import cameras; cams = cameras.add()                 # the robot's cameras (MM_CAMERAS=0: off)
 if not args.headless:
     from isaacsim.core.utils.viewports import set_camera_view
     set_camera_view(eye=np.array([1.6, 0.9, 1.0]), target=np.array([0.65, 0.0, 0.45]))

@@ -13,15 +13,15 @@
  ],
  "stations": {
   "home": {
-   "x": 0.0,
-   "y": 0.0,
+   "x": -1.375,
+   "y": -0.05,
    "yaw": 0.0,
    "product": null,
    "board": "start",
-   "note": "start pose",
+   "note": "start pose: the middle of the room, facing the table",
    "approach": [
-    -0.1,
-    0.0
+    -1.375,
+    -0.05
    ]
   },
   "rack_b0_boxedCereal_l01": {

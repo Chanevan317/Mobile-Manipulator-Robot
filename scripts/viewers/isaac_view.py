@@ -99,6 +99,7 @@ if args.paused and not args.headless:
         app.update()
 else:
     world.reset()
+    import cameras; cams = cameras.add()             # every robot's cameras (MM_CAMERAS=0: off)
     p0 = {lay: np.array(r.get_world_pose()[0], dtype=float) for lay, r in robots}
     k, steps = 0, int(args.duration * 60)
     while app.is_running() and (steps <= 0 or k < steps):

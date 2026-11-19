@@ -72,6 +72,7 @@ if args.save:
 robot = world.scene.add(Articulation(prim_path=robot_path, name='mobile_manipulator'))
 world.reset()
 robot.initialize()
+import cameras; cams = cameras.add()                 # the robot's cameras (MM_CAMERAS=0: off)
 if not args.headless:
     from isaacsim.core.utils.viewports import set_camera_view
     set_camera_view(eye=np.array([1.8, 1.2, 1.4]), target=np.array([0.3, 0.0, 0.6]))

@@ -90,6 +90,7 @@ else:
 robot = world.scene.add(Articulation(prim_path=art_path, name='mobile_manipulator'))
 world.reset()
 robot.initialize()
+import cameras; cams = cameras.add()                 # the robot's cameras (MM_CAMERAS=0: off)
 
 names = list(robot.dof_names)
 n = len(names)

@@ -18,11 +18,14 @@ import argparse, math, os, sys
 ap = argparse.ArgumentParser()
 here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(here, '..', '..', 'common')); import repo_paths as RP   # every script folder + repo paths
-ap.add_argument('--urdf', default=os.path.join(RP.URDF_DIR, 'mobile_manipulator_prototype_mono_arm.urdf'))
+ap.add_argument('--layout', default='prototype_mono_arm', choices=('prototype_mono_arm', 'prototype_mono_side'),
+                help='prototype_mono_side = TEST layout: column on the right side, tote along the left (2026-11-18)')
+ap.add_argument('--urdf', default=None, help='default: the layout\'s URDF')
 ap.add_argument('--headless', action='store_true')
 ap.add_argument('--no_self_collision', action='store_true')
 ap.add_argument('--no_smooth', action='store_true', help='step-by-step moves instead of the TOPP-RA blended ones (smooth_path.py)')
 args = ap.parse_args()
+args.urdf = args.urdf or RP.urdf(args.layout)
 
 from isaacsim import SimulationApp
 app = SimulationApp({'headless': args.headless})
@@ -32,6 +35,7 @@ from isaacsim.core.api.objects import DynamicCuboid, FixedCuboid
 sys.path.insert(0, here)
 from proto_task import Task
 import mono_poses as MP
+MP.use(args.layout)
 
 D = math.radians
 P = math.pi / 2
@@ -49,7 +53,7 @@ def goal_for(item_xy, yaw):
     return np.array([item_xy[0] - (c * REACH[0] - s * REACH[1]), item_xy[1] - (s * REACH[0] + c * REACH[1]), yaw])
 
 
-task = Task(app, args.urdf, args.headless, fix_base=False, self_collision=not args.no_self_collision, layout='prototype_mono_arm')
+task = Task(app, args.urdf, args.headless, fix_base=False, self_collision=not args.no_self_collision, layout=args.layout)
 w = task.world
 task.profile = 'trap'     # trapezoid moves: full allowed speed after a 0.3 s ramp (same limits)
 task.settle_mode = 'still'   # a move is done once the joints stop (the wrist pitch's gravity sag never gets within 2 deg)
@@ -77,7 +81,7 @@ if not args.headless:
 task.set_pose({'lift': MP.STOW['lift'], **{f'left_{k}': v for k, v in MP.STOW.items() if k != 'lift'}})
 item.set_world_pose(position=ITEM_A, orientation=np.array([1.0, 0, 0, 0]))
 task.wait(1.0)
-print(f"\nShelf task, ONE arm (mono): product {ITEM[0]*1000:.0f} x {ITEM[1]*1000:.0f} x {ITEM[2]*1000:.0f} mm, {ITEM_MASS*1000:.0f} g, "
+print(f"\nShelf task, ONE arm, layout {args.layout}: product {ITEM[0]*1000:.0f} x {ITEM[1]*1000:.0f} x {ITEM[2]*1000:.0f} mm, {ITEM_MASS*1000:.0f} g, "
       f"self-collision {'off' if args.no_self_collision else 'on'}\n")
 start_z = {}
 
@@ -91,7 +95,7 @@ def note(label):
     elif label == 'release in the tote':
         task.wait(0.4); c, up = task.obj_state(item); cb = task.to_base(c)
         task.report('place in tote', f'item at ({cb[0]:+.3f}, {cb[1]:+.3f}, {cb[2]:.3f}) m, lying {"flat" if abs(up[2]) < 0.2 else "NOT flat"}',
-                    ok=-0.238 < cb[0] < 0.098 and abs(cb[1]) < 0.233 and cb[2] < 0.376 and abs(up[2]) < 0.2)
+                    ok=MP.TOTE_BOX[0] < cb[0] < MP.TOTE_BOX[1] and MP.TOTE_BOX[2] < cb[1] < MP.TOTE_BOX[3] and cb[2] < 0.376 and abs(up[2]) < 0.2)
 
 
 try:
