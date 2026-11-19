@@ -48,6 +48,16 @@ BOSS_R = 9.7                            # boss radius: inside the plugs (>= 10 m
 # servo cases, M3 x 6 into the horns. SO-100 horn plates leave 3.4 mm of plastic under the head (measured from its print
 # files); here 3.5 (HORN_SCREW - HORN_ENGAGE), the head sits in a dia 6.2 pocket down to that seat.
 HORN_SCREW, HORN_ENGAGE = 6, 2.5        # M3 length / thread into the horn disc (2.8 mm thick)
+# fixed jaw -> gripper frame (2026-11-19, user idea): two PEGS on the frame run down through the jaw's holes to just
+# above a floor near its bottom; the same M3 x 6 (SO-100 horn screw) goes in from below, through the floor, into the
+# peg's end. The pegs locate the jaw and carry the finger loop's pull; the screws only hold it closed.
+FJ_SCREW = HORN_SCREW     # M3 x 6, no nut
+FJ_HEAD = 3.0             # counterbore for the head in the jaw's bottom face
+FJ_FLOOR = 2.5            # jaw floor between the head and the peg's end
+FJ_PEG_R = 2.7            # peg radius (dia 5.4); hole in the jaw + FJ_PEG_PLAY
+FJ_PEG_PLAY = 0.2
+FJ_PEG_GAP = 0.3          # peg end stops this far above the floor, so the screw clamps the jaw against the frame
+FJ_PILOT = 2.5            # pilot hole for an M3 cut into PLA, along the peg
 IDL_SCREW = HORN_SCREW                  # idler horn too: the head sits 3.5 mm over the disc, deep in the tall boss
                                         # (boss section 609 -> 404 mm3, ~0.9 MPa at a 10 N push on the grip: SF ~16)
 # cable plug on every servo's socket face (+Z servo frame, x PLUG['x'], |y| <= PLUG['y']): housing sticks out 3.5 mm,
@@ -374,6 +384,7 @@ def build():
     top = box(0, cx[1], -CL['y'], CLAMP_YP, 21.0, 24.0)
     clamp = box(cx[0], cx[1], -CL['y'], CLAMP_YP, -CL['z'], 24.0)
     fr = union([back, top, clamp, arch_x(3.0, 9.0, 24.0)])                     # arch: S5 -> S6 cable along the top
+    nuts = [(cx[0] + 5.0, 17.5), (cx[1] - 5.0, 17.5)]                         # fixed-jaw screw / peg spots
     S = SO100
     # S6 slides in SIDEWAYS from -Y (2026-11-17): the closed clamp let it move in no direction, so it could only go in before
     # the frame was on the roll horn, and then S6 covered the frame's 4 horn screws. Order now: frame onto the roll horn,
@@ -391,24 +402,27 @@ def build():
     cut = [xf(horn_cut(OUT_F, 4.0, HORN_SCREW), S5_IN_GRIP), xf(clamp_pocket('-z'), S6_IN_GRIP), side_open, notch, xf(clamp_screws(), S6_IN_GRIP),
            cyl(4.0, 20.0, 25.0, PX, 0, hole=True),                                               # over the idler / centre screw
            box(PX - PLUG['x'][1] - 0.5, PX - PLUG['x'][0] + 0.5, -PLUG['y'], PLUG['y'], 15.0, 25.0)]   # plug slot (socket face up; S6's x -> -X)
-    nuts = [(cx[0] + 5.0, 17.5), (cx[1] - 5.0, 17.5)]
-    for (x, y) in nuts:                                                                          # fixed-jaw bolts: nut traps in the thick +Y wall
-        cut += [cyl(1.7, -CL['z'] - 1, 6.0, x, y, hole=True), nut_cut((x, y, -2.0), (0, 0, 1), 'M3', depth=3.0),
-                box(x - 3.0, x + 3.0, y, CLAMP_YP + 1, -2.0, 1.0)]                               # nut slides in from +Y
-    add('gripper_frame', fr - union(cut), 'grip', (0.25, 0.25, 0.28),
+    # fixed-jaw pegs (see FJ_*): was M3 x 30 up through the whole jaw block into nut traps here
+    floor_top = JAW['z'][0] + FJ_HEAD + FJ_FLOOR
+    peg_end = floor_top + FJ_PEG_GAP
+    pegs = [cyl(FJ_PEG_R, peg_end, -CL['z'] + 0.5, x, y) for (x, y) in nuts]
+    eng = FJ_SCREW - FJ_FLOOR - FJ_PEG_GAP                                                       # thread in the peg (3.2)
+    cut += [cyl(FJ_PILOT / 2, peg_end - 1, peg_end + eng + 0.7, x, y, hole=True) for (x, y) in nuts]
+    add('gripper_frame', union([fr] + pegs) - union(cut), 'grip', (0.25, 0.25, 0.28),
         'pinch gripper frame on the roll horn: holds the gripper servo (horn down, body forward); prints top plate down')
     fast('SHCS', 'M3', HORN_SCREW, 4, 'roll horn (gripper frame back plate)'); fast('selftap', 'M2', 6, 3, 'gripper servo case (2 top + 1 bottom through the fixed jaw)')
     # fixed jaw (+Y): block under the clamp's thick wall + blade + loop; 2 x M3 up into the frame's nut traps
     blk = box(cx[0], cx[1], yi, CLAMP_YP, J['z'][0], -CL['z'])
     fj = union([blk, box(cx[0], x_tip, yi, yo, J['z'][0], -CL['z']), loop(+1)])
-    fcut = [cyl(1.7, J['z'][0] - 1, -CL['z'] + 1, x, y, hole=True) for (x, y) in nuts]
-    fcut += [cyl(3.2, J['z'][0] - 1, -CL['z'] - 6.0, x, y, hole=True) for (x, y) in nuts]       # heads recessed from below
+    fcut = [cyl(1.7, J['z'][0] - 1, floor_top + 0.01, x, y, hole=True) for (x, y) in nuts]        # screw through the floor
+    fcut += [cyl(3.2, J['z'][0] - 1, J['z'][0] + FJ_HEAD, x, y, hole=True) for (x, y) in nuts]   # head counterbore (bottom)
+    fcut += [cyl(FJ_PEG_R + FJ_PEG_PLAY, floor_top, -CL['z'] + 1, x, y, hole=True) for (x, y) in nuts]   # peg holes
     for (x, y) in S['idler']:                                                                    # driver access: S6's -Z face case screws (face the jaw)
         px_, py_ = PX - x, -y
         if py_ > yi: fcut.append(cyl(2.6, J['z'][0] - 1, -CL['z'] + 0.5, px_, py_, hole=True))
     add('gripper_fixed_jaw', fj - union(fcut), 'grip', (0.20, 0.20, 0.22),
-        'fixed jaw with its finger loop (+Y), bolted under the gripper frame (2 x M3); prints standing on its loop')
-    fast('SHCS', 'M3', 30, 2, 'fixed jaw to the gripper frame (nuts in the frame)'); fast('nut', 'M3', None, 2, 'fixed jaw')
+        'fixed jaw with its finger loop (+Y): slides onto the gripper frame\'s 2 pegs, 2 x M3 x 6 from below into the peg ends; prints standing on its loop')
+    fast('SHCS', 'M3', FJ_SCREW, 2, 'fixed jaw: from below into the gripper frame\'s pegs (no nut)')
     # moving jaw (frame: on S6's axis): plate on the output horn + blade (-Y) + loop
     # below the horn plate the blade starts at x 8.4, past the (+4.95, -4.95) horn screw's head pocket (r 3.1): it
     # covered that screw (2026-11-17); in the plate band it still runs from x 0

@@ -59,7 +59,7 @@ stack, 0.4 scale) are in the git history.
 | `04_wrist.stl` | fork around the wrist-pan servo (turned over) + clamp holding the pitch servo, cable clip on its −Y side | 1 | 2 | 33 |
 | `05_pitch_fork.stl` | fork around the pitch servo + plate holding the roll servo | 1 | 2 | 32 |
 | `06_gripper_frame.stl` | on the roll horn: holds the gripper servo (horn down, body forward), cable notch in the back plate, cable arch on top | 1 | 2 | 20 |
-| `07_gripper_fixed_jaw.stl` | the fixed jaw with its finger loop, bolted under the frame | 1 | 2 | 33 |
+| `07_gripper_fixed_jaw.stl` | the fixed jaw with its finger loop: slides onto the frame's 2 pegs, screwed from below | 1 | 2 | 33 |
 | `08_gripper_jaw.stl` | the moving jaw on the gripper servo's horn, with its finger loop | 1 | 2 | 27 |
 | `09_pedestal.stl` | hollow column from the desk to the shoulder hub; at the back, right under the cap: the board socket (the plate slides in sideways) and a closed cable loop under the stop rib | 1 | 2 | 239 |
 | `10_mono_foot.stl` | foot for one leader (mono) | 1 | – | 174 |
@@ -80,15 +80,16 @@ Sizes are in `printed_parts.csv`; screws in `fasteners.csv` (per arm module).
 | Gamepad (USB / Bluetooth) | 1 | drives the base and the lift between picks (one for both leaders) |
 | USB foot pedal (optional) | 1 | clutch, if you'd rather keep it off the gamepad |
 | M2 × 6 self-tapping | 23 | servo cases (4 per servo, 3 on the gripper servo): **the SO-100's own case screws** |
-| M3 × 6 | 36 | every horn, output and idler (the shoulder's 4 go up from below into the hub-side horn): **the SO-100's own horn screws**. The heads sit in Ø 6.2 pockets, 3.5 mm
+| M3 × 6 | 38 | every horn, output and idler (the shoulder's 4 go up from below into the hub-side horn), + 2 for the fixed jaw: **the SO-100's own horn screws**. The heads sit in Ø 6.2 pockets, 3.5 mm
   of plastic over the horn (the SO-100's parts leave 3.4 mm); on the idler side the pockets are deep inside the tall boss |
 | M3 × 20 + nut | 4 + 4 | shoulder hub to pedestal (nuts in the pedestal cap's underside) |
-| M3 × 30 + 2 nuts | 2 | fixed jaw to the gripper frame (nuts slide into the frame's side wall) |
 | M5 × 12 + nut | 3 + 3 | pedestal to foot (nuts in the hex pockets under the foot; the bolt ends flush) |
 | C-clamps | 2 | hold the foot on the desk |
 
 **Screws = the SO-100 set (2026-11-17).** Every servo screw is one the SO-100 uses (M2 × 6 self-tapping, M3 × 6). Only the
-base and jaw bolts (M3 × 20, M3 × 30, M5 × 12 and their nuts) are extra. The idler bosses are about a third weaker with
+base bolts (M3 × 20, M5 × 12 and their nuts) are extra. The fixed jaw uses M3 × 6 too (2026-11-19): two pegs on the gripper
+frame run down through the jaw's holes, and the screws go in from below through a 2.5 mm floor into the peg ends (3.2 mm
+of thread, no nut); the pegs carry the finger loop's pull, the screws only hold the jaw on. The idler bosses are about a third weaker with
 the short screws in deep pockets, still ~16 × under PLA's strength across the layers at a 10 N push on the gripper.
 
 **Which servo goes where.** Gravity acts only on the wrist pitch, so put the stiffest servo there.
@@ -117,8 +118,9 @@ Never put a C044 or C046 in the follower: it can't hold the follower's load.
    the two inner screws need a stubby driver), its cables through the slot in the plate.
 4. **Frame first:** gripper frame on the roll horn (4 × M3 × 6; the gripper servo would cover these screws). Then slide
    the gripper servo into the frame's clamp **sideways from the open side** (horn down, body forward) and screw it
-   (3 × M2: 2 on top, 1 underneath on the fixed jaw's side). Fixed jaw under the frame (2 × M3 × 30 into the nuts in
-   the frame's side wall; its hole lets you reach that bottom case screw later). Moving jaw on the gripper servo's horn
+   (3 × M2: 2 on top, 1 underneath on the fixed jaw's side). Fixed jaw under the frame: slide it up onto the frame's two
+   pegs, then 2 × M3 × 6 from below into the peg ends (no nut; the first time they cut their own thread, go gently). Its
+   hole lets you reach that bottom case screw later. Moving jaw on the gripper servo's horn
    (4 × M3 × 6) with the blades just touching.
 5. Pedestal onto the foot (3 × M5 × 12 into the nuts under the foot). Its board socket faces the back (mono: away from
    where the arm points at zero; prototype feet: each pedestal is turned with its arm, the holes only fit that way).
