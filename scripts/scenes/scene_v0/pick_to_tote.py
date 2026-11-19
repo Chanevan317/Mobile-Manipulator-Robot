@@ -19,7 +19,7 @@ the tote spot of mono_poses.py. Reports where the product ended and anything els
 In the window: two extra viewport windows show the scene camera and the wrist camera (live, through their real lens
 specs); the main viewport stays free. Close the window to exit.
 """
-import argparse, math, os, sys
+import argparse, math, os, sys, time
 here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(here, '..', '..', 'common')); import repo_paths as RP   # every script folder + repo paths
 ap = argparse.ArgumentParser()
@@ -86,7 +86,7 @@ if args.headless:
 # ---------------------------------------------------------------- the panel in the Isaac window
 import omni.ui as ui
 choices = picks if (args.all_stations or PP.PICKABLE is None) else [n for n in picks if n in PP.PICKABLE]
-choices.sort(key=label)
+choices.sort(key=PP.label)
 state = {'req': None, 'busy': False, 'sel': choices.index(args.station) if args.station in choices else 0}
 win = ui.Window('Pick to tote', width=560, height=230, position_x=40, position_y=90)
 with win.frame:
@@ -105,8 +105,15 @@ with win.frame:
 combo.model.get_item_value_model().add_value_changed_fn(lambda m: state.update(sel=m.as_int))
 
 print('pick_to_tote: use the "Pick to tote" panel in the Isaac window; close the window to exit.', flush=True)
+# tests without a person: P2T_CLICK=pick|place|both presses that button once; P2T_AUTOQUIT=S closes the window (like
+# its X) S seconds after start, or after the click's job when P2T_CLICK is set
+_quit_at = time.time() + float(os.environ['P2T_AUTOQUIT']) if os.environ.get('P2T_AUTOQUIT') else None
+if os.environ.get('P2T_CLICK'):
+    state['req'] = os.environ['P2T_CLICK']
 try:
     while app.is_running():
+        if _quit_at and time.time() > _quit_at:
+            import omni.kit.app; omni.kit.app.get_app().post_quit(); _quit_at = None
         req, state['req'] = state['req'], None
         if req == 'both' and choices[state['sel']] in PP.PICK_ONLY:
             status.text = f"{PP.label(choices[state['sel']])}: can't be placed back yet; use \"Pick into the tote\""
@@ -122,6 +129,7 @@ try:
             if ok and req == 'both':
                 req = 'place'
             state['busy'] = False
+            print('panel status:', status.text, flush=True)
         if req == 'place' and PP.CTX and PP.CTX['sid'] in PP.PICK_ONLY:
             status.text = f"{PP.label(PP.CTX['sid'])}: can't be placed back yet (it tips over in the tote)"
             req = None
@@ -134,6 +142,9 @@ try:
             status.text = f"{what}: {'back on its spot' if ok else 'FAILED: ' + txt}  ({task.t - t0:.0f} s)" + \
                           ('' if ok or not what else '. "Put products back" / "Reset robot" to start again.')
             state['busy'] = False
+            print('panel status:', status.text, flush=True)
+            if os.environ.get('P2T_CLICK') and os.environ.get('P2T_AUTOQUIT'):
+                _quit_at = time.time() + 2
         elif req in ('pick', 'both', 'place'):
             pass
         elif req == 'restore':

@@ -38,34 +38,13 @@ st = ST.load()
 app = R.start_app(not args.window)
 import numpy as np                                                       # noqa: E402
 import h5py                                                              # noqa: E402
-import omni.usd                                                          # noqa: E402
-from pxr import UsdLux, PhysicsSchemaTools                               # noqa: E402
-from omni.physx import get_physx_simulation_interface                    # noqa: E402
-import mono_poses as MP                                                  # noqa: E402
 import pick_place as PP                                                  # noqa: E402
+import sim_common as SCM                                                 # noqa: E402
 
 task, items, watch = R.load(app, not args.window)
 PP.init(task, items, watch, st, headless=not args.window, out=None)
+SCM.bind(task, items, PP)
 EVERY = round(60 / C.FPS)
-IDX = [[task.idx[j] for j in (u if isinstance(u, tuple) else (u,))] for _, u in C.JOINTS]
-stage = omni.usd.get_context().get_stage()
-LIGHTS = [(UsdLux.LightAPI(p).GetIntensityAttr(), float(UsdLux.LightAPI(p).GetIntensityAttr().Get()))
-          for p in stage.Traverse() if p.HasAPI(UsdLux.LightAPI) and p.IsActive() and UsdLux.LightAPI(p).GetIntensityAttr().Get() is not None]
-
-
-def set_cmd(v):
-    """7-vector -> joint targets (the gripper opening split over the two fingers)."""
-    for ii, x in zip(IDX, v):
-        for i in ii:
-            task.q_goal[i] = x / len(ii)
-
-
-def teleport(name, poses):
-    sim = get_physx_simulation_interface(); sid_ = omni.usd.get_context().get_stage_id()
-    for b, pq in zip(PP.MOVABLE[name], poses):
-        b.set_world_pose(position=pq[:3], orientation=pq[3:])
-        bid = PhysicsSchemaTools.sdfPathToInt(b.prim_path)
-        sim.put_to_sleep(sid_, bid); sim.wake_up(sid_, bid)
 
 
 passed = 0
@@ -74,26 +53,23 @@ for p in files:
         a = dict(f.attrs); act = f['action'][:]; rec = f['observation.state'][:]
     name, kind = str(a['product']), str(a['kind'])
     PP.restore()
-    for la, v0 in LIGHTS:
-        la.Set(v0 * float(a.get('light_scale', 1.0)))
+    SCM.set_light(float(a.get('light_scale', 1.0)))
     task.set_pose({n: float(v) for n, v in zip(a['q0_names'], a['q0'])})
     task.q_cmd[:] = task.q_goal                                        # set_pose sets both; keep them equal
-    teleport(name, a['product_pose0'])
+    SCM.teleport(name, a['product_pose0'])
     got = []
     for t in range(len(act)):
-        got.append([float(sum(task.robot.get_joint_positions()[i] for i in ii)) for ii in IDX])
+        got.append(SCM.state())
         nxt = act[min(t + 1, len(act) - 1)]
         for s in range(EVERY):
-            set_cmd(act[t] + (nxt - act[t]) * (s + 1) / EVERY)
+            SCM.command(act[t] + (nxt - act[t]) * (s + 1) / EVERY)
             task.step_once()
     task.wait(1.0)
     got = np.array(got, np.float32)
     drift = np.abs(got - rec[:len(got)])
     worst = int(np.argmax(drift.max(axis=0)))
-    pb = task.to_base(PP.R.positions({name: PP.MOVABLE[name][0].prim_path})[name])
+    ok, pb = SCM.in_tote(name)
     if kind == 'pick':
-        x0, x1, y0, y1 = MP.TOTE_BOX
-        ok = x0 < pb[0] < x1 and y0 < pb[1] < y1 and pb[2] < 0.376
         res = f'product at ({pb[0]:+.3f}, {pb[1]:+.3f}, {pb[2]:.3f}) in the base frame: {"in the tote" if ok else "NOT in the tote"}'
     else:
         g = np.array(a['goal_pose'])[0, :3]

@@ -147,7 +147,74 @@ def make(stage, path, spec, name):
         c.add_distance_to_image_plane_to_frame()
     if 'k' in spec:
         c.set_opencv_fisheye_properties(cx=spec['cx'], cy=spec['cy'], fx=spec['fx'], fy=spec['fy'], fisheye=spec['k'])
+    _LIVE.append(c)
+    _hook_shutdown()
     return c
+
+
+# Release the cameras BEFORE Isaac shuts down (2026-11-19, user's crash on closing the pick_to_tote window: segfault in
+# omni.syntheticdata, std::bad_variant_access, from Python's atexit). Isaac's Camera destroys its annotators / render
+# product in __del__; left alive, that runs during interpreter exit after Kit has torn the render graph down. Every
+# script's app.close() now releases them first (SimulationApp.close is wrapped once); a script that dies on an error
+# gets the same at exit (release + a proper app.close()).
+_LIVE = []
+_HOOKED = {'done': False}
+
+
+def release():
+    """Detach every camera's annotators and destroy its render product (idempotent)."""
+    while _LIVE:
+        c = _LIVE.pop()
+        try:
+            c.destroy()
+        except Exception:
+            pass
+
+
+def _hook_shutdown():
+    if _HOOKED['done']:
+        return
+    _HOOKED['done'] = True
+    import atexit
+    from isaacsim import SimulationApp
+    close0 = SimulationApp.close
+
+    def close(self, *a, **k):
+        release()
+        if getattr(self, '_cameras_closed', False):
+            return None
+        self._cameras_closed = True
+        return close0(self, *a, **k)
+    SimulationApp.close = close
+
+    import sys
+    _hook0 = sys.excepthook
+    _err = {'raised': False}
+
+    def excepthook(*ex):
+        _err['raised'] = True
+        _hook0(*ex)
+    sys.excepthook = excepthook
+
+    def at_exit():
+        """A script that dies on an error never calls app.close(): Kit's own exit-time shutdown then crashes in the
+        render graph (measured 2026-11-19: segfault even with the cameras released). After an error: release the
+        cameras and leave at once with exit code 1 (Kit's close would exit 0 and hide the failure); otherwise close
+        the app properly."""
+        import gc, os
+        release()
+        if _err['raised']:
+            sys.stdout.flush(); sys.stderr.flush()
+            os._exit(1)
+        for o in gc.get_objects():
+            if isinstance(o, SimulationApp):
+                try:
+                    if not getattr(o, '_cameras_closed', False):
+                        o._cameras_closed = True
+                        close0(o)
+                except Exception:
+                    pass
+    atexit.register(at_exit)          # registered after Kit's own handler, so it runs before it
 
 
 def _ready(cams):

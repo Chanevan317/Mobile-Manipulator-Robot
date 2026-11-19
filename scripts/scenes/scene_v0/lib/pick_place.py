@@ -154,6 +154,8 @@ def pick(sid):
         _hook('pick_start', sid=sid, name=name)
         p0 = R.positions(watch)
         c = task.to_base(p0[name])[:2]
+        if HOOKS.get('grasp_offset'):                 # train_pipeline noise: aim a little off the product, like a person
+            c = c + np.asarray(HOOKS['grasp_offset'](sid=sid, name=name), float)
         bp, byaw = task.base_pose()
         furn = CO.boxes_to_base(SC.furniture_boxes(), bp[:2], byaw, margin=0.005)  # furniture, 5 mm margin
 

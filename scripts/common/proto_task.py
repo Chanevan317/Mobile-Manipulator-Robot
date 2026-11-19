@@ -101,6 +101,9 @@ class Task:
         self.still_v = np.array([STILL_V_LIFT if self.names[i] == 'lift' else STILL_V for i in self.still_idx])
         self.substeps = max(1, round(DT / self.world.get_physics_dt()))
         self.q_goal = np.zeros(n); self.q_cmd = np.zeros(n); self.wheel_v = np.zeros(len(self.wheel))
+        # optional offset added to the command actually sent (train_pipeline: human-like tremor in recorded demos);
+        # q_sent = what the drives got last step (= q_cmd without an offset)
+        self.cmd_offset = None; self.q_sent = np.zeros(n)
         self.hold = None           # parked base pose (x, y, yaw) the wheels hold while the arms work (set by drive_to)
 
     # ------------------------------------------------------------ low level
@@ -132,7 +135,8 @@ class Task:
             self.hold_base()
         d = self.driven
         self.q_cmd[d] = rate_limit(self.q_cmd[d], self.q_goal[d], self.vmax[d], DT)
-        self.robot.apply_action(ArticulationAction(joint_positions=self.q_cmd[d], joint_indices=np.array(d)))
+        self.q_sent[:] = self.q_cmd if self.cmd_offset is None else self.q_cmd + self.cmd_offset
+        self.robot.apply_action(ArticulationAction(joint_positions=self.q_sent[d], joint_indices=np.array(d)))
         if self.wheel:
             self.robot.apply_action(ArticulationAction(joint_velocities=self.wheel_v, joint_indices=np.array(self.wheel)))
         self.tick(); self.t += DT
@@ -166,7 +170,7 @@ class Task:
         """Teleport the joints (start of a task only)."""
         q0 = np.zeros(len(self.names))
         for k, v in q_all.items(): q0[self.idx[k]] = v
-        self.robot.set_joint_positions(q0); self.q_goal[:] = q0; self.q_cmd[:] = q0
+        self.robot.set_joint_positions(q0); self.q_goal[:] = q0; self.q_cmd[:] = q0; self.q_sent[:] = q0
 
     def set_arm(self, side, q):
         for k, v in q.items():
