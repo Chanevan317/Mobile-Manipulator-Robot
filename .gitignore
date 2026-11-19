@@ -12,3 +12,7 @@ __pycache__/
 scenes/assets/
 # saved scenes ARE kept (small text files that reference those assets)
 !scenes/*/*.usda
+
+# train_pipeline: recordings, converted datasets and training runs (large; rebuild them with the scripts)
+train_pipeline/data/
+train_pipeline/outputs/

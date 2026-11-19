@@ -165,10 +165,12 @@ def _ready(cams):
 _warm = {'done': False}
 
 
-def capture(task, cams, renders=2, max_renders=60, settle=90):
+def capture(task, cams, renders=3, max_renders=60, settle=90):
     """Render and read every camera. Headless runs step physics without rendering, so this renders first: `renders`
-    frames (the annotators lag a frame), and on the first call until every camera has data (the render pipeline needs
-    a few frames to warm up). Returns {'<name>_rgb': uint8 HxWx3, 'scene_depth': float32 HxW (m, 0 = no depth)}."""
+    frames, and on the first call until every camera has data (the render pipeline needs a few frames to warm up).
+    renders=3 (2026-11-19, measured: snap the arm between two poses, capture once): 1 or 2 renders still return the
+    image from BEFORE the last move (recorded frames trailed their joint values by one frame, the panel's shots by a
+    whole stage); 3 show the current pose. Returns {'<name>_rgb': uint8 HxWx3, 'scene_depth': float32 HxW (m, 0 = no depth)}."""
     for _ in range(renders):
         task.world.render()
     k = 0

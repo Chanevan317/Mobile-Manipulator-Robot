@@ -18,12 +18,13 @@ the robot is tested in simulation (Isaac Sim, ROS 2).
 |---|---|
 | `CAD/SCARA_arm/` | the follower arm: print files, STEP, assembly, fastener lists |
 | `CAD/dual_holder/` | two-arm robot: printed holder for both arm bases on the C-Beam carriage (and the scene camera mast) |
-| `CAD/scene_cam/` | scene camera: OAK-D Pro on a pitch servo, on a swappable printed mast on the carriage |
+| `CAD/scene_cam/` | scene camera: OAK-D Pro W on a pitch servo, on a swappable printed mast on the carriage |
 | `CAD/mono_ring/` | shoulder ring for the one-arm version: the arm's own base on a shelf on the ring, 2 bought 6820-2RS bearings |
 | `CAD/leader_arm/` | the leader arm for teleoperation |
 | `CAD/lift_stick/` | one-hand controller for the lift: thumbstick, dead-man and stored-position buttons |
 | `mobile_manipulator_description/` | the robot model (URDF, meshes) and the CAD generator |
 | `scenes/` | simulation scenes: `scene_v0/` store scene for the one-arm prototype (saved USD, robot stations), downloaded assets in `assets/` (not in git) |
 | `scripts/` | every simulation script, by topic: robot tests, viewers, tasks, planning, ROS, scenes (`scripts/README.md`) |
+| `train_pipeline/` | learning from demonstrations with LeRobot: record episodes in the store scene, check, convert to a LeRobotDataset, train ACT (`train_pipeline/README.md`) |
 
 Large files (STL, STEP, PNG, ...) are stored with Git LFS: run `git lfs install` before cloning.
