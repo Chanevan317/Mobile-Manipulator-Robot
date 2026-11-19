@@ -1,6 +1,6 @@
 # Scene camera mount
 
-A **Luxonis OAK-D Pro (AF)** on a **Feetech STS3215 7.4 V** pitch servo, on a printed mast standing on the **carriage**
+A **Luxonis OAK-D Pro W (OV9782, 127° × 80°)** on a **Feetech STS3215 7.4 V** pitch servo, on a printed mast standing on the **carriage**
 in front of the C-Beam. It rides up and down with the arms (as the old scene camera did) and tilts to look ahead or
 down at the work. Fits both robots: on the two-arm robot the mast bolts to the dual holder's front bridge, on the
 one-arm robot to a pedestal on the ring clamp.
@@ -9,7 +9,8 @@ one-arm robot to a pedestal on the ring clamp.
 
 Made by `mobile_manipulator_description/generator/scene_cam.py`. The camera shape comes from Luxonis' own STEP files
 ([OAK-D Pro, depthai-hardware repo](https://github.com/luxonis/depthai-hardware/tree/master/DM9098_OAK-D-Pro/3D_Models));
-a mesh of it is in `generator/oakd/`.
+a mesh of it is in `generator/oakd/`. The mount was drawn for the OAK-D Pro AF; the Pro W is the same DM9098 board in the
+same housing (back M4 pair 75 mm apart, USB-C underneath), so it fits unchanged. Check the M4 spacing on your unit.
 
 ## Swappable parts
 
@@ -47,7 +48,8 @@ The arm sweep against the bigger mast found no new contacts: the same 91 of 396 
 
 The camera moves with the lift, so the lift height for each job was taken from where the arm works (hand down 0.12 m
 over a table item, hand level 35 mm over a shelf board), and the camera's height **above the carriage** was varied.
-Coverage of the OAK-D Pro (colour camera 69° × 55°, depth minimum 0.35 m, ideal 0.7–3 m) at the best tilt:
+Coverage of the OAK-D Pro AF (colour camera 69° × 55°, depth minimum 0.35 m, ideal 0.7–3 m) at the best tilt (this study was
+made for the AF; the Pro W's 127° × 80° sees more at every height, so the height stays):
 
 | Camera over the carriage origin | Tables 0.45–0.90 m: seen / in the ideal depth range | Shelves 0.30–1.10 m seen | Floor 0.6–3 m (lift 0.2) |
 |---|---|---|---|

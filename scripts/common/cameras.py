@@ -11,7 +11,8 @@ the OAK colour sensor's full 12 MP mode, scaled down on the device; user 2026-11
 too narrow). Light enough to render fast. The prims sit on the URDF's optical frames (ROS convention: z forward, x right,
 y down); a USD camera looks along -Z with +Y up, so each is turned 180 deg about x under its frame.
 
-SCENE: Luxonis OAK-D Pro, auto-focus version (docs.luxonis.com, OAK-D Pro page, 'Variant: Auto Focus'):
+SCENE: Luxonis OAK-D Pro W, OV9782 (user 2026-11-19; SCENE_PRO_W below: 127 x 80 deg fisheye, 640 x 400). The previous
+    choice, kept as MM_SCENE_CAM=pro_af: OAK-D Pro, auto-focus version (docs.luxonis.com, OAK-D Pro page, 'Variant: Auto Focus'):
     colour IMX378 1/2.3", 78 / 66 / 54 deg D / H / V over the full 4056 x 3040 sensor -> f = 2028 / tan 33 deg = 3123 px.
     Used: the full sensor (4:3), 66 deg H; square pixels give 51.9 deg V (Luxonis rounds to 54). Its 16:9 modes
     (1080p / 4K) crop to 3840 x 2160 -> 63.1 x 38.2 deg. Depth = Isaac's distance to the image plane from
@@ -34,7 +35,7 @@ SCENE_PRO_AF = dict(link='scene_camera_optical', res=(640, 480), assumed=False,
              depth=(0.2, 12.0), forward=0.0,
              model='Luxonis OAK-D Pro AF: IMX378 colour (full 4:3 sensor) + depth aligned to it')
 
-# Luxonis OAK-D Pro W, OV9782 version (2026-11-18, candidate: the AF's 66 deg was too narrow): colour OV9782 1 MP 1280 x 800,
+# Luxonis OAK-D Pro W, OV9782 version: THE SCENE CAMERA (user 2026-11-19, in the BOM; the AF's 66 deg was too narrow): colour OV9782 1 MP 1280 x 800,
 # global shutter, fixed focus, listed 150 / 127 / 80 deg D / H / V (Luxonis spec sheet 150 / 128 / 80); stereo OV9282 with the
 # same wide view. An equidistant fisheye (r = f * theta) with f = 640 / 63.5 deg = 577 px at 1280 x 800 gives exactly
 # 127 / 79.4 / 149.7 deg, so k1..k4 = 0 matches the listed numbers (replace with the unit's factory calibration).
@@ -44,7 +45,7 @@ SCENE_PRO_W = dict(link='scene_camera_optical', res=(640, 400), assumed=False, h
                    fx=_F_W, fy=_F_W, cx=320.0, cy=200.0, k=[0.0, 0.0, 0.0, 0.0], depth=(0.2, 12.0), forward=0.0,
                    model='Luxonis OAK-D Pro W (OV9782 colour, global shutter, 127 x 80 deg fisheye) + depth aligned to it')
 SCENE_MODELS = {'pro_af': SCENE_PRO_AF, 'pro_w': SCENE_PRO_W}
-SCENE_MODEL = __import__('os').environ.get('MM_SCENE_CAM', 'pro_af')     # MM_SCENE_CAM=pro_w to try the wide camera
+SCENE_MODEL = __import__('os').environ.get('MM_SCENE_CAM', 'pro_w')      # the robot's camera (user 2026-11-19); MM_SCENE_CAM=pro_af = the old AF
 SCENE = SCENE_MODELS[SCENE_MODEL]
 
 _HFOV_WRIST = 120.0                                              # ASSUMED (lens not listed)

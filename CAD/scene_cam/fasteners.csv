@@ -1,6 +1,6 @@
 kind,size,length_mm,qty,where
 servo,Feetech STS3215 7.4 V,,1,camera pitch
-camera,Luxonis OAK-D Pro AF,,1,scene camera (+ its USB-C Y-adapter for the IR projector / LED)
+camera,Luxonis OAK-D Pro W (OV9782),,1,scene camera (+ its USB-C Y-adapter for the IR projector / LED)
 SHCS,M2,6,2,strap to cradle
 insert,M2,4,2,strap
 selftap,M2,6,2,servo case (idler face)

@@ -1,4 +1,5 @@
-"""Scene camera (user 2026-11-13): a Luxonis OAK-D Pro (AF) on a pitch servo (Feetech STS3215 7.4 V), riding on the
+"""Scene camera (user 2026-11-13; camera = OAK-D Pro W OV9782 since 2026-11-19, the same DM9098 board and housing
+as the OAK-D Pro AF it was drawn for): a Luxonis OAK-D Pro on a pitch servo (Feetech STS3215 7.4 V), riding on the
 CARRIAGE (it moves up and down with the arms, as the old scene camera did), in front of the column. Built from
 SWAPPABLE printed parts joined by the same flange, so a different height (or later a forward offset) is one
 replacement part.
@@ -366,7 +367,7 @@ def export(out):
         for it in p['reg'].items:
             fast[(it['kind'], it['size'], it['length'], it['note'])] += 1
     fast[('servo', 'Feetech STS3215 7.4 V', '', 'camera pitch')] = 1
-    fast[('camera', 'Luxonis OAK-D Pro AF', '', 'scene camera (+ its USB-C Y-adapter for the IR projector / LED)')] = 1
+    fast[('camera', 'Luxonis OAK-D Pro W (OV9782)', '', 'scene camera (+ its USB-C Y-adapter for the IR projector / LED)')] = 1
     _write(os.path.join(out, 'assembly_stl', 'context', 'pitch_servo_STS3215.stl'), CONTEXT['servo'])
     _write(os.path.join(out, 'assembly_stl', 'context', 'oakd_pro_envelope.stl'), pitched(union([CONTEXT['cam_body_C'], CONTEXT['cam_plug_C']]), 0, CONTEXT['zh']))
     with open(os.path.join(out, 'printed_parts.csv'), 'w', newline='') as f:
