@@ -104,14 +104,12 @@ def shot(label):
     p = os.path.join(OPT['out'], f'{ROBOT["at"]}_{len(shots):02d}_{label.replace(" ", "_")}.png'); im.save(p); shots.append(p)
 
 
-# ---------------------------------------------------------------- one pick
-def pick(sid):
-    """Drive to station sid, pick its product, put it in the tote, fold. Raises RuntimeError when it can't."""
+def product_for(sid):
+    """(name, {name: body path} of every candidate) of the product station sid picks: the nearest movable product of
+    that kind to the station's target, a task product or a filler with physics (the scene has one task product per
+    package; e.g. the yogurt task product is on the table, the dairy board's yogurts are fillers)."""
     S = st[sid]
-    global watch
     pkg = S['product']
-    # the nearest movable product of that kind to the station's target: a task product, or a filler with physics (the scene
-    # has one task product per package; e.g. the yogurt task product is on the table, the dairy board's yogurts are fillers)
     cand = {n: it['bodies'][0] for n, it in items.items() if it.get('pkg') == pkg and it['role'] in ('product', 'filler')
             and it.get('bodies') and (it['role'] == 'product' or it.get('dynamic'))}
     if not cand:
@@ -120,6 +118,16 @@ def pick(sid):
     tgt = np.array(S['target'][:2])
     name = min(cand, key=lambda n: (items[n]['role'] != 'product' or np.linalg.norm(pos0[n][:2] - tgt) > 0.3,
                                      np.linalg.norm(pos0[n][:2] - tgt)))      # the task product if it is there, else the nearest
+    return name, cand
+
+
+# ---------------------------------------------------------------- one pick
+def pick(sid):
+    """Drive to station sid, pick its product, put it in the tote, fold. Raises RuntimeError when it can't."""
+    S = st[sid]
+    global watch
+    pkg = S['product']
+    name, cand = product_for(sid)
     if items[name]['role'] != 'product':
         print(f'NOTE: {name} is a filler in a packed run (facings ~6 mm apart); the open jaws need ~15 mm beside the product, '
               f'so the grasp may fail. The scene leaves 50 mm gaps only around the task products (scene.TASK_GAP).', flush=True)

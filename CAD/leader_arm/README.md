@@ -197,12 +197,16 @@ is at most 16 mm tall with its servo connector on the top edge; the cable is a f
   it sinks, the software can hold it with a little servo torque.
 - The gripper servo can act as a soft spring (low torque toward open) so the jaws open when you relax your hand.
 - The hand moves sideways and forward at a fixed height, like the SCARA follower; the height is on the pedals.
+- **Software set-up:** servo ids, calibration (zero pose, directions, ranges, gripper opening) and a live check are in
+  [`train_pipeline/` step 0](../../train_pipeline/README.md#0-set-up-the-leader-arm-once-per-arm). The roll's ±180°
+  jump and the follower's narrower ranges above are handled there.
 
 ## Still to do
 
-- The LeRobot "teleoperator": read the 6 servos, map each joint 1:1 (direction and zero offset) to the follower,
-  the gripper's 0..40° to the follower's 0..90 mm, the gamepad for the base / lift and the clutch, and a gentle
-  "spring" on the gripper servo (low torque) so it opens by itself.
+- Teleop: reading the servos, the 1:1 mapping and recording in the sim are done (`train_pipeline/leader/`,
+  `train_pipeline/record/teleop_sim.py`; tested with a dummy leader only). Still to do: try it with the real arm, the
+  lift controller (arrow keys until then), teleop on the real robot, and a gentle "spring" on the gripper servo (low
+  torque) so it opens by itself.
 - Print the gripper first and try the pinch: loop sizes and the 40° travel are first guesses.
 - Print one link and check the servo fit before printing the rest (the clamps hold the servo's rear end, as v2's
   stand did).
