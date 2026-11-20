@@ -17,7 +17,7 @@ from PIL import Image
 
 import common as C
 import cameras as CAM
-import pick_place as PP
+import pick_place_mono as PP
 import sim_common as SCM
 
 EVERY = round(60 / C.FPS)                                                # control steps per recorded frame

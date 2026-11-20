@@ -18,7 +18,7 @@ ap.add_argument('--out', default='camera_view')
 ap.add_argument('--headless', action='store_true')
 args = ap.parse_args()
 
-import stations as ST
+import stations_mono as ST
 import scene_robot as R
 st = ST.load()
 if args.station not in st:

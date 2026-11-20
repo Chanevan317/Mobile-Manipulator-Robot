@@ -1,10 +1,10 @@
-"""Drive the mono robot to random stations of scene_v0 and stay at each one for a while (default 3 s).
+"""Drive the DUAL-arm robot to random stations of scene_v0 and stay at each one for a while (default 3 s).
 
 Scripted base moves, not navigation: the next station is picked at random among the others (never the same twice in a
-row), the robot drives there on the fixed route (stations.py: back out to the turning point, across, straight in),
+row), the robot drives there on the fixed route (stations_mono.py: back out to the turning point, across, straight in),
 the wheels hold it in place for --stay seconds, then the next one. The arm stays folded.
 
-    OMNI_KIT_ACCEPT_EULA=YES conda run --no-capture-output -n env_isaaclab python scripts/scenes/scene_v0/random_drive.py
+    OMNI_KIT_ACCEPT_EULA=YES conda run --no-capture-output -n env_isaaclab python scripts/scenes/scene_v0/random_drive_dual.py
     ... --stay 3 --seed 1               # stay time (s), random sequence
     ... --count 10                      # stop after 10 stations (default: until the window is closed; headless: 10)
     ... --only task                     # only the task products' stations ('task'), or 'shelves' / 'table'
@@ -13,6 +13,7 @@ the wheels hold it in place for --stay seconds, then the next one. The arm stays
 Prints each move (drive time, how far from the station it stopped) and, at the end, whether anything was knocked
 over and the base's largest tilt.
 """
+# NOTE: uses the mono robot's stations (stations_mono.py) until dual stations exist: driving only, the arms stay folded.
 import argparse, math, os, random, sys
 here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(here, '..', '..', 'common')); import repo_paths as RP   # every script folder + repo paths
@@ -26,11 +27,11 @@ ap.add_argument('--physics_hz', type=int, default=240, help='240 = grasp fidelit
 ap.add_argument('--render_every', type=int, default=1, help='window: draw every Nth frame only (3 = 20 fps on screen, faster sim)')
 ap.add_argument('--wheels', action='store_true', help='full mecanum robot (roller simulation) instead of the planar arm-training base')
 ap.add_argument('--fill', type=float, default=1.0)
-ap.add_argument('--scene_seed', type=int, default=0, help="the scene's filler layout (as check_scene.py --seed)")
+ap.add_argument('--scene_seed', type=int, default=0, help="the scene's filler layout (as check_scene_mono.py --seed)")
 args = ap.parse_args()
 count = args.count if args.count is not None else (10 if args.headless else 0)    # 0 = endless
 
-import stations as ST
+import stations_mono as ST
 import scene_robot as R
 st = ST.load()
 pick = {'all': lambda n, s: n != 'home', 'task': lambda n, s: bool(s.get('task')),
@@ -43,7 +44,7 @@ print(f'random_drive: {len(pool)} stations ({args.only}, incl. home), stay {args
 
 app = R.start_app(args.headless)
 import numpy as np
-task, items, watch = R.load(app, args.headless, fill=args.fill, seed=args.scene_seed, wheels=args.wheels, physics_hz=args.physics_hz, render_every=args.render_every)
+task, items, watch = R.load(app, args.headless, layout='prototype', fill=args.fill, seed=args.scene_seed, wheels=args.wheels, physics_hz=args.physics_hz, render_every=args.render_every)
 p0 = R.positions(watch)
 
 import time

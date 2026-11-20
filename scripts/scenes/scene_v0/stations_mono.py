@@ -1,9 +1,9 @@
 """Fixed robot stations for scene_v0: named base poses (x, y, heading) the robot is DRIVEN to for arm training.
 
-Not real navigation: drive_stations.py moves the base between these marked coordinates on a fixed route. Run this file
+Not real navigation: drive_stations_mono.py moves the base between these marked coordinates on a fixed route. Run this file
 to (re)compute them after a layout change; it writes stations.json (kept in git) and prints the table.
 
-    python scripts/scenes/scene_v0/stations.py           # no simulator needed
+    python scripts/scenes/scene_v0/stations_mono.py           # no simulator needed
 
 Stations (world frame = the robot's start pose, metres / degrees):
   home                      the start pose (0, 0, 0)
@@ -25,7 +25,7 @@ sys.path.insert(0, os.path.join(here, '..', '..', 'common')); import repo_paths 
 sys.path.insert(0, here)
 import assets as SA
 import scene as SC
-import grasp_plan as G
+import grasp_plan_mono as G
 
 FOOT = dict(back=0.25, front=0.34, side=0.25)   # robot frame: base 0.50 x 0.50, scene camera to x 0.341
 MARGIN = 0.02
@@ -173,7 +173,7 @@ def load():
 if __name__ == '__main__':
     st = compute()
     bad = [n for n, s_ in st.items() if 'x' not in s_ or s_.get('approach') is None]
-    json.dump(dict(note='scene_v0 robot stations (stations.py); world frame = robot start; yaw deg; approach = turning point',
+    json.dump(dict(note='scene_v0 robot stations (stations_mono.py); world frame = robot start; yaw deg; approach = turning point',
                    footprint=FOOT, margin=MARGIN, turn_r=round(TURN_R, 3), hub=HUB, stations=st), open(OUT, 'w'), indent=1)
     print(f'{"station":28s} {"x":>7s} {"y":>7s} {"yaw":>5s}  grasp  reach  approach           section / product')
     for n, s_ in st.items():

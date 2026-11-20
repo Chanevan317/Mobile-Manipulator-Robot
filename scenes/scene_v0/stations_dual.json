@@ -1,0 +1,187 @@
+{
+ "note": "scene_v0 DUAL-arm pair stations (stations_dual.py); world frame; yaw deg; approach = turning point",
+ "stations": {
+  "home": {
+   "x": -1.375,
+   "y": -0.05,
+   "yaw": 0.0,
+   "product": null,
+   "board": "start",
+   "note": "start pose: the middle of the room, facing the table",
+   "approach": [
+    -1.375,
+    -0.05
+   ]
+  },
+  "pair_rack_b0_boxedCereal_l01__box_cracker_a01": {
+   "x": -1.218,
+   "y": 0.506,
+   "yaw": 90.0,
+   "grasp": "side",
+   "grip_z": 0.881,
+   "reach": 0.71,
+   "side_min_z": 0.0,
+   "board": "rack_b0",
+   "surface": 0.761,
+   "section": "breakfast and dry goods",
+   "left": {
+    "station": "rack_b0_boxedCereal_l01",
+    "product": "food_processed_boxedCereal_l01",
+    "target": [
+     -1.424,
+     1.21
+    ],
+    "elbow": -1
+   },
+   "right": {
+    "station": "rack_b0_box_cracker_a01",
+    "product": "food_box_cracker_a01",
+    "target": [
+     -1.012,
+     1.222
+    ],
+    "elbow": 1
+   },
+   "approach": [
+    -1.218,
+    0.506
+   ]
+  },
+  "pair_rack_b0_box_cracker_a01__boxedFood_b01": {
+   "x": -0.806,
+   "y": 0.503,
+   "yaw": 90.0,
+   "grasp": "side",
+   "grip_z": 0.839,
+   "reach": 0.71,
+   "side_min_z": 0.0,
+   "board": "rack_b0",
+   "surface": 0.761,
+   "section": "breakfast and dry goods",
+   "left": {
+    "station": "rack_b0_box_cracker_a01",
+    "product": "food_box_cracker_a01",
+    "target": [
+     -1.012,
+     1.222
+    ],
+    "elbow": -1
+   },
+   "right": {
+    "station": "rack_b0_boxedFood_b01",
+    "product": "food_processed_boxedFood_b01",
+    "target": [
+     -0.6,
+     1.205
+    ],
+    "elbow": 1
+   },
+   "approach": [
+    -0.806,
+    0.503
+   ]
+  },
+  "pair_rack_b0_boxedFood_b01__boxedFood_c01": {
+   "x": -0.394,
+   "y": 0.506,
+   "yaw": 90.0,
+   "grasp": "side",
+   "grip_z": 0.839,
+   "reach": 0.7,
+   "side_min_z": 0.0,
+   "board": "rack_b0",
+   "surface": 0.761,
+   "section": "breakfast and dry goods",
+   "left": {
+    "station": "rack_b0_boxedFood_b01",
+    "product": "food_processed_boxedFood_b01",
+    "target": [
+     -0.6,
+     1.205
+    ],
+    "elbow": -1
+   },
+   "right": {
+    "station": "rack_b0_boxedFood_c01",
+    "product": "food_processed_boxedFood_c01",
+    "target": [
+     -0.188,
+     1.208
+    ],
+    "elbow": 1
+   },
+   "approach": [
+    -0.394,
+    0.506
+   ]
+  },
+  "pair_rack_b0_boxedFood_c01__boxedFood_d01": {
+   "x": 0.018,
+   "y": 0.5,
+   "yaw": 90.0,
+   "grasp": "side",
+   "grip_z": 0.875,
+   "reach": 0.7,
+   "side_min_z": 1.03,
+   "board": "rack_b0",
+   "surface": 0.761,
+   "section": "breakfast and dry goods",
+   "left": {
+    "station": "rack_b0_boxedFood_c01",
+    "product": "food_processed_boxedFood_c01",
+    "target": [
+     -0.188,
+     1.208
+    ],
+    "elbow": -1
+   },
+   "right": {
+    "station": "rack_b0_boxedFood_d01",
+    "product": "food_processed_boxedFood_d01",
+    "target": [
+     0.224,
+     1.192
+    ],
+    "elbow": 1
+   },
+   "approach": [
+    -0.182,
+    0.5
+   ]
+  },
+  "pair_shelf2_b1_ketchup_c01__ketchup_i01": {
+   "x": -2.15,
+   "y": -0.782,
+   "yaw": -90.0,
+   "grasp": "side",
+   "grip_z": 0.772,
+   "reach": 0.45,
+   "side_min_z": 0.0,
+   "board": "shelf2_b1",
+   "surface": 0.667,
+   "section": "sauces",
+   "left": {
+    "station": "shelf2_b1_ketchup_i01",
+    "product": "food_processed_ketchup_i01",
+    "target": [
+     -1.805,
+     -1.232
+    ],
+    "elbow": -1
+   },
+   "right": {
+    "station": "shelf2_b1_ketchup_c01",
+    "product": "food_processed_ketchup_c01",
+    "target": [
+     -2.495,
+     -1.232
+    ],
+    "elbow": 1
+   },
+   "approach": [
+    -2.15,
+    -0.682
+   ]
+  }
+ }
+}

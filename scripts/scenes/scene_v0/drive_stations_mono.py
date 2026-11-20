@@ -3,7 +3,7 @@ not navigation: each leg backs out to the station's turning point, crosses the a
 line isn't clear), and drives straight in. The arm stays folded (mono_poses.STOW) while driving; at a station the
 wheels hold the base in place (proto_task.Task.hold_base).
 
-    OMNI_KIT_ACCEPT_EULA=YES conda run --no-capture-output -n env_isaaclab python scripts/scenes/scene_v0/drive_stations.py --headless
+    OMNI_KIT_ACCEPT_EULA=YES conda run --no-capture-output -n env_isaaclab python scripts/scenes/scene_v0/drive_stations_mono.py --headless
     ... --route home,rack_b0_box_cracker_a01,shelf2_b1_ketchup_c01,home      any stations, in order (default: a short tour)
     ... --tour                                                              every station once, then home
     ... --list                                                              print the station names and stop
@@ -26,7 +26,7 @@ ap.add_argument('--wheels', action='store_true', help='full mecanum robot (rolle
 ap.add_argument('--fill', type=float, default=1.0)
 ap.add_argument('--seed', type=int, default=0)
 args = ap.parse_args()
-import stations as ST                  # no simulator needed for these
+import stations_mono as ST                  # no simulator needed for these
 st = ST.load()
 if args.list:
     for n, s_ in st.items():

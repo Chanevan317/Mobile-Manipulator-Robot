@@ -11,7 +11,7 @@ and goes back to its resting place. Pass: it rose >= 85 mm (the rest is arm sag)
 within 15 mm of where it was picked, upright (< 5 deg).
 
 Run from the package folder (Isaac Sim 5.1; ask the user before running, CLAUDE.md):
-    OMNI_KIT_ACCEPT_EULA=YES PYTHONUNBUFFERED=1 conda run --no-capture-output -n env_isaaclab python scripts/scenes/scene_v0/check_scene.py --headless
+    OMNI_KIT_ACCEPT_EULA=YES PYTHONUNBUFFERED=1 conda run --no-capture-output -n env_isaaclab python scripts/scenes/scene_v0/check_scene_mono.py --headless
     ... --only ketchup,chocolate      only products whose name contains one of these
     ... --no_grasp                    reach + scene check only (with a window: then it stays open to look at, physics
                                       paused, at the screen's resolution; prints the frame rate; --res WxH to override)
@@ -62,7 +62,7 @@ sys.path.insert(0, here)
 from proto_task import Task
 import assets as SA
 import scene as SC
-import grasp_plan as G
+import grasp_plan_mono as G
 import mono_poses as MP
 
 LAYOUT = 'prototype_mono_arm'

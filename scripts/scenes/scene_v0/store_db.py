@@ -6,14 +6,14 @@ Every board of the racks / shelves is cut into fixed-width slots, each with a lo
     T1-01 .. T1-04              the pick spots on the table
 The product database scenes/scene_v0/products.json says which locations each product covers (one or more, on one or
 more boards). It is the source of truth for the store layout: scene.py builds the product runs from it (fillers stock
-them, the shelf task products sit in them), and stations.py ties every robot station to the locations it serves.
+them, the shelf task products sit in them), and stations_mono.py ties every robot station to the locations it serves.
 
     python3 scripts/scenes/scene_v0/store_db.py              check products.json, write locations.json, print the catalogue
     ... --product P03            where product P03 is (also a package name or part of a name: --product cereal)
     ... --at R1-B1-03            what is at a location
 
-After editing products.json: run this script (checks it), then stations.py (new stations if runs moved), then
-check_scene.py / save_scene.py in Isaac.
+After editing products.json: run this script (checks it), then stations_mono.py (new stations if runs moved), then
+check_scene_mono.py / save_scene.py in Isaac.
 """
 import argparse, json, os, sys
 here = os.path.dirname(os.path.abspath(__file__))
@@ -39,7 +39,7 @@ def short_ranges(ids):
 
 
 def stations_by_location():
-    try:                                                 # the file, not stations.py (that needs numpy)
+    try:                                                 # the file, not stations_mono.py (that needs numpy)
         st = json.load(open(os.path.join(RP.scene_dir('scene_v0'), 'stations.json')))['stations']
     except FileNotFoundError:
         return {}

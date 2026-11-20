@@ -6,7 +6,7 @@
 The file is the scene only (no robot): room (3 walls + a floor), lights, furniture, the 15 task products and the filler
 products for that fill / seed, with every physics fix of scene.py, plus a physics scene (gravity, 240 Hz). It REFERENCES
 the downloaded assets in scenes/assets/simready by relative path, so download them first (fetch_assets.py); the file
-itself holds no NVIDIA geometry or textures. The robot scripts build the same scene live (check_scene.py), not from it.
+itself holds no NVIDIA geometry or textures. The robot scripts build the same scene live (check_scene_mono.py), not from it.
 """
 import argparse, os, sys
 here = os.path.dirname(os.path.abspath(__file__))

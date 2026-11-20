@@ -1,6 +1,6 @@
 """One pick from a store shelf / table into the robot's tote, with the scene and wrist camera views side by side.
 
-    OMNI_KIT_ACCEPT_EULA=YES conda run --no-capture-output -n env_isaaclab python scripts/scenes/scene_v0/pick_to_tote.py
+    OMNI_KIT_ACCEPT_EULA=YES conda run --no-capture-output -n env_isaaclab python scripts/scenes/scene_v0/pick_to_tote_mono.py
     ... --station shelf_b1_milk_b01   any station of stations.json (default: the milk carton on the grey shelf)
     ... --tilt 40                      scene camera pitch in deg (+ = down; its servo allows -10 .. 80)
     ... --scene_cam pro_w              scene camera model: pro_w (OAK-D Pro W, 127 deg) or pro_af (OAK-D Pro AF, 66 deg)
@@ -14,7 +14,7 @@ picks, places, folds); before each pick every product that moved goes back to it
 
 The mono robot starts at home, drives to the station, then: open, straight in (side grasp, hand level) or down (top
 grasp, short products), close, lift, out, swing to the tote with the hand down (a side-gripped product ends up lying),
-release, back to the travel fold. Plans: grasp_plan.py (the same side / top grasps as the stations and check_scene.py),
+release, back to the travel fold. Plans: grasp_plan_mono.py (the same side / top grasps as the stations and check_scene_mono.py),
 the tote spot of mono_poses.py. Reports where the product ended and anything else that moved more than 10 mm.
 In the window: two extra viewport windows show the scene camera and the wrist camera (live, through their real lens
 specs); the main viewport stays free. Close the window to exit.
@@ -35,7 +35,7 @@ ap.add_argument('--all_stations', action='store_true', help='window: offer every
 args = ap.parse_args()
 os.environ['MM_SCENE_CAM'] = args.scene_cam          # read by cameras.py when the robot's cameras are made
 
-import stations as ST
+import stations_mono as ST
 import scene_robot as R
 st = ST.load()
 if args.station not in st:
@@ -45,7 +45,7 @@ import numpy as np
 import cameras as CAM
 task, items, watch = R.load(app, args.headless)
 cams = task.cams
-import pick_place as PP                      # the pick / place itself (lib/pick_place.py, shared with train_pipeline/record)
+import pick_place_mono as PP                      # the pick / place itself (lib/pick_place_mono.py, shared with train_pipeline/record)
 PP.init(task, items, watch, st, tilt=args.tilt, headless=args.headless, out=args.out if args.headless else None)
 
 # ---------------------------------------------------------------- the two camera views

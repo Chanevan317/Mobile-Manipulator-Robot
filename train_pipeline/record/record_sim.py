@@ -12,7 +12,7 @@
 Output: train_pipeline/data/raw/<name>/episode_XXXXXX.h5 (numbering continues in an existing folder).
 
 Source of the demonstrations:
-    planner   the offline-planned pick / place of scripts/scenes/scene_v0/lib/pick_place.py (works now)
+    planner   the offline-planned pick / place of scripts/scenes/scene_v0/lib/pick_place_mono.py (works now)
     (the leader arm records with teleop_sim.py instead: a person in the Isaac window)
 
 One episode = from the robot parked at the station (arm folded) to the arm folded again: drive legs are not recorded
@@ -57,12 +57,12 @@ ap.add_argument('--noise', choices=('none', 'mixed'), default='none')
 args = ap.parse_args()
 args.source = 'planner'
 
-import stations as ST                                                    # noqa: E402
+import stations_mono as ST                                                    # noqa: E402
 import scene_robot as R                                                  # noqa: E402
 st = ST.load()
 app = R.start_app(not args.window)
 import numpy as np                                                       # noqa: E402
-import pick_place as PP                                                  # noqa: E402
+import pick_place_mono as PP                                                  # noqa: E402
 import sim_common as SCM                                                 # noqa: E402
 import episode_writer as EW                                               # noqa: E402
 

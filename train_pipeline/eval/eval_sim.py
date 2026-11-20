@@ -60,7 +60,7 @@ else:
 import threading                                                         # noqa: E402
 threading.Thread(target=lambda: [print('  [server]', l.rstrip(), flush=True) for l in server.stdout], daemon=True).start()
 
-import stations as ST                                                    # noqa: E402
+import stations_mono as ST                                                    # noqa: E402
 import scene_robot as R                                                  # noqa: E402
 st = ST.load()
 if args.station not in st:
@@ -69,7 +69,7 @@ app = R.start_app(not args.window)
 import numpy as np                                                       # noqa: E402
 from PIL import Image, ImageDraw                                          # noqa: E402
 import cameras as CAM                                                    # noqa: E402
-import pick_place as PP                                                  # noqa: E402
+import pick_place_mono as PP                                                  # noqa: E402
 import sim_common as SCM                                                 # noqa: E402
 
 task, items, watch = R.load(app, not args.window)

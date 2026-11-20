@@ -1,6 +1,6 @@
 """Drive the mono robot around scene_v0 from a small menu inside the Isaac Sim window (no terminal needed).
 
-    OMNI_KIT_ACCEPT_EULA=YES conda run --no-capture-output -n env_isaaclab python scripts/scenes/scene_v0/station_menu.py
+    OMNI_KIT_ACCEPT_EULA=YES conda run --no-capture-output -n env_isaaclab python scripts/scenes/scene_v0/station_menu_mono.py
     ... --physics_hz 120          # about 2x faster, fine for driving (240 = grasp fidelity, the default)
 
 The "Robot stations" panel:
@@ -10,7 +10,7 @@ The "Robot stations" panel:
               = S1-B2-05); each list offers only what exists, and only the chosen product's locations. Out-of-reach
               decor slots are marked and have no station.
     Go to     the robot station that serves the choice (locations.json -> stations.json) and the locations it serves
-    Go        drive there on the fixed routes (stations.py: back out to the turning point, across, straight in)
+    Go        drive there on the fixed routes (stations_mono.py: back out to the turning point, across, straight in)
     Home      drive back to the start
     Stop      stop at the next waypoint (a Go from there goes straight on, or via the hub if the line isn't clear)
     Random    drive to a random other station
@@ -30,10 +30,10 @@ ap.add_argument('--physics_hz', type=int, default=240, help='240 = grasp fidelit
 ap.add_argument('--render_every', type=int, default=1, help='draw every Nth frame only (3 = 20 fps on screen, faster sim)')
 ap.add_argument('--wheels', action='store_true', help='full mecanum robot (roller simulation) instead of the planar arm-training base')
 ap.add_argument('--fill', type=float, default=1.0)
-ap.add_argument('--seed', type=int, default=0, help="the scene's filler layout (as check_scene.py --seed)")
+ap.add_argument('--seed', type=int, default=0, help="the scene's filler layout (as check_scene_mono.py --seed)")
 args = ap.parse_args()
 
-import stations as ST
+import stations_mono as ST
 import scene as SC
 import assets as SA
 from store_db import short_ranges

@@ -40,7 +40,7 @@ shelf boards ~0.265 + k 0.405 (ridged: the products settle ~0.668 / 1.071; 0.675
 """
 import math, os, sys
 import random
-try:                                  # the layout (REST, LOCATIONS, PRODUCTS, FURNITURE, ...) also loads without Isaac (stations.py)
+try:                                  # the layout (REST, LOCATIONS, PRODUCTS, FURNITURE, ...) also loads without Isaac (stations_mono.py)
     from pxr import Usd, UsdGeom, UsdPhysics, UsdLux, UsdShade, Sdf, Gf
 except ImportError:
     Usd = None
@@ -90,7 +90,7 @@ CAN, CHOC, CUP = _P + 'cannedFood_h01', _P + 'chocolate_e01', _F + 'beverage_cof
 MILK_B, MILK_C, YOG_A, YOG_C = _P + 'milk_b01', _P + 'milk_c01', _P + 'yogurt_a01', _P + 'yogurt_c01'
 KET_C, KET_I, KET_A = _P + 'ketchup_c01', _P + 'ketchup_i01', _F + 'condiment_ketchup_a02'
 # the 11 shelf task products: in the middle of their own run on a board the mono arm reaches. Short products (<= 70 mm,
-# picked from above) only on boards <= ~0.8 m: from above at 1.07 m needs lift 0.87 > 0.81 (stations.py found it)
+# picked from above) only on boards <= ~0.8 m: from above at 1.07 m needs lift 0.87 > 0.81 (stations_mono.py found it)
 TASK_BOARD = {CEREAL: 'rack_b0', CRACKER: 'rack_b0', BOX_B: 'rack_b0', BOX_C: 'rack_b0', BOX_D: 'rack_b0',
               CHOC: 'rack2_b0', MILK_B: 'shelf_b1', MILK_C: 'shelf_b2', KET_C: 'shelf2_b1', KET_I: 'shelf2_b1',
               KET_A: 'shelf2_b2'}
@@ -267,7 +267,7 @@ def build(stage, root='/World/store', products=True, fill=1.0, seed=0, room=True
     """Add the scene. Returns {name: dict(pkg, role, slot, bodies, rest=(surface z, x, y, heading), yaw, range)}.
     fill: filler-product density scale (0 = none; each board gets a random fill 10..100 % times this); seed: their layout."""
     global Usd, UsdGeom, UsdPhysics, UsdLux, UsdShade, Sdf, Gf
-    if Usd is None:                    # imported before Isaac started (e.g. through stations.py): load pxr now
+    if Usd is None:                    # imported before Isaac started (e.g. through stations_mono.py): load pxr now
         from pxr import Usd, UsdGeom, UsdPhysics, UsdLux, UsdShade, Sdf, Gf
     UsdGeom.Xform.Define(stage, Sdf.Path(root))
     out = {}

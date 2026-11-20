@@ -1,19 +1,19 @@
-"""Pick a store product into the robot's tote and put it back: the planner-driven pick / place of pick_to_tote.py,
+"""Pick a store product into the robot's tote and put it back: the planner-driven pick / place of pick_to_tote_mono.py,
 importable (2026-11-19) so the station panel and the LeRobot recorder (train_pipeline/record) share one copy.
 
-    import pick_place as PP
+    import pick_place_mono as PP
     PP.init(task, items, watch, st, tilt=40, headless=True, out=None)   # after scene_robot.load(); builds the planner
     ok, why = PP.run(sid)            # put moved products back, drive to station sid, pick into the tote, fold
     ok, why = PP.run_place()         # the last picked product from the tote back to its spot
     PP.restore(); PP.reset_robot(); PP.close()
 
 Moves are checked offline (collide.py: furniture, products, the robot, the carried product); plans are cached in
-~/.cache/mobile_manipulator/pick_to_tote_plans.json. See pick_to_tote.py and CLAUDE.md item 29 for the lessons.
+~/.cache/mobile_manipulator/pick_to_tote_plans.json. See pick_to_tote_mono.py and CLAUDE.md item 29 for the lessons.
 """
 import json, math, os, time
 import numpy as np
 import cameras as CAM
-import grasp_plan as G
+import grasp_plan_mono as G
 import mono_poses as MP
 import scene_robot as R
 import scara_ik as K
@@ -26,6 +26,8 @@ READY_GAP = 0.12        # m: the hand this far in front of the furniture while t
 STOW_LEFT = {**MP.STOW, 'shoulder_pan': -MP.STOW['shoulder_pan'], 'elbow_pan': -MP.STOW['elbow_pan'],
              'wrist_pan': -MP.STOW['wrist_pan']}   # the travel fold mirrored: clear at lift 0 .. 0.81 (offline check)
 PLAN_SPEED = 0.4        # planned (waypoint) moves run at this fraction of the joint speeds
+PAUSE = 0.4             # fixed pauses (before a pick, after releasing, before checking where the product ended) x this
+SETTLE_CAP = 1.0        # s: the longest a move waits for the arm to stop (it hunted for up to 8 s holding a product)
 CACHE_FILE = os.path.join(os.path.expanduser('~'), '.cache', 'mobile_manipulator', 'pick_to_tote_plans.json')
 
 # set by init()
@@ -64,6 +66,8 @@ def init(task_, items_, watch_, st_, tilt=40.0, headless=False, out=None, worker
     task.q_goal[task.idx['scene_camera_pitch']] = math.radians(tilt)
     task.profile = 'trap'        # as the mono shelf task: trapezoid moves (full allowed speed after a 0.3 s ramp)
     task.settle_mode = 'still'   # a move is done once the joints stop (holding a product the wrist pitch sags)
+    task.settle_cap = SETTLE_CAP
+    task.jaw_mode = 'stop'       # jaw actions end when the jaws stop (on the product or at the target)
     if os.environ.get('P2T_DEBUG'):  # after every move: commanded vs measured joints, TCP, jaw gap              # after every move: commanded vs measured joints, TCP, jaw gap
         def _wrap(fn, name_):
             def w(*a_, **k_):
@@ -138,7 +142,7 @@ def pick(sid):
           f"scene camera {OPT['scene_cam']} at {OPT['tilt']:.0f} deg\n", flush=True)
 
     if True:
-        task.wait(0.5)
+        task.wait(0.5 * PAUSE)
         # which side the arm will reach round: the grasp's ring angle, predicted from the product's resting spot and the
         # station's base pose. The ring can't wrap past +-180 deg, so going from the right-hand travel fold (ring -80) to a
         # grasp with the ring on the left turns it through the front, past the furniture (it hit the grey shelf's front post).
@@ -330,7 +334,7 @@ def pick(sid):
                       f'{np.round((pn_ - rel_b[0]) * 1000):} mm', flush=True)
         task.jaw('left', jopen + 0.01, 0.8)
         _tilt('jaws open')
-        task.wait(0.6)
+        task.wait(0.6 * PAUSE)
         _tilt('0.6 s later')
         shot('released in the tote')
         task.cart_move('left', (tx, ty, zr, yt, P), (tx, ty, hi, yt, P), et)
@@ -339,7 +343,7 @@ def pick(sid):
         go({**stow, 'lift': task.arm_now('left')['lift']}, 'fold for travel', env_=env_held)
         _tilt('folded')
         task.joint_move('left', {'lift': stow['lift']})
-        task.wait(1.0)
+        task.wait(1.0 * PAUSE)
         _tilt('lift at the fold height')
         pb = task.to_base(R.positions(watch)[name])
         x0, x1, y0, y1 = MP.TOTE_BOX
@@ -413,7 +417,7 @@ def pick(sid):
                 go(task.ik('left', up, e), 'swing back to the shelf', held, jaw_held, env_held)
                 task.cart_move('left', up, b5, e, 1.5)
             task.jaw('left', jopen, 0.8)
-            task.wait(0.4)
+            task.wait(0.4 * PAUSE)
             shot('set down')
             if S['grasp'] == 'side':
                 task.cart_move('left', b5, a, e, slow)
@@ -424,7 +428,7 @@ def pick(sid):
             task.jaw('left', 0.0, 0.5)
             go({**stow, 'lift': task.arm_now('left')['lift']}, 'fold after placing', env_=env)   # product back on its shelf
             task.joint_move('left', {'lift': stow['lift']})
-            task.wait(1.0)
+            task.wait(1.0 * PAUSE)
             pf, Rf = pose_b(cand[name])
             p_start = task.to_base(START[name][0][0])
             R_start = pose_b(None, START[name][0])[1]

@@ -11,7 +11,7 @@ Checks the arm's links against the robot's own static links (base, column, tote,
 arm's non-adjacent links against each other, the furniture boxes, and an optional carried product (a box in the TCP
 frame) against all of them. It uses the collision meshes of the layout's URDF (wheels and rollers left out).
 Same idea as the scratch checkers used for the mono task plans (mono_poses lessons); found 2026-11-18 that a direct
-swing from the travel fold to a shelf grasp hits the grey shelf's front post (pick_to_tote.py).
+swing from the travel fold to a shelf grasp hits the grey shelf's front post (pick_to_tote_mono.py).
 """
 import collections, math, os, sys
 import numpy as np

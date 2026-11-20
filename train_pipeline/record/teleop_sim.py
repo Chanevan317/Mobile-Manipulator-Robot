@@ -70,7 +70,7 @@ else:
     leader = LA.Leader(port=args.port, name=args.calib)
     print(f'leader arm: calibration {args.calib} ({leader.cal["date"]}), reading OK: {leader.read()}', flush=True)
 
-import stations as ST                                                    # noqa: E402
+import stations_mono as ST                                                    # noqa: E402
 import scene_robot as R                                                  # noqa: E402
 st = ST.load()
 app = R.start_app(args.headless)
@@ -79,7 +79,7 @@ import cameras as CAM                                                    # noqa:
 import mono_poses as MP                                                  # noqa: E402
 import scara_ik as K                                                     # noqa: E402
 import proto_task as PT                                                  # noqa: E402
-import pick_place as PP                                                  # noqa: E402
+import pick_place_mono as PP                                                  # noqa: E402
 import sim_common as SCM                                                 # noqa: E402
 import episode_writer as EW                                              # noqa: E402
 

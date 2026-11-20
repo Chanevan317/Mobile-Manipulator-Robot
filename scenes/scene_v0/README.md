@@ -1,4 +1,4 @@
-# scene_v0: store scene for the one-arm prototype
+# scene_v0: store scene for the one-arm (mono) and two-arm (dual) robots
 
 ![scene_v0: room, table with the robot, racks, shelves](preview_scene_v0.png)
 
@@ -34,7 +34,7 @@ python scripts/scenes/scene_v0/fetch_assets.py --check    # what is there
 ## 2. Look at it
 
 ```bash
-python scripts/scenes/scene_v0/check_scene.py --no_grasp
+python scripts/scenes/scene_v0/check_scene_mono.py --no_grasp
 ```
 
 Opens a full-screen window with the robot, checks the scene (below), then pauses physics so the view moves smoothly
@@ -46,7 +46,7 @@ Options: `--fill 0.5` (fewer filler products; `0` = only the 15 task products), 
 ## 3. Check it
 
 ```bash
-python scripts/scenes/scene_v0/check_scene.py --headless --no_grasp
+python scripts/scenes/scene_v0/check_scene_mono.py --headless --no_grasp
 ```
 
 - reach: the arm can pick each task product from some spot in front of its furniture (arm geometry only);
@@ -70,7 +70,7 @@ and the arm is trained there. Each station is a base position and heading `(x, y
 The world frame is the robot's start spot: x points to the table, y to the blue racks.
 
 - `home`: the start spot, the middle of the room (x -1.375, y -0.05), facing the table. Every script that puts the robot
-  in the store starts it here (`check_scene.py` excepted: its grasp test needs the robot at the table).
+  in the store starts it here (`check_scene_mono.py` excepted: its grasp test needs the robot at the table).
 - One station per product run on every board the arm reaches, named `<board>_<product>`, for example
   `rack_b0_box_cracker_a01` or `shelf2_b1_ketchup_c01`. The base stops facing the board, and the arm can reach that
   run's middle product.
@@ -80,21 +80,57 @@ They are on the floor as flat marks: **blue** = home, **green** = a task product
 product run. The small **orange** square is the station's turning point.
 
 ```bash
-python scripts/scenes/scene_v0/stations.py              # works out the stations -> stations.json (no simulator; rerun after a layout change)
-python scripts/scenes/scene_v0/drive_stations.py --list                       # names and coordinates
-python scripts/scenes/scene_v0/drive_stations.py --route home,rack_b0_box_cracker_a01,shelf_b1_milk_b01,home
-python scripts/scenes/scene_v0/drive_stations.py --tour                       # every station once (add --headless for no window)
-python scripts/scenes/scene_v0/random_drive.py                       # random stations, 3 s at each, until you close the window
-python scripts/scenes/scene_v0/random_drive.py --stay 5 --only task --seed 1   # options: stay time, which stations, sequence
+python scripts/scenes/scene_v0/stations_mono.py              # works out the stations -> stations.json (no simulator; rerun after a layout change)
+python scripts/scenes/scene_v0/drive_stations_mono.py --list                       # names and coordinates
+python scripts/scenes/scene_v0/drive_stations_mono.py --route home,rack_b0_box_cracker_a01,shelf_b1_milk_b01,home
+python scripts/scenes/scene_v0/drive_stations_mono.py --tour                       # every station once (add --headless for no window)
+python scripts/scenes/scene_v0/random_drive_mono.py                       # random stations, 3 s at each, until you close the window
+python scripts/scenes/scene_v0/random_drive_mono.py --stay 5 --only task --seed 1   # options: stay time, which stations, sequence
 ```
 
 How the robot drives: it backs straight out to the station's turning point, crosses the aisle (through the middle of
 the aisle when a direct line isn't clear), turns on the way, and drives straight in. The arm stays folded while driving.
 At a station, the wheels hold the base still while the arm works.
 
-What `stations.py` checks: the arm can reach the product from the station (joint limits), and the robot's outline
+What `stations_mono.py` checks: the arm can reach the product from the station (joint limits), and the robot's outline
 (the base plus the camera in front, + 2 cm) clears the furniture and walls at the station, on the way in and out, and
 while turning. Not checked: the arm against the furniture (the grasp test does that).
+
+## 5b. The dual-arm robot: two products at the same time
+
+Every robot script here comes in a `_mono` and a `_dual` version. The dual robot always works with **both arms at once,
+on two different products**: the left arm takes one, the right arm the one beside it.
+
+```bash
+python scripts/scenes/scene_v0/stations_dual.py                     # pair stations -> stations_dual.json (no simulator)
+python scripts/scenes/scene_v0/pick_to_tote_dual.py                  # window: "Dual pick" panel + scene and both wrist cameras
+python scripts/scenes/scene_v0/pick_to_tote_dual.py --headless --all --place   # every pair: pick both, put both back
+python scripts/scenes/scene_v0/station_menu_dual.py                  # window: drive to pair stations, pick / place both
+python scripts/scenes/scene_v0/drive_stations_dual.py --route home,shelf_b1_milk_b01,home   # driving only
+python scripts/scenes/scene_v0/random_drive_dual.py
+python scripts/scenes/scene_v0/check_scene_dual.py --headless       # pair reach + scene check with the dual robot
+```
+
+- **Pair stations** (`stations_dual.py`): two task products on one board, 0.20-0.75 m apart. Each arm reaches only its
+  own half in front (0.10-0.35 m from the middle, 0.55-0.65 m ahead with the hand level), and both arms share **one
+  lift**, so both products are gripped from the side at **one height** (the lower of their usual grip heights).
+  5 pairs: four on blue rack 1's bottom board and the two ketchups on grey shelf 2. The table's products are only
+  0.12 m apart: too close for two hands. The driving scripts still use the mono stations (`stations_mono.py`).
+- **The pick** (`lib/pick_place_dual.py`): drive there folded; lift; unfold one arm at a time; both hands in front of
+  their products; both jaws open (fully, before going in); both straight in; both close; both lift 2 cm and back out
+  of the shelf to a point from which the swing can't slide a held box along the board; elbow-open beside the robot;
+  hands down beside the robot (the boxes turn to lying); over the two tote spots, high enough to clear the tote walls
+  in any orientation; down; release; fold.
+- **The lift moves only while both hands are inside the robot's outline** (folded, over the tote) or straight in front
+  of the shelf. Next to the table (rack 1's last pair) the hands swing out above the table and the crate on it
+  (`side_min_z` in `stations_dual.json`), and the held boxes' length is added while they hang.
+- **Place back:** the same path backwards. Each hand re-grips its product where it lies now (it slides and drops a little
+  after release). Both hands are at one height, so the two boxes may be held a little deeper or shallower than when
+  they were dropped. Each hand then goes that much further in or less far into the shelf, so the box lands on its spot.
+- `DUAL_DEBUG=1` prints, after every step, both products, both hands, the jaw gaps, the worst joint error and anything
+  else that moved.
+- Not yet: collision planning for two arms (mono uses `collide.py`'s planner; the dual moves are fixed patterns, checked
+  in Isaac), table pairs, the training pipeline for two arms.
 
 ## 6. Locations and the product database
 
@@ -119,15 +155,15 @@ python3 scripts/scenes/scene_v0/store_db.py --product cereal       # where a pro
 python3 scripts/scenes/scene_v0/store_db.py --at S1-B2-05          # what is at a location, and which station serves it
 ```
 
-To drive there from inside Isaac Sim instead of the terminal: `python scripts/scenes/scene_v0/station_menu.py` opens the
+To drive there from inside Isaac Sim instead of the terminal: `python scripts/scenes/scene_v0/station_menu_mono.py` opens the
 scene with a **Robot stations** panel: the product (grouped by section, with its size, weight and friction), the
 location (nearest, or unit / board / slot), the station that serves them, and Go / Home / Stop / Random. **View**
 switches the viewport to the robot's scene or wrist camera (real specs, `scripts/common/cameras.py`). The **Up / Down** arrow keys move
 the lift while held (at its real speed, 0–0.81 m).
 
 The check fails if a location is unknown or claimed by two products, a task product has no location on its board, or
-a table spot is empty. After an edit: `store_db.py`, then `stations.py` (each station lists the locations it serves),
-then `check_scene.py` and `save_scene.py` in Isaac Sim.
+a table spot is empty. After an edit: `store_db.py`, then `stations_mono.py` (each station lists the locations it serves),
+then `check_scene_mono.py` and `save_scene.py` in Isaac Sim.
 
 ## Files
 
@@ -138,7 +174,7 @@ then `check_scene.py` and `save_scene.py` in Isaac Sim.
 | `products.json` | the product database: id, name, package, weight, size, the locations each product covers (edit this) |
 | `locations.json` | every location ID: unit, board, slot, height, position, reachable, product, station (written by `store_db.py`) |
 | `CREDITS.md` | attribution for the NVIDIA assets |
-| `preview_scene_v0.png` | picture of the scene (rendered with `check_scene.py --shot`, 4 views) |
+| `preview_scene_v0.png` | picture of the scene (rendered with `check_scene_mono.py --shot`, 4 views) |
 
 Scripts, in `../../scripts/scenes/scene_v0/`:
 
@@ -146,17 +182,17 @@ Scripts, in `../../scripts/scenes/scene_v0/`:
 |---|---|
 | `lib/scene.py` | builds the scene (layout, sections, walls, lights, products, station marks, every physics fix) |
 | `lib/assets.py` | the asset list, sizes and our product weights |
-| `lib/grasp_plan.py` | where and how the mono arm can grasp each product (no simulator) |
+| `lib/grasp_plan_mono.py` | where and how the mono arm can grasp each product (no simulator) |
 | `fetch_assets.py` | downloads the assets |
-| `check_scene.py` | reach + scene checks with the robot; viewing window |
+| `check_scene_mono.py` | reach + scene checks with the robot; viewing window |
 | `save_scene.py` | writes `scene_v0.usda` |
-| `pick_to_tote.py` | a panel in the Isaac window: choose a product (the 16 that can be picked), the robot drives to its station, picks it (side grasp or from above) and puts it in the tote; the scene camera (Pro W by default, `--tilt 40`) and the wrist camera show side by side. Moves are checked offline against the furniture and the products (`scripts/common/collide.py`; plans cached in `~/.cache/mobile_manipulator`) |
-| `station_menu.py` | opens the scene with a "Robot stations" panel: pick a product and / or a location, Go drives the robot to the station that serves it (Home, Stop too) |
+| `pick_to_tote_mono.py` | a panel in the Isaac window: choose a product (the 16 that can be picked), the robot drives to its station, picks it (side grasp or from above) and puts it in the tote; the scene camera (Pro W by default, `--tilt 40`) and the wrist camera show side by side. Moves are checked offline against the furniture and the products (`scripts/common/collide.py`; plans cached in `~/.cache/mobile_manipulator`) |
+| `station_menu_mono.py` | opens the scene with a "Robot stations" panel: pick a product and / or a location, Go drives the robot to the station that serves it (Home, Stop too) |
 | `store_db.py` | checks the product database, writes `locations.json`, looks up products and locations (no simulator) |
-| `stations.py` | works out the robot stations and routes -> `stations.json` (no simulator) |
+| `stations_mono.py` | works out the robot stations and routes -> `stations.json` (no simulator) |
 | `lib/scene_robot.py` | the robot in the scene and one drive between stations (used by the two below) |
-| `drive_stations.py` | drives the robot along a route of stations (`--route`, `--tour`) |
-| `random_drive.py` | drives to random stations and stays at each for 3 s (`--stay`, `--count`, `--only`, `--seed`) |
+| `drive_stations_mono.py` | drives the robot along a route of stations (`--route`, `--tour`) |
+| `random_drive_mono.py` | drives to random stations and stays at each for 3 s (`--stay`, `--count`, `--only`, `--seed`) |
 
 ## Changes made to the assets in our scene (the downloaded files stay untouched)
 

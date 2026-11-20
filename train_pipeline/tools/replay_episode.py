@@ -32,13 +32,13 @@ if not files:
     sys.exit(f'no episodes in {raw}')
 
 os.environ.setdefault('MM_CAMERAS', '0')       # not needed to replay (faster); MM_CAMERAS=1 to watch them
-import stations as ST                                                    # noqa: E402
+import stations_mono as ST                                                    # noqa: E402
 import scene_robot as R                                                  # noqa: E402
 st = ST.load()
 app = R.start_app(not args.window)
 import numpy as np                                                       # noqa: E402
 import h5py                                                              # noqa: E402
-import pick_place as PP                                                  # noqa: E402
+import pick_place_mono as PP                                                  # noqa: E402
 import sim_common as SCM                                                 # noqa: E402
 
 task, items, watch = R.load(app, not args.window)

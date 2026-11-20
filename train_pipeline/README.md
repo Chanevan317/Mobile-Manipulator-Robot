@@ -2,7 +2,7 @@
 
 Record demonstrations in the Isaac store scene, check them, turn them into a LeRobot dataset, and train ACT.
 The split (decided 2026-11-19): **our own code** for IK and motion planning (`scripts/common/scara_ik.py`,
-`collide.py`, `scripts/scenes/scene_v0/lib/pick_place.py`), **LeRobot** for the dataset format and the policies.
+`collide.py`, `scripts/scenes/scene_v0/lib/pick_place_mono.py`), **LeRobot** for the dataset format and the policies.
 
 Two conda environments, as in the SO-101 project, so LeRobot never has to live in the Isaac environment:
 

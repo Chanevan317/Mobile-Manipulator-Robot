@@ -27,6 +27,7 @@ MIN_MOVE = 0.4            # s, shortest straight-line move
 ARM_KEYS = ('shoulder_pan', 'elbow_pan', 'wrist_pan', 'wrist_pitch', 'wrist_roll')
 RAMP = 0.3                # s, accel / decel ramp of the 'trap' profile
 STILL_V = 0.1             # rad/s: 'stopped' for settle_mode 'still' (the wrist pitch holding a product hunts at 0.03-0.06)
+JAW_STILL_V = 0.004       # m/s: a jaw has stopped (jaw_mode 'stop')
 STILL_V_LIFT = 0.005      # m/s for the lift: its top speed is 0.10 m/s, so 0.1 counted it as stopped while it was still
                           # ~19 mm behind going into the tote (the jaws then opened 20 mm above the floor)
 
@@ -80,6 +81,9 @@ class Task:
         self.t = 0.0
         self.profile = 'cosine'   # 'trap' (mono tasks): faster, same speed limits
         self.settle_log = []      # (seconds spent settling, None or the joint that never got within tol)
+        self.jaw_mode = 'fixed'   # 'stop' (scene_v0): a jaw action ends when the jaws stop, not after a fixed time
+        self.settle_cap = None    # seconds: the longest a move may wait to settle (None = each move's own timeout)
+        self.jaw_log = []
         self.settle_mode = 'tol'  # 'still' (mono tasks): also done once the arm joints + lift have stopped (< STILL_V for 0.1 s)
         self.still = 0
 
@@ -147,6 +151,8 @@ class Task:
 
     def settle(self, tol=0.035, timeout=6.0):
         d = self.driven; t0 = self.t
+        if self.settle_cap is not None:              # scene_v0: never sit out a long timeout (the next move starts from
+            timeout = min(timeout, self.settle_cap)  # the last target, so ending early can't jump)
         for _ in range(int(timeout * CTRL_HZ)):
             self.step_once()
             q = self.robot.get_joint_positions()
@@ -181,7 +187,23 @@ class Task:
         self.q_goal[self.idx[f'{side}_finger_right']] = self.q_goal[self.idx[f'{side}_finger_left']] = v
 
     def jaw(self, side, v, seconds=0.7):
-        self.set_jaw(side, v); self.wait(seconds)
+        """Open / close a gripper. jaw_mode 'fixed' (default) waits `seconds`; 'stop' (scene_v0) waits until both jaws
+        have stopped (on the product, or at the target) for 4 steps, at least 0.15 s, at most `seconds`."""
+        self.set_jaw(side, v)
+        if self.jaw_mode != 'stop':
+            self.wait(seconds); return
+        ii = [self.idx[f'{side}_finger_right'], self.idx[f'{side}_finger_left']]
+        n = still = 0
+        moved = False                     # a stop counts only after the jaws moved, or once the command got there (a target
+        while n < seconds * CTRL_HZ:      # past the joint limit leaves the jaws still while the command winds back)
+            self.step_once(); n += 1
+            v = np.abs(self.robot.get_joint_velocities()[ii])
+            moved |= bool(np.any(v > 3 * JAW_STILL_V))
+            arrived = np.max(np.abs(self.q_cmd[ii] - self.q_goal[ii])) < 1e-6
+            still = still + 1 if np.all(v < JAW_STILL_V) else 0
+            if n >= 0.15 * CTRL_HZ and still >= 4 and (moved or arrived):
+                break
+        self.jaw_log.append(n / CTRL_HZ)
 
     def arm_now(self, side):
         q = {k: float(self.q_goal[self.idx[f'{side}_{k}']]) for k in ARM_KEYS}
@@ -357,3 +379,5 @@ class Task:
         print(f"\n{sum(ok for _, ok, _ in self.results)}/{len(self.results)} steps OK. Simulated time {self.t:.0f} s.")
         to = [(t, j) for t, j in self.settle_log if j]
         print(f"settling: {sum(t for t, _ in self.settle_log):.1f} s in {len(self.settle_log)} moves; {len(to)} timed out ({sum(t for t, _ in to):.1f} s), joints: { {j: sum(1 for _, k in to if k == j) for _, j in to} }")
+        if self.jaw_log:
+            print(f"jaws: {sum(self.jaw_log):.1f} s in {len(self.jaw_log)} actions (ended when the jaws stopped)")
