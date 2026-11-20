@@ -28,6 +28,9 @@ SEED="${SEED:-1000}"
 GPU="${GPU:-0}"
 # ACT chunk: 100 actions = 3.3 s at 30 fps (LeRobot's default); the arm's moves last 1-4 s
 CHUNK="${CHUNK:-100}"
+# FAST=1 (default): bf16 mixed precision + torch.compile through lerobot_train_fast.py, ~2x faster on the RTX 5060 Ti
+# (measured 2026-11-20, see that file). FAST=0 = plain lerobot-train in float32.
+FAST="${FAST:-1}"
 
 if [[ ! -d "$DATASET_ROOT" ]]; then
   echo "no dataset at $DATASET_ROOT (convert first: python train_pipeline/convert/to_lerobot.py --raw <raw name>)" >&2
@@ -41,7 +44,13 @@ fi
 export CUDA_VISIBLE_DEVICES="$GPU"
 export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:True}"
 
-exec lerobot-train \
+if [[ "$FAST" == "1" ]]; then
+  TRAIN=(python "$PIPE/train/lerobot_train_fast.py" --policy.use_amp=true)
+else
+  TRAIN=(lerobot-train)
+fi
+
+exec "${TRAIN[@]}" \
   --dataset.repo_id="$REPO_ID" \
   --dataset.root="$DATASET_ROOT" \
   --policy.type=act \
