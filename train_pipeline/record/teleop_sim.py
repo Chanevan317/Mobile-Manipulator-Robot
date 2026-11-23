@@ -12,7 +12,8 @@ Step 1 of the pipeline, by a person (record_sim.py is the planner's version; bot
 
 The window: a "Teleop recording" panel + the scene and wrist camera views (the policy sees exactly these).
     1. choose the product and the task (pick into the tote / place back on its shelf), "Go to station": the robot drives
-       there with its arm folded (navigation is scripted, not learned; pick: the products are put back first)
+       there with its arm folded (navigation is scripted, not learned; pick: the products are put back first).
+       (Teleop also works at home without a station, to try the leader; recording needs a station.)
     2. "Start teleop": the arm first moves SLOWLY to the leader's pose, then follows it 1:1 (put the leader in the travel
        fold first: then nothing moves). Up / Down arrow keys move the lift while held
     3. R = record, do the task, fold the arm again, N = save (checked automatically: in the tote / back on its spot,
@@ -102,7 +103,8 @@ SYNC_TOL = math.radians(2)
 FOLD_TOL = math.radians(8)
 
 S = dict(mode='idle', deg=None, cmd=None, sid=None, kind='pick', name=None, keys=set(), req=None, p0=None,
-         vmax=None, last=None, msg='')
+         vmax=None, last=None, msg='', read_err=0)
+READ_LOST = 30                                          # missed leader reads in a row (0.5 s) -> teleop stops, arm holds
 writer = EW.EpisodeWriter(task, items, C.RAW_DIR / args.name, 'leader_dummy' if DUMMY else 'leader', args.tilt,
                           jpeg=args.jpeg, depth=args.depth, keep_failed=True,
                           frame_extra=lambda: {'leader.deg': [S['deg'][j] for j, *_ in LA.JOINTS]})
@@ -125,7 +127,18 @@ _step = task.step_once
 
 def step_teleop():
     if S['mode'] in ('sync', 'follow'):
-        S['deg'] = leader.degrees()
+        try:
+            S['deg'] = leader.degrees(); S['read_err'] = 0
+        except IOError:                               # a missed servo packet: keep the last pose for a moment
+            S['read_err'] += 1
+            if S['read_err'] >= READ_LOST or S['deg'] is None:
+                if S['mode'] == 'sync':
+                    task.vmax = S['vmax']
+                S['mode'] = 'idle'; hold()
+                S['msg'] = 'LEADER LOST (no servo reply for 0.5 s): teleop off, the arm holds. Check the USB / power.'
+                print('      ' + S['msg'], flush=True)
+                _step(); writer.step()
+                return
         S['cmd'] = leader.command(S['deg'])
         set_arm_goal(S['cmd'])
         if DUMMY:
@@ -182,8 +195,8 @@ def go_to(sid, kind):
 
 
 def start_teleop():
-    if S['sid'] is None:
-        return 'go to a station first'
+    # works anywhere, also at home (2026-11-23, user: the arm didn't move: Start needed a station first); only
+    # RECORDING needs a station (an episode belongs to a station + product)
     if S['mode'] != 'idle':
         return 'already on'
     if DUMMY:
@@ -191,8 +204,10 @@ def start_teleop():
     S['vmax'] = task.vmax.copy()
     task.vmax = S['vmax'] * SYNC_SPEED
     leader.last = {}                                  # the roll starts counting from this reading
+    S['read_err'] = 0
     S['mode'] = 'sync'
-    return 'moving slowly to the leader\'s pose ...'
+    where = '' if S['sid'] else ' (at home: you can move the arm, but recording needs "Go to station")'
+    return 'moving slowly to the leader\'s pose ...' + where
 
 
 def stop_teleop():
@@ -205,6 +220,8 @@ def stop_teleop():
 
 
 def record():
+    if S['sid'] is None:
+        return 'go to a station first: an episode belongs to a station and its product'
     if S['mode'] != 'follow':
         return 'start teleop first (and wait until it follows)'
     if writer.active:
@@ -297,7 +314,7 @@ if not args.headless:
             v.viewport_api.resolution = r
         except Exception:
             pass
-    win = ui.Window('Teleop recording', width=600, height=300, position_x=40, position_y=90)
+    win = ui.Window('Teleop recording', width=640, height=330, position_x=40, position_y=90)
     btn = lambda label, req: ui.Button(label, clicked_fn=lambda: S.update(req=req))
     with win.frame:
         with ui.VStack(spacing=6, height=0):
@@ -313,7 +330,7 @@ if not args.headless:
                 btn('Start teleop', 'start'); btn('Stop teleop', 'stop')
             with ui.HStack(height=28, spacing=6):
                 btn('Record (R)', 'record'); btn('Save (N)', 'save'); btn('Discard (X)', 'discard')
-            status = ui.Label('', word_wrap=True, height=60)
+            status = ui.Label('', word_wrap=True, height=80)
             ui.Label('Up / Down arrows: lift (while teleop is on). Click the viewport if a dropdown keeps the keys.',
                      style={'color': 0xFF9A9A9A}, word_wrap=True)
     combo.model.get_item_value_model().add_value_changed_fn(lambda m: sel.update(i=m.as_int))
@@ -344,7 +361,16 @@ def show():
     live = ''
     if S['name'] and S['p0'] is not None and writer.active:
         live = '   product in the tote: ' + ('yes' if SCM.in_tote(S['name'])[0] else 'no') if S['kind'] == 'pick' else ''
-    status.text = f"{mode}{rec}   lift {task.robot.get_joint_positions()[LI] * 100:.0f} cm{live}\n{S['msg']}"
+    lead = ''
+    if S['mode'] != 'idle' and S['deg'] is not None:   # the leader's angles (* = past the follower limit, clamped)
+        cells = []
+        for j, _, name, lim in LA.JOINTS:
+            if j == 'gripper':
+                cells.append(f"grip {S['cmd'][name] * 1000:.0f}mm")
+            else:
+                cells.append(f"{j} {S['deg'][j]:+.0f}" + ('*' if not lim[0] <= S['deg'][j] <= lim[1] else ''))
+        lead = '\nleader: ' + '  '.join(cells)
+    status.text = f"{mode}{rec}   lift {task.robot.get_joint_positions()[LI] * 100:.0f} cm{live}{lead}\n{S['msg']}"
 
 
 # ---------------------------------------------------------------- --auto (dummy): the whole round by itself
