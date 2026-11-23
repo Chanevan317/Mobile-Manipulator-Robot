@@ -20,18 +20,9 @@ SIM = dict(physics_hz=240, self_collision=True, dynamic_fillers=True, gpu=False,
 
 
 def start_app(headless):
-    """SimulationApp; in a window, full screen at the screen's resolution (2560 x 1440 here; the GPU has plenty of room,
-    the CPU-side physics sets the frame rate)."""
-    from isaacsim import SimulationApp
-    cfg = {'headless': headless}
-    if not headless:
-        try:
-            m = re.search(r' connected primary (\d+)x(\d+)', subprocess.run(['xrandr'], capture_output=True, text=True, timeout=5).stdout)
-            W, H = int(m.group(1)), int(m.group(2))
-        except Exception:
-            W, H = 1920, 1080
-        cfg.update(width=W, height=H, window_width=W, window_height=H)
-    return SimulationApp(cfg)
+    """SimulationApp; in a window, full screen at the screen's resolution (scripts/common/sim_app.py)."""
+    import sim_app
+    return sim_app.start(headless)
 
 
 def load(app, headless, fill=1.0, seed=0, urdf=None, wheels=False, layout='prototype_mono_arm', **sim):

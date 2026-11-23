@@ -33,26 +33,8 @@ ap.add_argument('--shot', default='', help='save viewport pictures to PATH_<view
 args = ap.parse_args()
 
 
-def screen_size():
-    """The primary screen's size (the window then fills it, rendered at full resolution: Isaac's default renders
-    1280 x 720 and stretches it, which looked soft on the user's 2560 x 1440 screen)."""
-    if args.res:
-        return tuple(int(v) for v in args.res.lower().split('x'))
-    try:
-        import re, subprocess
-        out = subprocess.run(['xrandr'], capture_output=True, text=True, timeout=5).stdout
-        m = re.search(r' connected primary (\d+)x(\d+)', out) or re.search(r' connected (\d+)x(\d+)', out)
-        return int(m.group(1)), int(m.group(2))
-    except Exception:
-        return 1920, 1080
-
-
-from isaacsim import SimulationApp
-cfg = {'headless': args.headless}
-if not args.headless:
-    W, H = screen_size()
-    cfg.update(width=W, height=H, window_width=W, window_height=H)
-app = SimulationApp(cfg)
+import sim_app                                        # noqa: E402  (window at the screen's resolution, --res)
+app = sim_app.start(args.headless, args.res)
 
 import numpy as np
 import omni.usd

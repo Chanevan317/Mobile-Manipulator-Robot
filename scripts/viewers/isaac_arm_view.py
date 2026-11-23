@@ -21,7 +21,8 @@ ap.add_argument('--layout', default='prototype', choices=('prototype', 'prototyp
 args = ap.parse_args()
 
 from isaacsim import SimulationApp
-app = SimulationApp({'headless': False})
+import sim_app                                        # noqa: E402  (window at the screen's resolution)
+app = sim_app.start(False)
 
 import numpy as np
 import omni.kit.commands, omni.usd

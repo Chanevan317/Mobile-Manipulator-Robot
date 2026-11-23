@@ -38,7 +38,8 @@ try:
     from isaacsim import SimulationApp
 except ImportError:
     from omni.isaac.kit import SimulationApp
-app = SimulationApp({'headless': args.headless})
+import sim_app                                        # noqa: E402  (window at the screen's resolution)
+app = sim_app.start(args.headless)
 
 import numpy as np
 import omni.kit.commands, omni.usd

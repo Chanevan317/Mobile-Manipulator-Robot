@@ -25,7 +25,8 @@ ap.add_argument('--smooth', action='store_true', help='TOPP-RA blended moves (sm
 args = ap.parse_args()
 
 from isaacsim import SimulationApp
-app = SimulationApp({'headless': args.headless})
+import sim_app                                        # noqa: E402  (window at the screen's resolution)
+app = sim_app.start(args.headless)
 
 import numpy as np
 from isaacsim.core.api.objects import DynamicCuboid, FixedCuboid

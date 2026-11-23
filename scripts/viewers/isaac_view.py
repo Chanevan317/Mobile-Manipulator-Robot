@@ -35,7 +35,8 @@ LAYOUTS = ['prototype', 'prototype_mono_arm'] if args.layout == 'both' else [arg
 OFFSET_Y = 1.2                       # the one-arm robot stands this far to the left (+y) of the two-arm one
 
 from isaacsim import SimulationApp
-app = SimulationApp({'headless': args.headless})
+import sim_app                                        # noqa: E402  (window at the screen's resolution)
+app = sim_app.start(args.headless)
 
 import numpy as np
 import omni.kit.commands, omni.usd

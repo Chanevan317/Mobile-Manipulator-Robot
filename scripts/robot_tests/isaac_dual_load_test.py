@@ -23,7 +23,8 @@ ap.add_argument('--out', default=None)
 args = ap.parse_args()
 
 from isaacsim import SimulationApp
-app = SimulationApp({'headless': args.headless})
+import sim_app                                        # noqa: E402  (window at the screen's resolution)
+app = sim_app.start(args.headless)
 
 import numpy as np
 import omni.usd

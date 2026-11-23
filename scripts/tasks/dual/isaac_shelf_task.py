@@ -38,7 +38,8 @@ if args.urdf is None:
     args.urdf = os.path.join(RP.URDF_DIR, f'mobile_manipulator_{args.layout}.urdf')
 
 from isaacsim import SimulationApp
-app = SimulationApp({'headless': args.headless})
+import sim_app                                        # noqa: E402  (window at the screen's resolution)
+app = sim_app.start(args.headless)
 
 sys.path.insert(0, here)
 import shelf_task_prototype
