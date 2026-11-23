@@ -27,6 +27,9 @@ MIN_MOVE = 0.4            # s, shortest straight-line move
 ARM_KEYS = ('shoulder_pan', 'elbow_pan', 'wrist_pan', 'wrist_pitch', 'wrist_roll')
 RAMP = 0.3                # s, accel / decel ramp of the 'trap' profile
 STILL_V = 0.1             # rad/s: 'stopped' for settle_mode 'still' (the wrist pitch holding a product hunts at 0.03-0.06)
+STILL_N = 6               # control steps (0.1 s) over which a joint must not move more than STILL_SPREAD
+STILL_SPREAD = 0.0026     # rad (0.15 deg) / STILL_SPREAD_LIFT m: 'stopped' for settle_mode 'still'
+STILL_SPREAD_LIFT = 0.0003
 JAW_STILL_V = 0.004       # m/s: a jaw has stopped (jaw_mode 'stop')
 STILL_V_LIFT = 0.005      # m/s for the lift: its top speed is 0.10 m/s, so 0.1 counted it as stopped while it was still
                           # ~19 mm behind going into the tote (the jaws then opened 20 mm above the floor)
@@ -85,7 +88,6 @@ class Task:
         self.settle_cap = None    # seconds: the longest a move may wait to settle (None = each move's own timeout)
         self.jaw_log = []
         self.settle_mode = 'tol'  # 'still' (mono tasks): also done once the arm joints + lift have stopped (< STILL_V for 0.1 s)
-        self.still = 0
 
     def start(self):
         """Call after the scene objects are added."""
@@ -103,6 +105,7 @@ class Task:
         self.driven = [i for i, nm in enumerate(self.names) if 'roller' not in nm and not nm.startswith('wheel')]
         self.still_idx = [i for i in self.driven if 'finger' not in self.names[i]]
         self.still_v = np.array([STILL_V_LIFT if self.names[i] == 'lift' else STILL_V for i in self.still_idx])
+        self.still_spread = np.array([STILL_SPREAD_LIFT if self.names[i] == 'lift' else STILL_SPREAD for i in self.still_idx])
         self.substeps = max(1, round(DT / self.world.get_physics_dt()))
         self.q_goal = np.zeros(n); self.q_cmd = np.zeros(n); self.wheel_v = np.zeros(len(self.wheel))
         # optional offset added to the command actually sent (train_pipeline: human-like tremor in recorded demos);
@@ -153,23 +156,34 @@ class Task:
         d = self.driven; t0 = self.t
         if self.settle_cap is not None:              # scene_v0: never sit out a long timeout (the next move starts from
             timeout = min(timeout, self.settle_cap)  # the last target, so ending early can't jump)
+        hist = []
         for _ in range(int(timeout * CTRL_HZ)):
             self.step_once()
             q = self.robot.get_joint_positions()
+            hist = (hist + [q[self.still_idx].copy()])[-12:]
             reached = np.max(np.abs(self.q_cmd[d] - self.q_goal[d])) < 1e-6
             if reached and np.max(np.abs(q[d] - self.q_goal[d])) < tol:
-                self.wait(0.1); self.settle_log.append((self.t - t0, False)); return True
-            if reached and self.settle_mode == 'still':
-                # stopped moving: a steady gravity sag (the wrist pitch holding a product, ~2-3 deg) won't shrink by waiting
+                if self.settle_cap is None:              # the older tasks keep their extra 0.1 s; scene_v0 (settle_cap)
+                    self.wait(0.1)                       # goes on at once: the next move starts from this target anyway
+                self.settle_log.append((self.t - t0, False)); return True
+            if reached and self.settle_mode == 'still' and len(hist) >= STILL_N:
+                # stopped moving: a steady gravity sag (the wrist pitch holding a product, ~2-3 deg) won't shrink by waiting.
+                # Judged by how far each joint MOVED over the last STILL_N steps, not by the reported joint speed: holding
+                # a product PhysX reports ~0.2 rad/s on a wrist whose angle didn't change by 0.01 deg in 0.2 s, so the
+                # speed test never passed and every such move sat out its timeout (2026-11-20).
                 # arm joints + lift only: the fingers squeezing a product jitter and never read as stopped
-                v = np.abs(self.robot.get_joint_velocities()[self.still_idx])
-                self.still = self.still + 1 if np.all(v < self.still_v) else 0
-                if self.still >= 6:
-                    self.still = 0; self.settle_log.append((self.t - t0, False)); return True
+                H = np.array(hist[-STILL_N:])
+                if np.all(H.max(0) - H.min(0) < self.still_spread):
+                    self.settle_log.append((self.t - t0, False)); return True
         worst = self.names[d[int(np.argmax(np.abs(q[d] - self.q_goal[d])))]]
         if self.settle_mode == 'still':
             v = np.abs(self.robot.get_joint_velocities()[self.still_idx])
             worst += f' (fastest {self.names[self.still_idx[int(np.argmax(v))]]} {np.max(v):.3f})'
+            if os.environ.get('SETTLE_DEBUG') and hist:
+                H = np.array(hist); spread = H.max(0) - H.min(0)
+                print('      [settle] timeout; 0.2 s spread (deg / mm): ' + ', '.join(
+                    f'{self.names[i]} {spread[k] * (1000 if self.names[i] == "lift" else 57.3):.2f} v {v[k]:.3f}'
+                    for k, i in enumerate(self.still_idx) if spread[k] > 1e-4 or v[k] > 0.02), flush=True)
         self.settle_log.append((self.t - t0, worst)); return False
 
     def set_pose(self, q_all):
