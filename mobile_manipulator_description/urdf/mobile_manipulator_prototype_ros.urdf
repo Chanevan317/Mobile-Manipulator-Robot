@@ -629,7 +629,7 @@
   </link>
   <joint name="lift" type="prismatic"><parent link="base_link"/><child link="carriage"/><origin xyz="0.18 0 0.42" rpy="0 0 0"/><axis xyz="0 0 1"/><limit lower="0" upper="0.871" effort="300" velocity="0.1"/><dynamics damping="50" friction="5"/></joint>
   <link name="left_base">
-    <inertial><origin xyz="-0.0220782 -2.39973e-05 -0.000918396" rpy="0 0 0"/><mass value="0.381504"/><inertia ixx="0.000274332" ixy="-5.57209e-07" ixz="-6.95293e-05" iyy="0.000607107" iyz="-1.47228e-07" izz="0.000528735"/></inertial>
+    <inertial><origin xyz="-0.0220981 -2.40799e-05 -0.000912393" rpy="0 0 0"/><mass value="0.380478"/><inertia ixx="0.00027411" ixy="-5.57011e-07" ixz="-6.95259e-05" iyy="0.000606691" iyz="-1.47293e-07" izz="0.000528324"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_base_top.stl"/></geometry><material name="mat_05"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_base_bottom.stl"/></geometry><material name="mat_06"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_servo_shoulder_STS3215.stl"/></geometry><material name="mat_07"/></visual>
@@ -680,7 +680,7 @@
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_servo_shoulder_STS3215_c.stl"/></geometry></collision>
   </link>
   <link name="left_upper_arm">
-    <inertial><origin xyz="0.096666 1.35736e-10 0.00235275" rpy="0 0 0"/><mass value="0.388809"/><inertia ixx="0.000307867" ixy="-2.64428e-12" ixz="-4.69353e-06" iyy="0.00119379" iyz="5.93388e-13" izz="0.00111918"/></inertial>
+    <inertial><origin xyz="0.0966167 -1.74671e-08 0.00236729" rpy="0 0 0"/><mass value="0.387784"/><inertia ixx="0.00030762" ixy="9.08121e-11" ixz="-4.77855e-06" iyy="0.00119304" iyz="-3.1279e-11" izz="0.00111847"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_upper_arm_top.stl"/></geometry><material name="mat_10"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_upper_arm_bottom.stl"/></geometry><material name="mat_11"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_servo_elbow_STS3215.stl"/></geometry><material name="mat_07"/></visual>
@@ -759,7 +759,7 @@
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_servo_elbow_STS3215_c.stl"/></geometry></collision>
   </link>
   <link name="left_forearm">
-    <inertial><origin xyz="0.096666 1.35736e-10 0.00235275" rpy="0 0 0"/><mass value="0.388809"/><inertia ixx="0.000307867" ixy="-2.64428e-12" ixz="-4.69353e-06" iyy="0.00119379" iyz="5.93388e-13" izz="0.00111918"/></inertial>
+    <inertial><origin xyz="0.0966167 -1.74671e-08 0.00236729" rpy="0 0 0"/><mass value="0.387784"/><inertia ixx="0.00030762" ixy="9.08121e-11" ixz="-4.77855e-06" iyy="0.00119304" iyz="-3.1279e-11" izz="0.00111847"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_forearm_top.stl"/></geometry><material name="mat_10"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_forearm_bottom.stl"/></geometry><material name="mat_11"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_servo_wrist_pan_STS3215.stl"/></geometry><material name="mat_07"/></visual>
@@ -838,7 +838,7 @@
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_servo_wrist_pan_STS3215_c.stl"/></geometry></collision>
   </link>
   <link name="left_wrist">
-    <inertial><origin xyz="0.0356979 -0.00186178 -0.0500575" rpy="0 0 0"/><mass value="0.368734"/><inertia ixx="0.000739026" ixy="2.65238e-06" ixz="8.16845e-05" iyy="0.000816772" iyz="-1.55781e-05" izz="0.00032311"/></inertial>
+    <inertial><origin xyz="0.0356859 -0.00187539 -0.0500307" rpy="0 0 0"/><mass value="0.367695"/><inertia ixx="0.000738542" ixy="2.67516e-06" ixz="8.16418e-05" iyy="0.000816297" iyz="-1.56108e-05" izz="0.000322849"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_wrist_top.stl"/></geometry><material name="mat_12"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_wrist_bottom.stl"/></geometry><material name="mat_13"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_pitch_housing_horn.stl"/></geometry><material name="mat_14"/></visual>
@@ -909,7 +909,7 @@
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_servo_pitch_STS3215_c.stl"/></geometry></collision>
   </link>
   <link name="left_tilt">
-    <inertial><origin xyz="0.0570896 -0.000750694 0.0206575" rpy="0 0 0"/><mass value="0.250868"/><inertia ixx="0.000433743" ixy="-8.88317e-06" ixz="-0.000159098" iyy="0.000661401" iyz="-4.71786e-06" izz="0.000447305"/></inertial>
+    <inertial><origin xyz="0.0568695 -0.000756775 0.0207343" rpy="0 0 0"/><mass value="0.248852"/><inertia ixx="0.000432898" ixy="-8.84174e-06" ixz="-0.000159591" iyy="0.000659002" iyz="-4.73233e-06" izz="0.000445316"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_tilt_fork_horn.stl"/></geometry><material name="mat_16"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_tilt_fork_idler.stl"/></geometry><material name="mat_17"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_camera_cradle.stl"/></geometry><material name="mat_18"/></visual>
@@ -981,7 +981,7 @@
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_wrist_cam_OV_32x32_c.stl"/></geometry></collision>
   </link>
   <link name="left_hand">
-    <inertial><origin xyz="0.0615196 -3.59642e-10 0.0201532" rpy="0 0 0"/><mass value="0.200257"/><inertia ixx="0.000284989" ixy="-1.33499e-12" ixz="-2.5949e-05" iyy="0.00010438" iyz="-1.43706e-12" izz="0.000293086"/></inertial>
+    <inertial><origin xyz="0.061527 -1.22498e-10 0.0201554" rpy="0 0 0"/><mass value="0.200205"/><inertia ixx="0.000284971" ixy="-2.71206e-14" ixz="-2.59368e-05" iyy="0.000104322" iyz="-5.99587e-13" izz="0.00029304"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_roll_yoke_gripper_housing.stl"/></geometry><material name="mat_20"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_gripper_front_plate.stl"/></geometry><material name="mat_21"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_pinion_24T_m1.stl"/></geometry><material name="mat_22"/></visual>
@@ -1058,7 +1058,7 @@
   </link>
   <joint name="left_tcp_fixed" type="fixed"><parent link="left_hand"/><child link="left_tcp"/><origin xyz="0.13 0 0" rpy="0 0 0"/></joint>
   <link name="right_base">
-    <inertial><origin xyz="-0.0220782 -2.39973e-05 -0.000918396" rpy="0 0 0"/><mass value="0.381504"/><inertia ixx="0.000274332" ixy="-5.57209e-07" ixz="-6.95293e-05" iyy="0.000607107" iyz="-1.47228e-07" izz="0.000528735"/></inertial>
+    <inertial><origin xyz="-0.0220981 -2.40799e-05 -0.000912393" rpy="0 0 0"/><mass value="0.380478"/><inertia ixx="0.00027411" ixy="-5.57011e-07" ixz="-6.95259e-05" iyy="0.000606691" iyz="-1.47293e-07" izz="0.000528324"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_base_top.stl"/></geometry><material name="mat_05"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_base_bottom.stl"/></geometry><material name="mat_06"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_servo_shoulder_STS3215.stl"/></geometry><material name="mat_07"/></visual>
@@ -1109,7 +1109,7 @@
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_servo_shoulder_STS3215_c.stl"/></geometry></collision>
   </link>
   <link name="right_upper_arm">
-    <inertial><origin xyz="0.096666 1.35736e-10 0.00235275" rpy="0 0 0"/><mass value="0.388809"/><inertia ixx="0.000307867" ixy="-2.64428e-12" ixz="-4.69353e-06" iyy="0.00119379" iyz="5.93388e-13" izz="0.00111918"/></inertial>
+    <inertial><origin xyz="0.0966167 -1.74671e-08 0.00236729" rpy="0 0 0"/><mass value="0.387784"/><inertia ixx="0.00030762" ixy="9.08121e-11" ixz="-4.77855e-06" iyy="0.00119304" iyz="-3.1279e-11" izz="0.00111847"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_upper_arm_top.stl"/></geometry><material name="mat_10"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_upper_arm_bottom.stl"/></geometry><material name="mat_11"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_servo_elbow_STS3215.stl"/></geometry><material name="mat_07"/></visual>
@@ -1188,7 +1188,7 @@
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_servo_elbow_STS3215_c.stl"/></geometry></collision>
   </link>
   <link name="right_forearm">
-    <inertial><origin xyz="0.096666 1.35736e-10 0.00235275" rpy="0 0 0"/><mass value="0.388809"/><inertia ixx="0.000307867" ixy="-2.64428e-12" ixz="-4.69353e-06" iyy="0.00119379" iyz="5.93388e-13" izz="0.00111918"/></inertial>
+    <inertial><origin xyz="0.0966167 -1.74671e-08 0.00236729" rpy="0 0 0"/><mass value="0.387784"/><inertia ixx="0.00030762" ixy="9.08121e-11" ixz="-4.77855e-06" iyy="0.00119304" iyz="-3.1279e-11" izz="0.00111847"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_forearm_top.stl"/></geometry><material name="mat_10"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_forearm_bottom.stl"/></geometry><material name="mat_11"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_servo_wrist_pan_STS3215.stl"/></geometry><material name="mat_07"/></visual>
@@ -1267,7 +1267,7 @@
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_servo_wrist_pan_STS3215_c.stl"/></geometry></collision>
   </link>
   <link name="right_wrist">
-    <inertial><origin xyz="0.0356979 -0.00186178 -0.0500575" rpy="0 0 0"/><mass value="0.368734"/><inertia ixx="0.000739026" ixy="2.65238e-06" ixz="8.16845e-05" iyy="0.000816772" iyz="-1.55781e-05" izz="0.00032311"/></inertial>
+    <inertial><origin xyz="0.0356859 -0.00187539 -0.0500307" rpy="0 0 0"/><mass value="0.367695"/><inertia ixx="0.000738542" ixy="2.67516e-06" ixz="8.16418e-05" iyy="0.000816297" iyz="-1.56108e-05" izz="0.000322849"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_wrist_top.stl"/></geometry><material name="mat_12"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_wrist_bottom.stl"/></geometry><material name="mat_13"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_pitch_housing_horn.stl"/></geometry><material name="mat_14"/></visual>
@@ -1338,7 +1338,7 @@
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_servo_pitch_STS3215_c.stl"/></geometry></collision>
   </link>
   <link name="right_tilt">
-    <inertial><origin xyz="0.0570896 -0.000750694 0.0206575" rpy="0 0 0"/><mass value="0.250868"/><inertia ixx="0.000433743" ixy="-8.88317e-06" ixz="-0.000159098" iyy="0.000661401" iyz="-4.71786e-06" izz="0.000447305"/></inertial>
+    <inertial><origin xyz="0.0568695 -0.000756775 0.0207343" rpy="0 0 0"/><mass value="0.248852"/><inertia ixx="0.000432898" ixy="-8.84174e-06" ixz="-0.000159591" iyy="0.000659002" iyz="-4.73233e-06" izz="0.000445316"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_tilt_fork_horn.stl"/></geometry><material name="mat_16"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_tilt_fork_idler.stl"/></geometry><material name="mat_17"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_camera_cradle.stl"/></geometry><material name="mat_18"/></visual>
@@ -1410,7 +1410,7 @@
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/arm_wrist_cam_OV_32x32_c.stl"/></geometry></collision>
   </link>
   <link name="right_hand">
-    <inertial><origin xyz="0.0615196 -3.59642e-10 0.0201532" rpy="0 0 0"/><mass value="0.200257"/><inertia ixx="0.000284989" ixy="-1.33499e-12" ixz="-2.5949e-05" iyy="0.00010438" iyz="-1.43706e-12" izz="0.000293086"/></inertial>
+    <inertial><origin xyz="0.061527 -1.22498e-10 0.0201554" rpy="0 0 0"/><mass value="0.200205"/><inertia ixx="0.000284971" ixy="-2.71206e-14" ixz="-2.59368e-05" iyy="0.000104322" iyz="-5.99587e-13" izz="0.00029304"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_roll_yoke_gripper_housing.stl"/></geometry><material name="mat_20"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_gripper_front_plate.stl"/></geometry><material name="mat_21"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_pinion_24T_m1.stl"/></geometry><material name="mat_22"/></visual>

@@ -26,7 +26,10 @@ Units are millimetres. The files use the **arm frame**: Z is up, and the origin 
 
 **Servo casing.** The casing comes from Feetech's STS3215 CAD model (SO-ARM100 repo, Apache-2.0). Every servo pocket is cut from that real mesh, not from a box. Each pocket follows the slid-out direction, so a clamshell half lifts straight off.
 - **Every servo is an STS3215, held exactly like on the SO-100 (SO-ARM100)**, so a servo moves between the SO-100 and this arm with its own screws. The socket was measured from the SO-100 leader print files.
-- The pocket is line-to-line with the case, as on the SO-100: no clearance around the sides, the horn face flush, 0.1 mm play on the idler side.
+- The pocket has the same fit as the leader arm (since 2026-11-23; the line-to-line SO-100 fit printed too tight):
+  0.2 mm play around the sides, 0.5 mm over the case face at the top of each pocket (it prints as a bridge and sags),
+  and a 0.8 mm chamfer round the opening (it takes the elephant's foot). The servo should drop in by hand; the M2
+  case screws still go through a 2.0 mm wall and hold it in place.
 
 Measured from the CAD model:
 

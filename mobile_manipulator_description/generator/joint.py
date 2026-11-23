@@ -41,6 +41,12 @@ SO100 = dict(
     screw_len=6,
 )
 RIM = 15.9                 # case rims on both faces (|Z|)
+# Follower socket fit (2026-11-23, user: the printed follower sockets were too tight, "same clearance as the leader"):
+# the leader's CLAMP_PLAY / ROOF_PLAY / CLAMP_LEAD rule. c = play around the case (each side); roof = play over the
+# case face that is a printed bridge (every clamshell half prints split face down, so its pocket floor is the roof);
+# lead = 45 deg chamfer round the mouth (on the bed: takes the elephant's foot). SO100 above stays the line-to-line
+# reference (the leader's clamp / seat code builds its own play on top of it).
+FIT = dict(c=0.2, roof=0.5, lead=0.8)
 # Horn centre screw (not in the servo model): the horn's centre boss is dia 6 up to Z = 18.45. The SO-100 leaves the
 # head open (dia 5.2 through its 6 mm horn plate). Here: a dia 7.2 recess with 3.5 mm over the boss top, enough for an
 # M3 socket head (3.0 mm) or pan head (2.4 mm). It stays below the four horn-screw heads (seat Z = 25.6).
@@ -107,6 +113,28 @@ def sweep(solid, exit_sign, zlo, zhi, c=None, cz=None, dz=0.1):
     return union(layers)
 
 
+def mouth_chamfer(solid, z, inward, c, ch):
+    """45 deg lead-in round the mouth of a pocket for `solid` that opens at z (sweep frame); inward = +1 / -1 is the
+    direction into the part. Hull of the case outline at the mouth offset c + ch (at z, plus 1 mm outside) and offset c
+    (ch deeper). The outline is near-convex (servo case), so the hull follows it."""
+    sl = solid.slice(z)
+    sec = CS([q for q in sl.to_polygons() if _sarea(q) > 0])
+    big = sec.offset(c + ch, circular_segments=16).extrude(1.0).translate((0, 0, z - (1.0 if inward > 0 else 0.0)))
+    small = sec.offset(c, circular_segments=16).extrude(0.01).translate((0, 0, z + inward * ch - 0.005))
+    return (big + small).hull()
+
+
+def fit_pocket(sign):
+    """_pocket() with the FIT play: the follower clamshells (tongue())."""
+    key = ('fit', sign)
+    if key not in _sweep_cache:
+        F = FIT
+        sw = (sweep(SERVO, -1, 0.0, 20.6, c=F['c'], cz=F['roof']) if sign > 0 else
+              sweep(SERVO, +1, -20.6, 0.0, c=F['c'], cz=F['roof']))
+        _sweep_cache[key] = union([sw, mouth_chamfer(SERVO, 0.0, sign, F['c'], F['lead'])])
+    return _sweep_cache[key]
+
+
 def _pocket(sign):
     key = ('p', sign)
     if key not in _sweep_cache:
@@ -128,7 +156,7 @@ def tongue(sign, x0=-46.0, bolts='up', slot='rear', reg=None, extra=None, bolt_r
     else:
         z0, z1 = P['botB'], 0.0
     body = union([cyl(R, z0, z1), box(x0, 0, -WY, WY, z0, z1)] + ([extra] if extra is not None else []))
-    cut = [_pocket(sign)]
+    cut = [fit_pocket(sign)]
     if sign > 0:
         # connector chamber; narrower behind the connectors to keep a wall around the rear horn-face screws
         chamber = [box(-34.5, -3.0, -7.0, 7.0, 15.6, 26.5), box(-28.0, -3.0, -10.5, 10.5, 15.6, 26.5),
@@ -173,12 +201,12 @@ def tongue(sign, x0=-46.0, bolts='up', slot='rear', reg=None, extra=None, bolt_r
     # SO-100 case screws: M2x6 self-tap, 2.0 mm wall, dia 2.0 hole, dia 4.0 head counterbore
     S = SO100
     if sign > 0:
-        seat = RIM + S['cz_horn'] + S['wall']                           # head seat above the horn face
+        seat = RIM + FIT['roof'] + S['wall']                            # head seat above the horn face (2.0 wall over the roof play)
         for (x, y) in S['horn']:
             cut.append(screw_cut((x, y, seat), (0, 0, -1), 'M2', S['wall'], cb=z1 - seat + 0.5, clear=S['hole'], cb_dia=S['cb']))
             if reg is not None: reg.add('selftap', 'M2', (x, y, seat), (0, 0, -1), S['screw_len'], 'servo case (SO-100)')
     else:
-        seat = -RIM - S['cz_idler'] - S['wall']
+        seat = -RIM - FIT['roof'] - S['wall']
         for (x, y) in S['idler']:
             cut.append(screw_cut((x, y, seat), (0, 0, 1), 'M2', S['wall'], cb=seat - z0 + 0.5, clear=S['hole'], cb_dia=S['cb']))
             if reg is not None: reg.add('selftap', 'M2', (x, y, seat), (0, 0, 1), S['screw_len'], 'servo case (SO-100)')

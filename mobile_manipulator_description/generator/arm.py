@@ -11,7 +11,7 @@ import numpy as np
 from lib import M, box, cyl, cone, ring, union, xf, T, Rx, Ry, Rz, basis, mesh_arrays, CS
 from hw import Reg, screw_cut, insert_cut, nut_cut, place, bearing_6808, mgn9_rail, mgn9h_block, SPEC
 import joint
-from joint import P, tongue, fork, pan_link, sweep, SERVO, HORN_HOLES, SO100, RIM, case_screw, CTR_D, CTR_TOP, OUT_FACE, OUT_CTR
+from joint import P, tongue, fork, pan_link, sweep, mouth_chamfer, FIT, SERVO, HORN_HOLES, SO100, RIM, case_screw, CTR_D, CTR_TOP, OUT_FACE, OUT_CTR
 
 L1, L2 = 130.0, 130.0      # 2026-11-09 (user): was 180 / 150; 130 / 130 lets the stock 20 cm servo cables reach
 X0 = -46.0
@@ -168,7 +168,10 @@ def tilt_parts(frame):
         c = union([c, box(76.0, 94.0, cy0, cy1, 34.0, CAM_PIVOT[2] + 8.0), box(76.0, 94.0, ry0, ry1, 34.0, 42.0)])
         exit_sign = +1 if sign > 0 else -1                              # this half pulls away along -/+Y; servo exits toward +/-Y in sweep frame
         # in sweep frame Z = Y_T; the -Y half is removed toward -Y, i.e. servo exits toward +Z relative to it
-        sw = sweep(xf(ROLL_SERVO_T, rot), +1 if sign > 0 else -1, -20.0 if sign > 0 else 0.0, 0.0 if sign > 0 else 20.0)
+        # FIT play (2026-11-23, as the leader): the halves print split face down, so the pocket floor is the roof
+        _rs = xf(ROLL_SERVO_T, rot)
+        sw = sweep(_rs, +1 if sign > 0 else -1, -20.0 if sign > 0 else 0.0, 0.0 if sign > 0 else 20.0, c=FIT['c'], cz=FIT['roof'])
+        sw = union([sw, mouth_chamfer(_rs, 0.0, -1 if sign > 0 else 1, FIT['c'], FIT['lead'])])
         pocket = xf(sw, Rx(-90))
         s = union([s, c]) - pocket
         recut = []
@@ -186,7 +189,7 @@ def tilt_parts(frame):
         for yy in (-10.25, 10.25):
             if (yy < 0) == (sign > 0):
                 for zz in (32.8, 8.3):
-                    seat = SOCK_ROLL - SO100['cz_horn'] - SO100['wall']
+                    seat = SOCK_ROLL - SO100['cz_horn'] - FIT['c'] - SO100['wall']   # 2.0 wall behind the FIT play
                     cut.append(case_screw((seat, yy, zz), (1, 0, 0), rr, 'roll servo case (SO-100)', cb=seat - F_TILT + 0.5))
         # lateral clamp bolts (heads on the idler/+Y side, inserts in the horn/-Y side)
         for (x, z) in ((75.0, 38.7), (96.0, 38.7), (56.0, 24.0), (61.0, -9.0)):     # (56, 24): clear of the cable channel
@@ -280,7 +283,10 @@ def yoke_part(frame):
     # gripper case screws (z 32.8).)
     cut.append(xf(box(-20.2, -7.8, -11.2, 11.2, 13.8, 15.9), GRIP_J))
     # gripper servo pocket: servo slides out forward
-    sw = sweep(xf(GRIP_SERVO_R, Ry(-90)), +1, 28.5, 70.0)
+    # FIT play (2026-11-23): 0.2 round the case; no roof (the mouth faces up in print, the back wall is on the bed) +
+    # lead-in at the mouth (R x 66, the housing front)
+    _gs = xf(GRIP_SERVO_R, Ry(-90))
+    sw = union([sweep(_gs, +1, 28.5, 70.0, c=FIT['c'], cz=0.0), mouth_chamfer(_gs, 66.0, -1, FIT['c'], FIT['lead'])])
     cut.append(xf(sw, Ry(90)))
     # roll horn screws (from inside the housing, before the gripper servo goes in)
     for (a, b) in HORN_HOLES:                       # horn frame (x_s, y_s) -> R: z = -x_s, y = y_s
@@ -325,7 +331,7 @@ def front_plate_part(frame):
         cut.append(nut_cut((66.0, y, RAIL_Z), (1, 0, 0)))
         r.add('SHCS', 'M3', (77.0, y, RAIL_Z), (-1, 0, 0), 12, 'MGN9 rail')
         r.add('nut', 'M3', (66.0, y, RAIL_Z), (1, 0, 0), None, 'MGN9 rail (nut trap)')
-    cut.append(xf(sweep(xf(GRIP_SERVO_R, Ry(-90)), -1, 60.0, 75.0), Ry(90)))       # horn-side plateau, horn, connectors
+    cut.append(xf(sweep(xf(GRIP_SERVO_R, Ry(-90)), -1, 60.0, 75.0, c=FIT['c']), Ry(90)))       # horn-side plateau, horn, connectors (FIT play)
     s = s - union(cut)
     add('gripper_front_plate', s, frame, (0.30, 0.30, 0.34), r, note='closes the gripper housing and carries the 170 mm MGN9 rail')
 
