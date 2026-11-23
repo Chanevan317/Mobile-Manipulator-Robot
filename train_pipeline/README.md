@@ -65,16 +65,24 @@ python train_pipeline/leader/setup_ids.py      # one servo at a time, gripper fi
 
 ```bash
 python train_pipeline/leader/calibrate.py
+python train_pipeline/leader/calibrate.py --dummy    # try the screens without the arm (a simulated leader; never saves)
 ```
 
+Every step shows a **live table of all 6 joints**, redrawn in place (like `lerobot-calibrate`'s MIN / POS / MAX
+table). Press Enter to go on.
+
 1. **Zero pose**, the follower's zero: link 1 straight ahead (away from the stop rib), link 2 and the wrist in line
-   with it, gripper level, the two jaw blades side by side (left / right), finger loops closed. Enter.
+   with it, gripper level, the two jaw blades side by side (left / right), finger loops closed. The table shows each
+   servo's raw reading and whether it is still; press Enter when every joint says `still`.
 2. **Directions:** it asks you to move each joint one way (pans to the left, pitch down, roll clockwise seen from
    behind, loops open). That sets which way each servo counts, so a servo mounted the other way round is fine.
    The gripper step also measures how far the loops open (design 40°): fully open = 90 mm on the follower.
-3. **Ranges:** move every joint to both ends. J1 must stop at about ±174°; more than ±176° means the zero pose was
+   The table marks the joint being taught with `>`, shows how far each joint has moved from the zero pose, and warns
+   if another joint moves too.
+3. **Ranges:** move every joint to both ends. The table shows MIN / POS / MAX per joint next to the follower's limits. J1 must stop at about ±174°; more than ±176° means the zero pose was
    not straight ahead and nothing is saved.
-4. **Check** the live numbers, then `y` to save `train_pipeline/leader/calibration/leader_mono.json`. Commit it: the
+4. **Check** the live numbers (leader angle and the follower command it makes; `*` = the follower stops at its
+   limit there), then `y` to save `train_pipeline/leader/calibration/leader_mono.json`. Commit it: the
    calibration belongs to the arm, so every PC gets it with `git pull`.
 
 Why not `lerobot-calibrate`: it puts each zero in the middle of whatever range you sweep, and treats the wrist roll as
