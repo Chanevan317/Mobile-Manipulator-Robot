@@ -157,7 +157,7 @@ def step_ranges(bus, cal):
                 return '!! past the +-174 stop'
             return 'ok: both stops' if min(abs(lo[j]), abs(hi[j])) >= 165 else 'reach both end stops (~+-174)'
         if j == 'gripper':
-            return 'ok' if lo[j] <= 2 and hi[j] >= 0.9 * cal['joints'][j]['open_deg'] else 'close and open fully'
+            return f'fully open = {hi[j]:.0f} deg' if lo[j] <= 2 else 'close the loops fully'
         return 'ok' if lo[j] <= lim[0] and hi[j] >= lim[1] else 'short of the follower (info)'
 
     def render():
@@ -224,16 +224,18 @@ try:
             print(f'    it moved only {d:+.1f} deg: move it further (at least {MIN_MOVE:.0f} deg)\n')
         cal['joints'][j]['sign'] = 1 if d > 0 else -1
         if j == 'gripper':
-            cal['joints'][j]['open_deg'] = round(abs(d), 1)
-            print(f'    {j}: sign {cal["joints"][j]["sign"]:+d}, fully open = {abs(d):.1f} deg (design: 40)')
-            if not 25 <= abs(d) <= 50:
-                print('    !! far from the design 40 deg: were the loops fully open / closed in the zero pose?')
+            cal['joints'][j]['open_deg'] = round(abs(d), 1)      # provisional: step 3's widest opening replaces it
+            print(f'    {j}: sign {cal["joints"][j]["sign"]:+d} ({abs(d):.1f} deg open; fully open is taken from step 3)')
         else:
             print(f'    {j}: sign {cal["joints"][j]["sign"]:+d} ({d:+.1f} deg). Bring it back to zero.\n')
 
     print('\n3/4  Ranges.\n')
     lo, hi, bad = step_ranges(bus, cal)
     cal['ranges_deg'] = {j: [round(lo[j], 1), round(hi[j], 1)] for j in lo}
+    # gripper fully open = the widest opening seen in step 3 (2026-11-23, user: open_deg from step 2 was only how far
+    # the loops happened to be opened then (20 deg), so the follower was wide open at a quarter of the loop travel)
+    cal['joints']['gripper']['open_deg'] = round(max(hi['gripper'], cal['joints']['gripper']['open_deg']), 1)
+    print(f"  gripper: fully open = {cal['joints']['gripper']['open_deg']:.1f} deg of loop travel = 90 mm on the follower")
     if bad:
         print('  !! J1 went past the +-174 end stop: the zero pose was not straight ahead. Calibrate again.')
 

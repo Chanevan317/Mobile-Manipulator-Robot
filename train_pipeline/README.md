@@ -35,6 +35,7 @@ train_pipeline/
   leader/setup_ids.py    servo ids 1..6 (new or replaced servos only)
   leader/calibrate.py    zero pose, directions, ranges, gripper opening -> leader/calibration/<name>.json
   leader/check_leader.py live angles + follower commands
+  leader/check_sim.py    the leader drives the mono arm alone in Isaac Sim (calibration check on the twin)
   sim_common.py          Isaac helpers shared by the recorder, the replay and the eval (state, command, light, product moves)
   data/raw/<name>/       episode_000000.h5 ...              (git-ignored)
   data/lerobot/<name>/   converted datasets                  (git-ignored)
@@ -100,6 +101,14 @@ python train_pipeline/leader/check_leader.py
 
 Commands are clamped to the follower's limits (`*` in the check): shoulder ±115°, elbow ±122°, pitch −15..115°,
 roll ±120°. Recalibrate after replacing a servo or taking the arm apart.
+
+**Check it on the digital twin** (`env_isaaclab`): the leader drives the mono arm alone in Isaac Sim (no base, lift
+or scene), first slowly to the leader's pose, then 1:1. The terminal shows leader angle, command, sim angle and lag
+per joint. Move one leader joint at a time: the same sim joint must turn the same way.
+
+```bash
+OMNI_KIT_ACCEPT_EULA=YES PYTHONUNBUFFERED=1 python train_pipeline/leader/check_sim.py
+```
 
 ## 1. Record
 

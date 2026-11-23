@@ -1,0 +1,72 @@
+{
+ "name": "leader_mono",
+ "date": "2026-11-23",
+ "port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5A68012416-if00",
+ "homing_offsets": {
+  "1": -1725,
+  "2": -2028,
+  "3": 1911,
+  "4": 1154,
+  "5": 1218,
+  "6": -805
+ },
+ "joints": {
+  "J1": {
+   "id": 1,
+   "zero": 1022.0,
+   "sign": 1
+  },
+  "J2": {
+   "id": 2,
+   "zero": 2140.0,
+   "sign": -1
+  },
+  "J3": {
+   "id": 3,
+   "zero": 1109.0,
+   "sign": -1
+  },
+  "wrist_pitch": {
+   "id": 4,
+   "zero": 50.0,
+   "sign": -1
+  },
+  "wrist_roll": {
+   "id": 5,
+   "zero": 7.0,
+   "sign": -1
+  },
+  "gripper": {
+   "id": 6,
+   "zero": 1096.0,
+   "sign": -1,
+   "open_deg": 119.3
+  }
+ },
+ "ranges_deg": {
+  "J1": [
+   -173.5,
+   175.6
+  ],
+  "J2": [
+   -135.2,
+   144.8
+  ],
+  "J3": [
+   -145.3,
+   137.4
+  ],
+  "wrist_pitch": [
+   -44.7,
+   174.2
+  ],
+  "wrist_roll": [
+   -330.7,
+   291.9
+  ],
+  "gripper": [
+   -1.1,
+   119.3
+  ]
+ }
+}
