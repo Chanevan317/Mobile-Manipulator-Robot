@@ -18,7 +18,7 @@ import argparse, math, os, sys
 ap = argparse.ArgumentParser()
 here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(here, '..', 'common')); import repo_paths as RP   # every script folder + repo paths
-ap.add_argument('--layout', default='prototype', choices=('prototype',), help='robot layout (urdf/mobile_manipulator_<layout>.urdf)')
+ap.add_argument('--layout', default='prototype', choices=('prototype', 'prototype_mono_arm'), help='robot layout (urdf/mobile_manipulator_<layout>.urdf)')
 ap.add_argument('--urdf', default=None, help='URDF path (overrides --layout)')
 ap.add_argument('--headless', action='store_true')
 ap.add_argument('--speed', type=float, default=0.3, help='linear speed, m/s')
@@ -85,7 +85,7 @@ def tick():
 
 # ---------------------------------------------------------------- mecanum kinematics
 R_WHEEL = 0.05                    # wheel radius (m), from urdf_build.py
-LX, LY = 0.17, 0.222              # wheel centre offsets from the base centre (m)
+LX, LY = {'prototype_mono_arm': (0.145, 0.197)}.get(args.layout, (0.17, 0.222))   # wheel centre offsets (m): the one-arm base is 0.45
 wheel = {w: names.index(f'wheel_{w}_joint') for w in ('fl', 'fr', 'rl', 'rr')}
 hold_q = np.zeros(n)
 hold_q[names.index('lift')] = 0.35

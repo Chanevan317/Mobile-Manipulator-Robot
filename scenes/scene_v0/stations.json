@@ -1,12 +1,12 @@
 {
  "note": "scene_v0 robot stations (stations_mono.py); world frame = robot start; yaw deg; approach = turning point",
  "footprint": {
-  "back": 0.25,
-  "front": 0.26,
-  "side": 0.25
+  "back": 0.225,
+  "front": 0.235,
+  "side": 0.225
  },
  "margin": 0.02,
- "turn_r": 0.391,
+ "turn_r": 0.355,
  "hub": [
   -1.2,
   0.0
@@ -26,11 +26,12 @@
   },
   "rack_b0_boxedCereal_l01": {
    "x": -1.224,
-   "y": 0.74,
+   "y": 0.76,
    "yaw": 90.0,
    "grasp": "side",
-   "reach": 0.47,
+   "reach": 0.45,
    "offset": 0.2,
+   "entry": 0,
    "product": "food_processed_boxedCereal_l01",
    "board": "rack_b0",
    "surface": 0.761,
@@ -46,16 +47,17 @@
    ],
    "approach": [
     -1.224,
-    0.69
+    0.71
    ]
   },
   "rack_b0_box_cracker_a01": {
    "x": -0.812,
-   "y": 0.732,
+   "y": 0.762,
    "yaw": 90.0,
    "grasp": "side",
-   "reach": 0.49,
+   "reach": 0.46,
    "offset": 0.2,
+   "entry": 0,
    "product": "food_box_cracker_a01",
    "board": "rack_b0",
    "surface": 0.761,
@@ -71,16 +73,17 @@
    ],
    "approach": [
     -0.812,
-    0.682
+    0.712
    ]
   },
   "rack_b0_boxedFood_b01": {
    "x": -0.4,
-   "y": 0.734,
+   "y": 0.764,
    "yaw": 90.0,
    "grasp": "side",
-   "reach": 0.47,
+   "reach": 0.44,
    "offset": 0.2,
+   "entry": 0,
    "product": "food_processed_boxedFood_b01",
    "board": "rack_b0",
    "surface": 0.761,
@@ -96,16 +99,17 @@
    ],
    "approach": [
     -0.4,
-    0.684
+    0.714
    ]
   },
   "rack_b0_boxedFood_c01": {
    "x": 0.012,
-   "y": 0.737,
+   "y": 0.757,
    "yaw": 90.0,
    "grasp": "side",
-   "reach": 0.47,
+   "reach": 0.45,
    "offset": 0.2,
+   "entry": 0,
    "product": "food_processed_boxedFood_c01",
    "board": "rack_b0",
    "surface": 0.761,
@@ -121,16 +125,17 @@
    ],
    "approach": [
     -0.088,
-    0.687
+    0.707
    ]
   },
   "rack_b0_boxedFood_d01": {
    "x": 0.074,
-   "y": 0.552,
+   "y": 0.582,
    "yaw": 90.0,
    "grasp": "side",
-   "reach": 0.64,
+   "reach": 0.61,
    "offset": -0.15,
+   "entry": 0,
    "product": "food_processed_boxedFood_d01",
    "board": "rack_b0",
    "surface": 0.761,
@@ -145,17 +150,18 @@
     "R1-B1-10"
    ],
    "approach": [
-    -0.126,
-    0.552
+    -0.026,
+    0.582
    ]
   },
   "shelf_b1_milk_b01": {
    "x": -1.145,
-   "y": -0.799,
+   "y": -0.829,
    "yaw": -90.0,
    "grasp": "side",
-   "reach": 0.44,
+   "reach": 0.41,
    "offset": 0.2,
+   "entry": 0,
    "product": "food_processed_milk_b01",
    "board": "shelf_b1",
    "surface": 0.667,
@@ -172,7 +178,7 @@
    ],
    "approach": [
     -1.145,
-    -0.749
+    -0.779
    ]
   },
   "shelf_b1_yogurt_a01": {
@@ -194,11 +200,12 @@
   },
   "shelf_b2_yogurt_c01": {
    "x": -1.145,
-   "y": -0.79,
+   "y": -0.82,
    "yaw": -90.0,
    "grasp": "side",
-   "reach": 0.44,
+   "reach": 0.41,
    "offset": 0.2,
+   "entry": 0,
    "product": "food_processed_yogurt_c01",
    "board": "shelf_b2",
    "surface": 1.07,
@@ -215,16 +222,17 @@
    ],
    "approach": [
     -1.145,
-    -0.74
+    -0.77
    ]
   },
   "shelf_b2_milk_c01": {
    "x": -0.455,
-   "y": -0.805,
+   "y": -0.825,
    "yaw": -90.0,
    "grasp": "side",
-   "reach": 0.43,
+   "reach": 0.41,
    "offset": 0.2,
+   "entry": 0,
    "product": "food_processed_milk_c01",
    "board": "shelf_b2",
    "surface": 1.07,
@@ -241,16 +249,17 @@
    ],
    "approach": [
     -0.455,
-    -0.705
+    -0.775
    ]
   },
   "rack2_b0_cannedFood_h01": {
-   "x": -3.265,
-   "y": 0.757,
+   "x": -3.215,
+   "y": 0.787,
    "yaw": 90.0,
    "grasp": "top",
-   "reach": 0.42,
-   "offset": 0.0,
+   "reach": 0.39,
+   "offset": 0.05,
+   "entry": 0,
    "product": "food_processed_cannedFood_h01",
    "board": "rack2_b0",
    "surface": 0.761,
@@ -268,17 +277,18 @@
     "R2-B1-05"
    ],
    "approach": [
-    -3.265,
-    0.707
+    -3.215,
+    0.737
    ]
   },
   "rack2_b0_chocolate_e01": {
-   "x": -2.235,
-   "y": 0.802,
+   "x": -2.185,
+   "y": 0.832,
    "yaw": 90.0,
    "grasp": "top",
-   "reach": 0.42,
-   "offset": 0.0,
+   "reach": 0.39,
+   "offset": 0.05,
+   "entry": 0,
    "product": "food_processed_chocolate_e01",
    "board": "rack2_b0",
    "surface": 0.761,
@@ -296,17 +306,18 @@
     "R2-B1-10"
    ],
    "approach": [
-    -2.235,
-    0.702
+    -2.185,
+    0.732
    ]
   },
   "shelf2_b1_ketchup_c01": {
    "x": -2.695,
-   "y": -0.802,
+   "y": -0.822,
    "yaw": -90.0,
    "grasp": "side",
-   "reach": 0.43,
+   "reach": 0.41,
    "offset": 0.2,
+   "entry": 0,
    "product": "food_processed_ketchup_c01",
    "board": "shelf2_b1",
    "surface": 0.667,
@@ -323,16 +334,17 @@
    ],
    "approach": [
     -2.695,
-    -0.752
+    -0.772
    ]
   },
   "shelf2_b1_ketchup_i01": {
    "x": -2.005,
-   "y": -0.802,
+   "y": -0.822,
    "yaw": -90.0,
    "grasp": "side",
-   "reach": 0.43,
+   "reach": 0.41,
    "offset": 0.2,
+   "entry": 0,
    "product": "food_processed_ketchup_i01",
    "board": "shelf2_b1",
    "surface": 0.667,
@@ -349,16 +361,17 @@
    ],
    "approach": [
     -2.005,
-    -0.752
+    -0.772
    ]
   },
   "shelf2_b2_ketchup_a02": {
    "x": -2.695,
-   "y": -0.802,
+   "y": -0.822,
    "yaw": -90.0,
    "grasp": "side",
-   "reach": 0.44,
+   "reach": 0.42,
    "offset": 0.2,
+   "entry": 0,
    "product": "food_condiment_ketchup_a02",
    "board": "shelf2_b2",
    "surface": 1.07,
@@ -375,16 +388,17 @@
    ],
    "approach": [
     -2.695,
-    -0.752
+    -0.772
    ]
   },
   "shelf2_b2_ketchup_c01": {
    "x": -2.005,
-   "y": -0.792,
+   "y": -0.812,
    "yaw": -90.0,
    "grasp": "side",
-   "reach": 0.43,
+   "reach": 0.41,
    "offset": 0.2,
+   "entry": 0,
    "product": "food_processed_ketchup_c01",
    "board": "shelf2_b2",
    "surface": 1.07,
@@ -401,16 +415,17 @@
    ],
    "approach": [
     -2.005,
-    -0.742
+    -0.762
    ]
   },
   "table_cannedFood_h01": {
-   "x": -0.0,
-   "y": -0.57,
+   "x": 0.03,
+   "y": -0.62,
    "yaw": 0.0,
    "grasp": "top",
-   "reach": 0.42,
-   "offset": 0.0,
+   "reach": 0.39,
+   "offset": 0.05,
+   "entry": 0,
    "product": "food_processed_cannedFood_h01",
    "board": "table",
    "surface": 0.85,
@@ -424,17 +439,18 @@
     "T1-02"
    ],
    "approach": [
-    -0.05,
-    -0.57
+    -0.02,
+    -0.62
    ]
   },
   "table_coffeeCup_b01": {
-   "x": -0.15,
-   "y": -0.84,
+   "x": 0.01,
+   "y": -0.89,
    "yaw": 0.0,
    "grasp": "side",
-   "reach": 0.57,
-   "offset": 0.15,
+   "reach": 0.41,
+   "offset": 0.2,
+   "entry": 0,
    "product": "food_beverage_coffeeCup_b01",
    "board": "table",
    "surface": 0.85,
@@ -448,17 +464,18 @@
     "T1-03"
    ],
    "approach": [
-    -0.15,
-    -0.74
+    -0.04,
+    -0.69
    ]
   },
   "table_yogurt_a01": {
-   "x": -0.0,
-   "y": -0.45,
+   "x": 0.03,
+   "y": -0.5,
    "yaw": 0.0,
    "grasp": "top",
-   "reach": 0.42,
-   "offset": 0.0,
+   "reach": 0.39,
+   "offset": 0.05,
+   "entry": 0,
    "product": "food_processed_yogurt_a01",
    "board": "table",
    "surface": 0.85,
@@ -472,17 +489,18 @@
     "T1-01"
    ],
    "approach": [
-    -0.05,
-    -0.45
+    -0.02,
+    -0.5
    ]
   },
   "table_yogurt_c01": {
-   "x": -0.2,
+   "x": -0.18,
    "y": -0.71,
    "yaw": 0.0,
    "grasp": "side",
-   "reach": 0.62,
+   "reach": 0.6,
    "offset": -0.1,
+   "entry": 0,
    "product": "food_processed_yogurt_c01",
    "board": "table",
    "surface": 0.85,
@@ -496,7 +514,7 @@
     "T1-04"
    ],
    "approach": [
-    -0.2,
+    -0.18,
     -0.71
    ]
   }

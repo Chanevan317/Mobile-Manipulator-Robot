@@ -224,9 +224,10 @@ def pick(sid):
             return {**task.arm_now('left'), 'jaw': jaw}
 
         gz, fz = G.grip_heights(S['surface'], h)
+        ang = math.radians(S.get('entry', 0.0))         # the hand may enter at an angle (stations_mono, 2026-11-24)
         if S['grasp'] == 'side':
-            a, b, up = G.side_poses(c, 0.0, deep, gz, 0.03)
-            out = (a[0], a[1], up[2], 0.0, 0.0)
+            a, b, up = G.side_poses(c, ang, deep, gz, 0.03)
+            out = (a[0], a[1], up[2], ang, 0.0)
             e = G._ok((a, b, up, out))
             slow = 2.5                                    # straight in / out slowly (mono_poses SLOW_IN: servo lag)
             near = min(deep / 2, 0.03)                    # TCP this far past the product's near face
@@ -312,11 +313,19 @@ def pick(sid):
         # then straight in to the approach start: a swing that ends right at the shelf has to thread between the products
         ready = a
         front = c[0] - (deep if S['grasp'] == 'side' else max(narrow, deep)) / 2 - 0.03
-        if True:
+        if ang == 0.0:
             for x in np.arange(min(a[0], front - READY_GAP), 0.12, -0.01):
                 qr = K.ik('left', x, a[1], a[2], a[3], a[4], elbow=e)
                 if qr and not chk.check({**now(0.0), **qr}, env):
                     ready = (float(x), a[1], a[2], a[3], a[4]); break
+        else:                                             # angled entry: back out along the hand's heading
+            u = np.array([math.cos(ang), math.sin(ang)])
+            for t in np.arange(max(0.0, (a[0] - (front - READY_GAP)) / u[0]), 0.6, 0.01):
+                p_ = np.array(a[:2]) - u * t
+                if p_[0] < 0.12: break
+                qr = K.ik('left', p_[0], p_[1], a[2], a[3], a[4], elbow=e)
+                if qr and not chk.check({**now(0.0), **qr}, env):
+                    ready = (float(p_[0]), float(p_[1]), a[2], a[3], a[4]); break
         qa = task.ik('left', ready, e)
         task.lift_to(qa['lift'])                          # the travel fold is clear at any lift
         unfold = go(qa, 'unfold to the ready pose', jaw=0.0)       # jaws closed while swinging: less to clear
@@ -410,6 +419,8 @@ def pick(sid):
                 print(f'      [debug] product at release {np.round(pr, 3)} axes (cols x y z)\n{np.round(Rr, 2)}\n'
                       f'      [debug] product now {np.round(pn, 3)}\n{np.round(Rn, 2)}', flush=True)
             tilt = math.degrees(math.acos(max(-1.0, min(1.0, Rrel[2, 2]))))
+            if SA.PRODUCTS[pkg].get('shape') in ('round', 'bottle'):   # turning about its own axis doesn't matter: compare the axis
+                tilt = math.degrees(math.acos(max(-1.0, min(1.0, float(Rn[:, 2] @ Rr[:, 2])))))
             if tilt > 15:
                 raise RuntimeError(f'the product tipped {tilt:.0f} deg in the tote: no re-grasp from above')
             dyaw = math.atan2(Rrel[1, 0], Rrel[0, 0])

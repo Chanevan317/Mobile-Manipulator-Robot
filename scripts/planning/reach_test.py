@@ -35,6 +35,7 @@ ap.add_argument('--width', type=float, default=0.45, help='test y from -width to
 ap.add_argument('--step', type=float, default=0.03, help='grid step (m)')
 ap.add_argument('--jobs', type=int, default=max(1, (os.cpu_count() or 2) - 2))
 ap.add_argument('--no_tote', action='store_true', help='skip the tote')
+ap.add_argument('--shelf_angle', type=float, default=0.0, help='shelves: the hand may enter up to +- this many deg off straight in (5 deg steps)')
 ap.add_argument('--out', default=None, help='output prefix (default: <package>/reach_test_<layout>)')
 args = ap.parse_args()
 
@@ -48,8 +49,8 @@ SIDES = list(K.SHOULDER)                          # ['left', 'right'], or ['left
 TOTE = dict(x=(-0.238, 0.098), y=0.233, floor=0.263)   # tote interior / floor top in base_link (urdf_build lift_prototype)
 if args.layout == 'prototype_mono_arm':          # mono holder: its own L-shaped base tote, mono_holder.base_tote()
     import mono_holder as _MH
-    _t = _MH.base_tote(); _w = _t['wall']
-    TOTE = dict(x=(_t['x'][0] + _w, _t['x'][1] - _w), y=max(abs(_t['y'][0]), _t['y'][1]) - _w, floor=_t['z'][0] + _w,
+    _t = _MH.base_tote(); _w = _t['wall']              # rects = the walls' inner faces; floor = its flat part
+    TOTE = dict(x=(_t['x'][0], _t['x'][1]), y=max(abs(_t['y'][0]), _t['y'][1]), floor=_t['z'][0] + _w,
                 inside=lambda x, y: _MH.in_tote(_t, x, y))
 D = math.radians
 ARM = ['upper_arm', 'forearm', 'wrist', 'tilt', 'hand', 'finger_right', 'finger_left']
@@ -119,7 +120,8 @@ def reach_one(job):
     if kind in ('table', 'tote'):
         z, pitch, yaws = h + TABLE_DZ, D(90), [k * math.pi / 4 for k in range(8)]
     else:
-        z, pitch, yaws = h + SHELF_DZ, 0.0, [0.0]
+        n_ = int(args.shelf_angle // 5)
+        z, pitch, yaws = h + SHELF_DZ, 0.0, sorted([D(5 * k) for k in range(-n_, n_ + 1)], key=abs)
     for yaw in yaws:
         for e in (1, -1):
             q = K.ik(side, x, y, z, yaw, pitch, elbow=e)

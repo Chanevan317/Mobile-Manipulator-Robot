@@ -43,25 +43,25 @@
     <inertial><origin xyz="0 0 0" rpy="0 0 0"/><mass value="0.001"/><inertia ixx="1e-08" ixy="0" ixz="0" iyy="1e-08" iyz="0" izz="1e-08"/></inertial>
   </link>
   <link name="base_body">
-    <inertial><origin xyz="0 0 0.113947" rpy="0 0 0"/><mass value="19"/><inertia ixx="0.355529" ixy="0" ixz="0" iyy="0.469746" iyz="0" izz="0.6726"/></inertial>
-    <visual><origin xyz="0 0 0.22" rpy="0 0 0"/><geometry><box size="0.5 0.5 0.04"/></geometry><material name="mat_26"/></visual>
-    <visual><origin xyz="0 0 0.243" rpy="0 0 0"/><geometry><box size="0.49 0.49 0.006"/></geometry><material name="mat_27"/></visual>
-    <visual><origin xyz="0 0 0.08" rpy="0 0 0"/><geometry><box size="0.5 0.39 0.1"/></geometry><material name="mat_26"/></visual>
-    <visual><origin xyz="0 0.2225 0.08" rpy="0 0 0"/><geometry><box size="0.24 0.055 0.1"/></geometry><material name="mat_26"/></visual>
-    <visual><origin xyz="0 -0.2225 0.08" rpy="0 0 0"/><geometry><box size="0.24 0.055 0.1"/></geometry><material name="mat_26"/></visual>
-    <visual><origin xyz="0.235 0.235 0.165" rpy="0 0 0"/><geometry><box size="0.015 0.015 0.07"/></geometry><material name="mat_00"/></visual>
-    <visual><origin xyz="0.235 -0.235 0.165" rpy="0 0 0"/><geometry><box size="0.015 0.015 0.07"/></geometry><material name="mat_00"/></visual>
-    <visual><origin xyz="-0.235 0.235 0.165" rpy="0 0 0"/><geometry><box size="0.015 0.015 0.07"/></geometry><material name="mat_00"/></visual>
-    <visual><origin xyz="-0.235 -0.235 0.165" rpy="0 0 0"/><geometry><box size="0.015 0.015 0.07"/></geometry><material name="mat_00"/></visual>
-    <visual><origin xyz="-0.225 0.035 0.165" rpy="0 0 0"/><geometry><box size="0.015 0.015 0.07"/></geometry><material name="mat_00"/></visual>
-    <visual><origin xyz="-0.225 -0.035 0.165" rpy="0 0 0"/><geometry><box size="0.015 0.015 0.07"/></geometry><material name="mat_00"/></visual>
-    <visual><origin xyz="0.253 0 0.07" rpy="0 0 0"/><geometry><box size="0.012 0.48 0.035"/></geometry><material name="mat_28"/></visual>
-    <visual><origin xyz="-0.253 0 0.07" rpy="0 0 0"/><geometry><box size="0.012 0.48 0.035"/></geometry><material name="mat_28"/></visual>
-    <visual><origin xyz="0.248 0 0.205" rpy="0 0 0"/><geometry><box size="0.006 0.3 0.008"/></geometry><material name="mat_29"/></visual>
-    <collision><origin xyz="0 0 0.22" rpy="0 0 0"/><geometry><box size="0.5 0.5 0.04"/></geometry></collision>
-    <collision><origin xyz="0 0 0.08" rpy="0 0 0"/><geometry><box size="0.5 0.39 0.1"/></geometry></collision>
-    <collision><origin xyz="0 0.2225 0.08" rpy="0 0 0"/><geometry><box size="0.24 0.055 0.1"/></geometry></collision>
-    <collision><origin xyz="0 -0.2225 0.08" rpy="0 0 0"/><geometry><box size="0.24 0.055 0.1"/></geometry></collision>
+    <inertial><origin xyz="0 0 0.113947" rpy="0 0 0"/><mass value="19"/><inertia ixx="0.293404" ixy="0" ixz="0" iyy="0.394787" iyz="0" izz="0.535517"/></inertial>
+    <visual><origin xyz="0 0 0.22" rpy="0 0 0"/><geometry><box size="0.45 0.45 0.04"/></geometry><material name="mat_26"/></visual>
+    <visual><origin xyz="0 0 0.243" rpy="0 0 0"/><geometry><box size="0.44 0.44 0.006"/></geometry><material name="mat_27"/></visual>
+    <visual><origin xyz="0 0 0.08" rpy="0 0 0"/><geometry><box size="0.45 0.34 0.1"/></geometry><material name="mat_26"/></visual>
+    <visual><origin xyz="0 0.1975 0.08" rpy="0 0 0"/><geometry><box size="0.19 0.055 0.1"/></geometry><material name="mat_26"/></visual>
+    <visual><origin xyz="0 -0.1975 0.08" rpy="0 0 0"/><geometry><box size="0.19 0.055 0.1"/></geometry><material name="mat_26"/></visual>
+    <visual><origin xyz="0.21 0.21 0.165" rpy="0 0 0"/><geometry><box size="0.015 0.015 0.07"/></geometry><material name="mat_00"/></visual>
+    <visual><origin xyz="0.21 -0.21 0.165" rpy="0 0 0"/><geometry><box size="0.015 0.015 0.07"/></geometry><material name="mat_00"/></visual>
+    <visual><origin xyz="-0.21 0.21 0.165" rpy="0 0 0"/><geometry><box size="0.015 0.015 0.07"/></geometry><material name="mat_00"/></visual>
+    <visual><origin xyz="-0.21 -0.21 0.165" rpy="0 0 0"/><geometry><box size="0.015 0.015 0.07"/></geometry><material name="mat_00"/></visual>
+    <visual><origin xyz="-0.2 0.035 0.165" rpy="0 0 0"/><geometry><box size="0.015 0.015 0.07"/></geometry><material name="mat_00"/></visual>
+    <visual><origin xyz="-0.2 -0.035 0.165" rpy="0 0 0"/><geometry><box size="0.015 0.015 0.07"/></geometry><material name="mat_00"/></visual>
+    <visual><origin xyz="0.228 0 0.07" rpy="0 0 0"/><geometry><box size="0.012 0.43 0.035"/></geometry><material name="mat_28"/></visual>
+    <visual><origin xyz="-0.228 0 0.07" rpy="0 0 0"/><geometry><box size="0.012 0.43 0.035"/></geometry><material name="mat_28"/></visual>
+    <visual><origin xyz="0.223 0 0.205" rpy="0 0 0"/><geometry><box size="0.006 0.3 0.008"/></geometry><material name="mat_29"/></visual>
+    <collision><origin xyz="0 0 0.22" rpy="0 0 0"/><geometry><box size="0.45 0.45 0.04"/></geometry></collision>
+    <collision><origin xyz="0 0 0.08" rpy="0 0 0"/><geometry><box size="0.45 0.34 0.1"/></geometry></collision>
+    <collision><origin xyz="0 0.1975 0.08" rpy="0 0 0"/><geometry><box size="0.19 0.055 0.1"/></geometry></collision>
+    <collision><origin xyz="0 -0.1975 0.08" rpy="0 0 0"/><geometry><box size="0.19 0.055 0.1"/></geometry></collision>
   </link>
   <joint name="base_body_fixed" type="fixed"><parent link="base_link"/><child link="base_body"/><origin xyz="0 0 0" rpy="0 0 0"/></joint>
   <link name="wheel_fl">
@@ -69,7 +69,7 @@
     <visual><origin xyz="0 0 0" rpy="1.5708 0 0"/><geometry><cylinder radius="0.03" length="0.051"/></geometry><material name="mat_30"/></visual>
     <collision><origin xyz="0 0 0" rpy="1.5708 0 0"/><geometry><cylinder radius="0.028" length="0.045"/></geometry></collision>
   </link>
-  <joint name="wheel_fl_joint" type="continuous"><parent link="base_link"/><child link="wheel_fl"/><origin xyz="0.17 0.222 0.05" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-1e+09" upper="1e+09" effort="6" velocity="25"/><dynamics damping="0.1" friction="0.05"/></joint>
+  <joint name="wheel_fl_joint" type="continuous"><parent link="base_link"/><child link="wheel_fl"/><origin xyz="0.145 0.197 0.05" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-1e+09" upper="1e+09" effort="6" velocity="25"/><dynamics damping="0.1" friction="0.05"/></joint>
   <link name="wheel_fl_roller_0">
     <inertial><origin xyz="0 0 0" rpy="0 0 0"/><mass value="0.012"/><inertia ixx="1.963e-06" ixy="0" ixz="0" iyy="1.963e-06" iyz="0" izz="7.26e-07"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><cylinder radius="0.011" length="0.04"/></geometry><material name="mat_31"/></visual>
@@ -147,7 +147,7 @@
     <visual><origin xyz="0 0 0" rpy="1.5708 0 0"/><geometry><cylinder radius="0.03" length="0.051"/></geometry><material name="mat_30"/></visual>
     <collision><origin xyz="0 0 0" rpy="1.5708 0 0"/><geometry><cylinder radius="0.028" length="0.045"/></geometry></collision>
   </link>
-  <joint name="wheel_fr_joint" type="continuous"><parent link="base_link"/><child link="wheel_fr"/><origin xyz="0.17 -0.222 0.05" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-1e+09" upper="1e+09" effort="6" velocity="25"/><dynamics damping="0.1" friction="0.05"/></joint>
+  <joint name="wheel_fr_joint" type="continuous"><parent link="base_link"/><child link="wheel_fr"/><origin xyz="0.145 -0.197 0.05" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-1e+09" upper="1e+09" effort="6" velocity="25"/><dynamics damping="0.1" friction="0.05"/></joint>
   <link name="wheel_fr_roller_0">
     <inertial><origin xyz="0 0 0" rpy="0 0 0"/><mass value="0.012"/><inertia ixx="1.963e-06" ixy="0" ixz="0" iyy="1.963e-06" iyz="0" izz="7.26e-07"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><cylinder radius="0.011" length="0.04"/></geometry><material name="mat_31"/></visual>
@@ -225,7 +225,7 @@
     <visual><origin xyz="0 0 0" rpy="1.5708 0 0"/><geometry><cylinder radius="0.03" length="0.051"/></geometry><material name="mat_30"/></visual>
     <collision><origin xyz="0 0 0" rpy="1.5708 0 0"/><geometry><cylinder radius="0.028" length="0.045"/></geometry></collision>
   </link>
-  <joint name="wheel_rl_joint" type="continuous"><parent link="base_link"/><child link="wheel_rl"/><origin xyz="-0.17 0.222 0.05" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-1e+09" upper="1e+09" effort="6" velocity="25"/><dynamics damping="0.1" friction="0.05"/></joint>
+  <joint name="wheel_rl_joint" type="continuous"><parent link="base_link"/><child link="wheel_rl"/><origin xyz="-0.145 0.197 0.05" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-1e+09" upper="1e+09" effort="6" velocity="25"/><dynamics damping="0.1" friction="0.05"/></joint>
   <link name="wheel_rl_roller_0">
     <inertial><origin xyz="0 0 0" rpy="0 0 0"/><mass value="0.012"/><inertia ixx="1.963e-06" ixy="0" ixz="0" iyy="1.963e-06" iyz="0" izz="7.26e-07"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><cylinder radius="0.011" length="0.04"/></geometry><material name="mat_31"/></visual>
@@ -303,7 +303,7 @@
     <visual><origin xyz="0 0 0" rpy="1.5708 0 0"/><geometry><cylinder radius="0.03" length="0.051"/></geometry><material name="mat_30"/></visual>
     <collision><origin xyz="0 0 0" rpy="1.5708 0 0"/><geometry><cylinder radius="0.028" length="0.045"/></geometry></collision>
   </link>
-  <joint name="wheel_rr_joint" type="continuous"><parent link="base_link"/><child link="wheel_rr"/><origin xyz="-0.17 -0.222 0.05" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-1e+09" upper="1e+09" effort="6" velocity="25"/><dynamics damping="0.1" friction="0.05"/></joint>
+  <joint name="wheel_rr_joint" type="continuous"><parent link="base_link"/><child link="wheel_rr"/><origin xyz="-0.145 -0.197 0.05" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-1e+09" upper="1e+09" effort="6" velocity="25"/><dynamics damping="0.1" friction="0.05"/></joint>
   <link name="wheel_rr_roller_0">
     <inertial><origin xyz="0 0 0" rpy="0 0 0"/><mass value="0.012"/><inertia ixx="1.963e-06" ixy="0" ixz="0" iyy="1.963e-06" iyz="0" izz="7.26e-07"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><cylinder radius="0.011" length="0.04"/></geometry><material name="mat_31"/></visual>
@@ -382,25 +382,204 @@
   </link>
   <joint name="lidar_fixed" type="fixed"><parent link="base_link"/><child link="lidar_link"/><origin xyz="0.04 0 0.165" rpy="0 0 0"/></joint>
   <link name="tote">
-    <inertial><origin xyz="0.0228169 0.0454225 0.04" rpy="0 0 0"/><mass value="0.79875"/><inertia ixx="0.00694913" ixy="0" ixz="0" iyy="0.00694913" iyz="0" izz="0.0119813"/></inertial>
-    <visual><origin xyz="-0.02 0.015 0.0035" rpy="0 0 0"/><geometry><box size="0.22 0.45 0.007"/></geometry><material name="mat_29"/></visual>
-    <visual><origin xyz="0.17 0.15 0.0035" rpy="0 0 0"/><geometry><box size="0.16 0.18 0.007"/></geometry><material name="mat_29"/></visual>
-    <visual><origin xyz="-0.1265 0.015 0.06" rpy="0 0 0"/><geometry><box size="0.007 0.45 0.12"/></geometry><material name="mat_29"/></visual>
-    <visual><origin xyz="-0.02 -0.2065 0.06" rpy="0 0 0"/><geometry><box size="0.22 0.007 0.12"/></geometry><material name="mat_29"/></visual>
-    <visual><origin xyz="0.0865 -0.0715 0.06" rpy="0 0 0"/><geometry><box size="0.007 0.277 0.12"/></geometry><material name="mat_29"/></visual>
-    <visual><origin xyz="0.1665 0.0635 0.06" rpy="0 0 0"/><geometry><box size="0.167 0.007 0.12"/></geometry><material name="mat_29"/></visual>
-    <visual><origin xyz="0.2465 0.15 0.06" rpy="0 0 0"/><geometry><box size="0.007 0.18 0.12"/></geometry><material name="mat_29"/></visual>
-    <visual><origin xyz="0.06 0.2365 0.06" rpy="0 0 0"/><geometry><box size="0.38 0.007 0.12"/></geometry><material name="mat_29"/></visual>
-    <collision><origin xyz="-0.02 0.015 0.0035" rpy="0 0 0"/><geometry><box size="0.22 0.45 0.007"/></geometry></collision>
-    <collision><origin xyz="0.17 0.15 0.0035" rpy="0 0 0"/><geometry><box size="0.16 0.18 0.007"/></geometry></collision>
-    <collision><origin xyz="-0.1265 0.015 0.06" rpy="0 0 0"/><geometry><box size="0.007 0.45 0.12"/></geometry></collision>
-    <collision><origin xyz="-0.02 -0.2065 0.06" rpy="0 0 0"/><geometry><box size="0.22 0.007 0.12"/></geometry></collision>
-    <collision><origin xyz="0.0865 -0.0715 0.06" rpy="0 0 0"/><geometry><box size="0.007 0.277 0.12"/></geometry></collision>
-    <collision><origin xyz="0.1665 0.0635 0.06" rpy="0 0 0"/><geometry><box size="0.167 0.007 0.12"/></geometry></collision>
-    <collision><origin xyz="0.2465 0.15 0.06" rpy="0 0 0"/><geometry><box size="0.007 0.18 0.12"/></geometry></collision>
-    <collision><origin xyz="0.06 0.2365 0.06" rpy="0 0 0"/><geometry><box size="0.38 0.007 0.12"/></geometry></collision>
+    <inertial><origin xyz="-0.053628 0.0185523 0.290014" rpy="0 0 0"/><mass value="1.199"/><inertia ixx="0.0305234" ixy="-0.00587106" ixz="-0.000568053" iyy="0.0261222" iyz="-9.94952e-05" izz="0.0535481"/></inertial>
+    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/visual/mtote_tote.stl"/></geometry><material name="mat_29"/></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c00.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c01.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c02.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c03.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c04.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c05.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c06.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c07.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c08.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c09.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c10.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c11.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c12.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c13.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c14.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c15.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c16.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c17.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c18.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c19.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c20.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c21.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c22.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c23.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c24.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c25.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c26.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c27.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c28.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c29.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c30.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c31.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c32.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c33.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c34.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c35.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c36.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c37.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c38.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c39.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c40.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c41.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c42.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c43.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c44.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c45.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c46.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c47.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c48.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c49.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c50.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c51.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c52.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c53.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c54.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c55.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c56.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c57.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c58.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c59.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c60.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c61.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c62.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c63.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c64.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c65.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c66.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c67.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c68.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c69.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c70.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c71.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c72.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c73.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c74.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c75.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c76.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c77.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c78.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c79.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c80.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c81.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c82.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c83.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c84.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c85.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c86.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c87.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c88.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c89.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c90.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c91.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c92.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c93.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c94.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c95.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c96.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c97.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c98.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c99.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c100.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c101.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c102.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c103.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c104.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c105.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c106.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c107.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c108.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c109.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c110.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c111.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c112.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c113.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c114.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c115.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c116.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c117.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c118.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c119.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c120.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c121.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c122.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c123.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c124.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c125.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c126.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c127.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c128.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c129.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c130.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c131.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c132.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c133.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c134.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c135.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c136.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c137.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c138.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c139.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c140.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c141.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c142.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c143.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c144.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c145.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c146.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c147.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c148.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c149.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c150.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c151.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c152.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c153.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c154.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c155.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c156.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c157.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c158.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c159.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c160.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c161.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c162.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c163.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c164.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c165.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c166.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c167.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c168.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c169.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c170.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c171.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c172.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c173.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c174.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c175.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c176.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c177.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c178.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c179.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c180.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c181.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c182.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c183.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c184.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c185.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c186.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c187.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c188.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c189.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c190.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c191.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c192.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mtote_c193.stl"/></geometry></collision>
   </link>
-  <joint name="tote_fixed" type="fixed"><parent link="base_link"/><child link="tote"/><origin xyz="0 0 0.256" rpy="0 0 0"/></joint>
+  <joint name="tote_fixed" type="fixed"><parent link="base_link"/><child link="tote"/><origin xyz="0 0 0" rpy="0 0 0"/></joint>
   <link name="column">
     <inertial><origin xyz="-0.000837434 3.71592e-06 0.315898" rpy="0 0 0"/><mass value="3.6588"/><inertia ixx="0.453763" ixy="1.74717e-07" ixz="-0.00278795" iyy="0.452628" iyz="4.70253e-06" izz="0.00276951"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/visual/cbeam_beam.stl"/></geometry><material name="mat_32"/></visual>
@@ -412,13 +591,13 @@
     <collision><origin xyz="-0.010335 0 -0.054" rpy="0 0 0"/><geometry><box size="0.06067 0.08 0.108"/></geometry></collision>
     <collision><origin xyz="0.023 0 -0.007" rpy="0 0 0"/><geometry><box size="0.006 0.08 0.12"/></geometry></collision>
   </link>
-  <joint name="column_fixed" type="fixed"><parent link="base_link"/><child link="column"/><origin xyz="0.18 -0.122 0.313" rpy="0 0 -1.5708"/></joint>
+  <joint name="column_fixed" type="fixed"><parent link="base_link"/><child link="column"/><origin xyz="0.155 -0.122 0.313" rpy="0 0 -1.5708"/></joint>
   <link name="top_beam">
     <inertial><origin xyz="-0.00486948 1.81726e-06 0.00558039" rpy="0 0 0"/><mass value="0.1456"/><inertia ixx="8.06856e-05" ixy="3.30126e-09" ixz="-7.25664e-08" iyy="3.23254e-05" iyz="5.88752e-10" izz="0.000108533"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/visual/cbeam_top.stl"/></geometry><material name="mat_00"/></visual>
     <collision><origin xyz="-0.005 0 0.006" rpy="0 0 0"/><geometry><box size="0.05 0.08 0.012"/></geometry></collision>
   </link>
-  <joint name="top_beam_fixed" type="fixed"><parent link="base_link"/><child link="top_beam"/><origin xyz="0.18 -0.122 1.313" rpy="0 0 -1.5708"/></joint>
+  <joint name="top_beam_fixed" type="fixed"><parent link="base_link"/><child link="top_beam"/><origin xyz="0.155 -0.122 1.313" rpy="0 0 -1.5708"/></joint>
   <link name="estop">
     <inertial><origin xyz="0 0 0" rpy="0 0 0"/><mass value="0.03"/><inertia ixx="4.63e-06" ixy="0" ixz="0" iyy="4.63e-06" iyz="0" izz="7.26e-06"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><cylinder radius="0.022" length="0.02"/></geometry><material name="mat_33"/></visual>
@@ -500,7 +679,7 @@
     <collision><origin xyz="-0.00775 0.05 -0.0425" rpy="0 0 0"/><geometry><box size="0.0165 0.0239954 0.125"/></geometry></collision>
     <collision><origin xyz="-0.00775 -0.05 -0.0425" rpy="0 0 0"/><geometry><box size="0.0165 0.0239954 0.125"/></geometry></collision>
   </link>
-  <joint name="lift" type="prismatic"><parent link="base_link"/><child link="carriage"/><origin xyz="0.18 -0.122 0.42" rpy="0 0 -1.5708"/><axis xyz="0 0 1"/><limit lower="0" upper="0.871" effort="300" velocity="0.1"/><dynamics damping="50" friction="5"/></joint>
+  <joint name="lift" type="prismatic"><parent link="base_link"/><child link="carriage"/><origin xyz="0.155 -0.122 0.42" rpy="0 0 -1.5708"/><axis xyz="0 0 1"/><limit lower="0" upper="0.871" effort="300" velocity="0.1"/><dynamics damping="50" friction="5"/></joint>
   <link name="scene_mast">
     <inertial><origin xyz="0.0549809 -0.028941 0.275495" rpy="0 0 0"/><mass value="0.199418"/><inertia ixx="0.000742644" ixy="4.77689e-05" ixz="-6.48373e-05" iyy="0.000355577" iyz="0.000163057" izz="0.000479621"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/visual/scene_mast_98.stl"/></geometry><material name="mat_01"/></visual>

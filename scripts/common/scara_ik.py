@@ -25,7 +25,7 @@ LAYOUTS = {'prototype': {'left': (0.18, 0.15, D(135)), 'right': (0.18, -0.15, -D
            # THE one-arm prototype since 2026-11-23 (mono holder): the prototype's own arm, shoulder on the robot's
            # centreline 0.18 m forward (0.12 until 2026-11-24), zero pose pointing LEFT (+y); the column 0.122 m to its
            # right, the tote on the base behind the arm (as the original design); keep equal to mono_holder.ROBOT_X
-           'prototype_mono_arm': {'left': (0.18, 0.0, D(90))},
+           'prototype_mono_arm': {'left': (0.155, 0.0, D(90))},    # 0.18 until the base went 0.50 -> 0.45 (2026-11-24)
            # PARKED (2026-11-23): the shoulder ring around the column (2026-11-10) and its side test (2026-11-18)
            'prototype_mono_ring': {'left': (0.18, 0.0, 0.0)},
            'prototype_mono_ring_side': {'left': (0.0, -0.18, 0.0)}}

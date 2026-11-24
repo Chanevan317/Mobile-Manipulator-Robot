@@ -16,6 +16,7 @@ camera reaching 0.34 m forward, + MARGIN), and gets an APPROACH point nearby wit
 clear all round): legs go station -> its approach -> (straight across, turning on the way) -> the next approach ->
 straight in. When the straight line between two approach points is not clear for a turning robot, the leg goes via
 HUB (the middle of the aisle).
+Side grasps may enter up to grasp_plan_mono.ENTRY deg off straight in (2026-11-24; 'entry' in the station, deg).
 Checked: kinematics (scara_ik, joint limits), footprints (2-D boxes) and the grasp poses (approach, grasp, lift, jaws
 open) against the robot itself, the furniture and the other task products (collide.Checker); among the stops that pass,
 the one with the most comfortable arm wins (COMFORT_R). NOT checked: the moves between the poses (pick_place plans those).
@@ -30,14 +31,14 @@ import scene as SC
 import grasp_plan_mono as G
 import scara_ik as K
 
-FOOT = dict(back=0.25, front=0.26, side=0.25)   # robot frame: base 0.50 x 0.50 + bumper (mono holder: the scene camera is
+FOOT = dict(back=0.225, front=0.235, side=0.225)   # (0.25 / 0.26 / 0.25 on the 0.50 base until 2026-11-24)   # robot frame: base 0.50 x 0.50 + bumper (mono holder: the scene camera is
                                                 # inside, x ~0.14; with the ring it reached x 0.341 -> front 0.34)
 MARGIN = 0.02
 TURN_R = math.hypot(FOOT['front'], FOOT['side']) + 0.03     # clearance needed to turn on the spot
 HUB = (-1.20, 0.0)
 HOME = (round((SC.ROOM['x0'] + SC.ROOM['x1']) / 2, 3), round((SC.ROOM['y0'] + SC.ROOM['y1']) / 2, 3))   # the middle of the room
                                             # (2026-11-18, user: every script starts the robot there; it was the world origin at the table end)
-OUT = os.path.join(RP.scene_dir('scene_v0'), 'stations.json')
+OUT = os.environ.get('MM_STATIONS') or os.path.join(RP.scene_dir('scene_v0'), 'stations.json')   # MM_STATIONS: a test set
 
 
 def obstacles():
@@ -109,7 +110,7 @@ def _env(bx, by, heading_deg, skip_pkg):
     return furn + G.CO().boxes_to_base(prods, (bx, by), math.radians(heading_deg))
 
 
-def base_for(pkg, centre, surface, heading_deg, front_dist, dz):
+def base_for(pkg, centre, surface, heading_deg, front_dist, dz, entry=None):
     """Base pose (x, y, yaw) from which the arm picks the product at `centre` (world). Every candidate stop must keep the
     robot's outline clear and reach the grasp (approach, grasp, lift) without touching the robot; of those, the stop
     with the most comfortable arm (wrist-pan axis closest to COMFORT_R from the shoulder) whose grasp poses also clear
@@ -119,34 +120,57 @@ def base_for(pkg, centre, surface, heading_deg, front_dist, dz):
     c, s = math.cos(math.radians(heading_deg)), math.sin(math.radians(heading_deg))
     jaw = min(0.045, narrow / 2 + 0.015)
     sx_, sy_ = K.SHOULDER['left']
-    cands = []
+    emax = G.entry_max(pkg) if h > G.TOP_H else 0
+    angles = [entry] if entry is not None else (list(range(-emax, emax + 1, 5)) if emax else [0])   # entry: force one (tests)
+    cands = []                       # kinematics only here (fast); the collision checks run below, best stop first
     for d in np.arange(0.28, 0.95, 0.01):
         if d - front_dist < G.FRONT_MIN:
             continue
         for b in (0.0, 0.02, -0.02, 0.05, -0.05, 0.10, -0.10, 0.15, -0.15, 0.20, -0.20, 0.25, -0.25, 0.30, -0.30):
-            if h <= G.TOP_H:
-                opts = [(G.top_poses((d, b), yaw, fz, 0.025), 'top') for yaw in (0.0, math.pi)]
-            else:
-                opts = [(G.side_poses((d, b), 0.0, deep, gz, dz), 'side')]
             bx, by = centre[0] - c * d + s * b, centre[1] - s * d - c * b
             if hits(footprint(bx, by, heading_deg)):
                 continue
-            for P, kind in opts:
-                e = G._ok(P, clear=True)
+            if h <= G.TOP_H:
+                opts = [(G.top_poses((d, b), yaw, fz, 0.025), 'top', 0) for yaw in (0.0, math.pi)]
+            else:                       # also entering at an angle (2026-11-24): the hand's heading off straight in
+                opts = [(G.side_poses((d, b), math.radians(a), deep, gz, dz), 'side', a) for a in angles]
+            for P, kind, ang in opts:
+                e = G._ok(P)
                 if not e:
                     continue
-                q = K.ik('left', *P[1], elbow=e)
+                if ang and not _line_ok(P, e, d - front_dist):
+                    continue
                 wx, wy = P[1][0] - (0.04 + 0.215 * math.cos(P[1][4])) * math.cos(P[1][3]), P[1][1] - (0.04 + 0.215 * math.cos(P[1][4])) * math.sin(P[1][3])
                 r = math.hypot(wx - sx_, wy - sy_)
-                cands.append((abs(r - COMFORT_R), float(d), b, bx, by, kind, P, e))
-    for score, d, b, bx, by, kind, P, e in sorted(cands, key=lambda t: t[0]):
+                # straight in preferred: 3 mm of comfort per deg off straight
+                cands.append((abs(r - COMFORT_R) + 0.003 * abs(ang), float(d), b, bx, by, kind, P, e, ang))
+    for score, d, b, bx, by, kind, P, e, ang in sorted(cands, key=lambda t: t[0]):
+        if not G._clear(P, e):                          # the arm clear of the robot itself
+            continue
         env = _env(bx, by, heading_deg, pkg)
         # from above, the grasp pose has the fingertips 1 mm over the board the product stands on (inside the furniture
         # margin): its approach and lift-off poses are checked, the grasp is straight down between them
         chk_poses = (P[0], P[2]) if kind == 'top' else P
         if all(not G._CHK[0].check({**K.ik('left', *p_, elbow=e), 'jaw': jaw}, env) for p_ in chk_poses):
-            return dict(x=round(bx, 3), y=round(by, 3), yaw=heading_deg, grasp=kind, reach=round(d, 3), offset=b)
+            return dict(x=round(bx, 3), y=round(by, 3), yaw=heading_deg, grasp=kind, reach=round(d, 3), offset=b, entry=ang)
     return None
+
+
+def _line_ok(P, e, front):
+    """Angled entry: the straight moves have IK all along (Isaac 2026-11-24: a pose-only check passed a station whose
+    insertion line left the workspace): approach -> grasp -> lift, and the hand backed out along its heading to 0.10 m
+    before the furniture front (`front`, base-frame x of the shelf front; pick_place's ready spot is there or nearer)."""
+    a, b, up = P
+    u = np.array([math.cos(a[3]), math.sin(a[3])])
+    pts = [tuple(np.array(a[:3]) + (np.array(b[:3]) - np.array(a[:3])) * t) for t in np.linspace(0, 1, 6)]
+    pts += [(b[0], b[1], b[2] + (up[2] - b[2]) * t) for t in np.linspace(0, 1, 3)]
+    t = 0.0
+    while True:
+        p_ = np.array(a[:2]) - u * t
+        if p_[0] < 0.12: break
+        pts.append((p_[0], p_[1], up[2])); t += 0.02
+        if p_[0] < front - 0.10: break
+    return all(K.ik('left', x, y, z, a[3], a[4], elbow=e) for x, y, z in pts)
 
 
 def approach_for(st):
@@ -217,10 +241,10 @@ if __name__ == '__main__':
     bad = [n for n, s_ in st.items() if 'x' not in s_ or s_.get('approach') is None]
     json.dump(dict(note='scene_v0 robot stations (stations_mono.py); world frame = robot start; yaw deg; approach = turning point',
                    footprint=FOOT, margin=MARGIN, turn_r=round(TURN_R, 3), hub=HUB, stations=st), open(OUT, 'w'), indent=1)
-    print(f'{"station":28s} {"x":>7s} {"y":>7s} {"yaw":>5s}  grasp  reach  approach           section / product')
+    print(f'{"station":28s} {"x":>7s} {"y":>7s} {"yaw":>5s}  grasp  reach entry  approach           section / product')
     for n, s_ in st.items():
         if 'x' not in s_:
             print(f'{n:28s} {s_.get("note")}'); continue
-        print(f'{n:28s} {s_["x"]:7.3f} {s_["y"]:7.3f} {s_["yaw"]:5.0f}  {s_.get("grasp", "-"):5s}  {s_.get("reach", 0):5.2f}  '
+        print(f'{n:28s} {s_["x"]:7.3f} {s_["y"]:7.3f} {s_["yaw"]:5.0f}  {s_.get("grasp", "-"):5s}  {s_.get("reach", 0):5.2f} {s_.get("entry", 0):+4.0f}  '
               f'{str(s_.get("approach")):18s} {s_.get("section", "")} / {(s_.get("product") or "").replace("food_", "")}{"  (task product)" if s_.get("task") else ""}')
     print(f'hub {HUB} clearance {clearance(*HUB):.2f} (need {TURN_R:.2f}); {len(st)} stations, problems: {bad or "none"} -> {OUT}')

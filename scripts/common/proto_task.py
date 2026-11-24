@@ -24,6 +24,8 @@ DT = 1.0 / CTRL_HZ
 TCP_SPEED = 0.20          # m/s for straight-line hand moves (time follows the distance)
 TCP_TURN = 1.5            # rad/s for heading / pitch changes in those moves
 MIN_MOVE = 0.4            # s, shortest straight-line move
+WHEELS = {'prototype_mono_arm': (0.145, 0.197)}   # wheel centre offsets (x, y) per layout: the one-arm base is 0.45 since
+                                                  # 2026-11-24; the others (0.50 base) use (0.17, 0.222)
 ARM_KEYS = ('shoulder_pan', 'elbow_pan', 'wrist_pan', 'wrist_pitch', 'wrist_roll')
 RAMP = 0.3                # s, accel / decel ramp of the 'trap' profile
 STILL_V = 0.1             # rad/s: 'stopped' for settle_mode 'still' (the wrist pitch holding a product hunts at 0.03-0.06)
@@ -128,7 +130,7 @@ class Task:
         """Wheel velocities that pull the parked base back to self.hold. The wheels' velocity drives are soft, and the
         passive rollers let the arms' reaction push the base around (5 cm in the shelf task, 2026-11-09); a real base
         holds position with its wheel motors."""
-        R, LX, LY = 0.05, 0.17, 0.222
+        R = 0.05; LX, LY = WHEELS.get(self.layout, (0.17, 0.222))
         p, yaw = self.base_pose(); g = self.hold
         ex, ey = g[0] - p[0], g[1] - p[1]; eyaw = math.atan2(math.sin(g[2] - yaw), math.cos(g[2] - yaw))
         vw = np.array([ex, ey]) * 2.0; sp = np.linalg.norm(vw)
@@ -334,7 +336,7 @@ class Task:
         """Closed-loop base move to (x, y, yaw) in the world with mecanum wheel mixing ."""
         if self.planar:
             return self._planar_move(goal, label)
-        R, LX, LY = 0.05, 0.17, 0.222
+        R = 0.05; LX, LY = WHEELS.get(self.layout, (0.17, 0.222))
         self.hold = None
         for _ in range(int(timeout * CTRL_HZ)):
             p, yaw = self.base_pose()

@@ -1,0 +1,4 @@
+what,x0_mm,x1_mm,y0_mm,y1_mm,note
+"A (behind the arm, full width)",-218,65,-218,218,"inner wall faces, robot frame (x forward, y left, base centre)"
+"B (left side, to the front edge)",65,218,60,218,"inner wall faces, robot frame (x forward, y left, base centre)"
+floor,,,,,"deck top 256 mm + 7 mm floor; flat within 270 mm of the shoulder (x 155, y 0), rising 30 deg beyond; rim 376 mm"

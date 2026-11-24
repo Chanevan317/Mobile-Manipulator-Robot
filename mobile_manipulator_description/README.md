@@ -241,14 +241,15 @@ rl = (vx + vy - (LX+LY)·wz) / R      rr = (vx - vy + (LX+LY)·wz) / R
 ## One-arm prototype (`prototype_mono_arm`)
 
 The official prototype since 2026-11-23: **one arm on the lift carriage, the lift column shifted to the side.** Moved
-forward and the camera put over the arm on 2026-11-24.
+forward and the camera put over the arm on 2026-11-24; base 0.45 × 0.45 m and the tote over the whole deck the same day.
 
 | | |
 |---|---|
-| Lift column | **0.18 m in front** of the base centre and **0.122 m to the right** of the centreline, turned so the gantry plate (the carriage) **faces the centre**; the carriage's front ends at the bumper |
+| Base | **0.45 × 0.45 m** mecanum (was 0.50; the other layouts keep 0.50), wheels at (±0.145, ±0.197) |
+| Lift column | **0.155 m in front** of the base centre (7 cm behind the deck's front edge) and **0.122 m to the right** of the centreline, turned so the gantry plate (the carriage) **faces the centre**; the carriage's front ends at the bumper |
 | Carriage | the kit's gantry plate + the printed **mono holder** (`../CAD/mono_holder/`): the arm base (01 + 02) on a pad, a post behind the beam and a bar over the arm for the scene camera |
-| Arm | the prototype's own arm (shoulder ±115°, elbow ±125°, wrist pan ±122°, 130 + 130 mm links), its shoulder on the robot's centreline at x 0.18; zero pose points **left**, so the blind sector faces the column |
-| Tote | on the **base**, as in the original design (the lift lowers the hand into it); **L-shaped**, sized to where the hand reaches: behind the arm (x −0.13 … 0.09, y −0.21 … 0.24) plus a leg along the free left side up to the front edge (x 0.09 … 0.25, y 0.06 … 0.24), 0.12 m deep |
+| Arm | the prototype's own arm (shoulder ±115°, elbow ±125°, wrist pan ±122°, 130 + 130 mm links), its shoulder on the robot's centreline at x 0.155; zero pose points **left**, so the blind sector faces the column |
+| Tote | on the **base**, as in the original design (the lift lowers the hand into it); **L-shaped over the whole deck**: behind the arm (x −0.218 … 0.065, full width) plus the free left side up to the front edge (x 0.065 … 0.218, y 0.06 … 0.218), walls 0.12 m. The floor is **flat where the hand reaches** (plus 50 mm of room for the hand) and **rises at 30°** from there to the walls, so a product that slides into a corner or the back strip comes back down to where the arm gets it. Shape: `../CAD/mono_holder/tote/` |
 | Lift travel | 0–0.871 m (nothing stands over the beam) |
 | Scene camera | OAK-D Pro W on a pitch servo, on a 98 mm mast on the holder's bar: **straight above the shoulder**, 10 mm over the arm's highest point, lens 0.33 m over the carriage, looking forward; nothing sticks out in front of the carriage |
 
@@ -259,19 +260,21 @@ Joint names are the normal arm's (`left_shoulder_pan`, `left_elbow_pan`, `left_w
 Gains: the normal arm's (`drives.py`). Travel fold `mono_poses.STOW` (shoulder 10°, elbow 110°, wrist pan 60°, hand
 level): inside the footprint, clear from lift 0 to 0.871 m.
 
-**Reach** (`reach_test.py --layout prototype_mono_arm --edge 0.28 --shelf_edge 0.28`: furniture as close as the robot
-can stand, 0.28 m from the base centre):
+**Reach** (`reach_test.py --layout prototype_mono_arm --edge 0.255 --shelf_edge 0.255 --shelf_angle 30`: furniture as
+close as the robot can stand, 0.255 m from the base centre on the 0.45 base):
 
-| | Tables (hand down) | Shelf boards 0.70 / 1.10 m (hand level, straight in) | Tote floor |
+| | Tables (hand down) | Shelf boards 0.70 / 1.10 m (hand level) | Tote floor |
 |---|---|---|---|
-| Area | 0.074 m², up to 0.21 m past the edge, 0.42 m wide at 0.10 m | 0.025 m², a 0.15 m strip left of the centre | 0.047 m² (42 % of the L tote's floor; a plain tote behind the arm gave 0.032; the rest is room for the products beside the walls) |
+| Area | 0.074 m², up to 0.21 m past the edge, 0.42 m wide at 0.10 m | straight in: 0.025 m², a 0.15 m strip left of the centre; **round products entering up to ±30°: 0.072 m²** | 0.050 m², all on the flat floor (the old L tote on the 0.50 base: 0.047) |
 | Shoulder at x 0.12 (2026-11-23) | 0.048 m² | 0.025 m² | — |
 | Ring robot (furniture at 0.36 m: its camera stuck out) | 0.060 m² | 0.045 m² | — |
 
 Shelves are limited by the arm itself, not by where it sits: with the hand pointing straight in, the middle and the right
 need the forearm to point backward, past the wrist pan's ±122° (shoulder forward, mount turned ±20–30°: all 0.020–0.026
 m²). The ring robot's extra joint got round that. The robot drives sideways to each shelf product instead
-(`stations_mono.py`: every one of the 19 stations reachable).
+(`stations_mono.py`). **Angled entry** (`grasp_plan_mono.ENTRY`): round products (bottles, cans, cups) may be taken
+up to ±30° off straight in. Not boxes: a product gripped at an angle sits turned in the hand, the drop into the tote
+turns that into a roll the wrist can't undo, and a box then goes back on the shelf turned by the entry angle.
 
 **Isaac Sim results (headless):**
 
@@ -279,7 +282,9 @@ m²). The ring robot's extra joint got round that. The robot drives sideways to 
 |---|---|
 | Joint sweep (2026-11-23) | 8/8 OK; shoulder / elbow / wrist pan reach their limits, lift 0–870.7 of 871 mm |
 | Hold, 3 poses × 30 s (2026-11-23) | 21/21 OK, no drift |
-| Store scene, pick into the tote and put back (`pick_to_tote_mono.py --place --all`) | **14 / 14** pickable stations: picked, dropped in the tote, picked out and put back 1–14 mm from where each stood, nothing else knocked. `shelf_b2_milk_c01` is picked but not put back (the round bottle leans in the tote). Not pickable: `rack_b0_boxedFood_d01` (only a far stop at 0.64 m is free; the jaws missed it), and as on the ring robot `shelf_b1_yogurt_a01`, `shelf_b2_yogurt_c01`, `rack2_b0_cannedFood_h01` (packed run) |
+| Store scene on the 0.45 base with the funnel tote (2026-11-24) | **14 / 14** pickable stations picked, dropped in the tote, picked out and put back **1–6 mm** from where each stood |
+| Angled entry, round products (forced test stations, ±30°) | **4 / 4**, back 1–6 mm from their spots (a bottle may end turned about its own axis) |
+| Store scene on the 0.50 base, old L tote | **14 / 14** pickable stations: picked, dropped in the tote, picked out and put back 1–14 mm from where each stood, nothing else knocked. `shelf_b2_milk_c01` is picked but not put back (the round bottle leans in the tote). Not pickable: `rack_b0_boxedFood_d01` (only a far stop at 0.64 m is free; the jaws missed it), and as on the ring robot `shelf_b1_yogurt_a01`, `shelf_b2_yogurt_c01`, `rack2_b0_cannedFood_h01` (packed run) |
 
 ## Parked: shoulder ring (`prototype_mono_ring`)
 

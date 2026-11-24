@@ -410,20 +410,22 @@ MONO_LIFT_MAX = 0.81                                  # mono ring (layout B): it
 
 def base_xml(mono=False, side=False, single=False):
     o = frame_link('base_link')
-    B = 0.50
+    B = MH.BASE if single else 0.50          # one-arm robot: 0.45 since 2026-11-24 (mono_holder.BASE); the rest keep 0.50
+    r4 = lambda v_: round(v_, 4)
+    h, sb, pc, pr, bm = r4(B / 2), r4(B / 2 - 0.0275), r4(B / 2 - 0.015), r4(B / 2 - 0.025), r4(B / 2 + 0.003)
     v = vprim('0 0 0.22', bx(B, B, 0.04), SHELL) + vprim('0 0 0.243', bx(B - 0.01, B - 0.01, 0.006), TRIM)
-    v += vprim('0 0 0.08', bx(B, 0.39, 0.10), SHELL)
+    v += vprim('0 0 0.08', bx(B, B - 0.11, 0.10), SHELL)
     for sy in (1, -1):
-        v += vprim(f'0 {sy*0.2225} 0.08', bx(0.24, 0.055, 0.10), SHELL)
-    for x, y in [(0.235, 0.235), (0.235, -0.235), (-0.235, 0.235), (-0.235, -0.235), (-0.225, 0.035), (-0.225, -0.035)]:
+        v += vprim(f'0 {sy*sb} 0.08', bx(B - 0.26, 0.055, 0.10), SHELL)
+    for x, y in [(pc, pc), (pc, -pc), (-pc, pc), (-pc, -pc), (-pr, 0.035), (-pr, -0.035)]:
         v += vprim(f'{x} {y} 0.165', bx(0.015, 0.015, 0.07), ALU)
-    v += vprim('0.253 0 0.07', bx(0.012, B - 0.02, 0.035), RUBBER) + vprim('-0.253 0 0.07', bx(0.012, B - 0.02, 0.035), RUBBER)
-    v += vprim('0.248 0 0.205', bx(0.006, 0.30, 0.008), BLUE)
-    c = cprim('0 0 0.22', bx(B, B, 0.04)) + cprim('0 0 0.08', bx(B, 0.39, 0.10))
+    v += vprim(f'{bm} 0 0.07', bx(0.012, B - 0.02, 0.035), RUBBER) + vprim(f'-{bm} 0 0.07', bx(0.012, B - 0.02, 0.035), RUBBER)
+    v += vprim(f'{r4(B / 2 - 0.002)} 0 0.205', bx(0.006, 0.30, 0.008), BLUE)
+    c = cprim('0 0 0.22', bx(B, B, 0.04)) + cprim('0 0 0.08', bx(B, B - 0.11, 0.10))
     for sy in (1, -1):
-        c += cprim(f'0 {sy*0.2225} 0.08', bx(0.24, 0.055, 0.10))
-    m, com, I = combine([box_props(14.0, (0.5, 0.39, 0.10), (0, 0, 0.08)), box_props(4.0, (0.5, 0.5, 0.04), (0, 0, 0.22)),
-                         box_props(1.0, (0.47, 0.47, 0.07), (0, 0, 0.165))])
+        c += cprim(f'0 {sy*sb} 0.08', bx(B - 0.26, 0.055, 0.10))
+    m, com, I = combine([box_props(14.0, (B, B - 0.11, 0.10), (0, 0, 0.08)), box_props(4.0, (B, B, 0.04), (0, 0, 0.22)),
+                         box_props(1.0, (B - 0.03, B - 0.03, 0.07), (0, 0, 0.165))])
     o += '  <link name="base_body">\n' + inertial(m, com, I) + v + c + '  </link>\n'
     o += joint('base_body_fixed', 'fixed', 'base_link', 'base_body', '0 0 0')
     # mecanum wheels with passive rollers, standard layout: the ground-contact roller axes form an X
@@ -433,7 +435,8 @@ def base_xml(mono=False, side=False, single=False):
     # (hand signs were the other way round before 2026-11-03: sideways moves came out reversed and a
     #  pure turn only had a lever arm of LY - LX = 5 cm.)
     R0, W, RR, NR = 0.05, 0.045, 0.011, 9
-    for nm, x, y, hand in (('wheel_fl', 0.17, 0.222, -1), ('wheel_fr', 0.17, -0.222, 1), ('wheel_rl', -0.17, 0.222, 1), ('wheel_rr', -0.17, -0.222, -1)):
+    WX, WY = r4(B / 2 - 0.08), r4(B / 2 - 0.028)          # wheel centres (0.17, 0.222 on the 0.50 base)
+    for nm, x, y, hand in (('wheel_fl', WX, WY, -1), ('wheel_fr', WX, -WY, 1), ('wheel_rl', -WX, WY, 1), ('wheel_rr', -WX, -WY, -1)):
         hub = vprim('0 0 0', cy(0.030, W + 0.006), (0.62, 0.66, 0.70, 1), '1.5708 0 0')
         m, com, I = cyl_props(0.30, 0.03, W, axis=1)
         o += f'  <link name="{nm}">\n' + inertial(m, com, I) + hub + cprim('0 0 0', cy(0.028, W), '1.5708 0 0') + '  </link>\n'
@@ -523,16 +526,10 @@ def lift_prototype(mono=False, side=False):
 def lift_single():
     """One-arm prototype (mono_holder.py): column at (0, SINGLE_CY) turned SINGLE_YAW, carriage = kit plate + the mono
     holder, the scene camera mast on the holder's camera arm; the tote on the base behind the arm (MH.BASE_TOTE)."""
-    t = MH.BASE_TOTE                                   # the L tote (mono_holder.base_tote): boxes in the robot frame
-    tv = tc = ''
-    for (x0, x1, y0, y1, z0, z1) in MH.tote_walls(t):
-        c_ = f'{(x0 + x1) / 2:.6g} {(y0 + y1) / 2:.6g} {(z0 + z1) / 2 - t["z"][0]:.6g}'
-        tv += vprim(c_, bx(x1 - x0, y1 - y0, z1 - z0), BLUE); tc += cprim(c_, bx(x1 - x0, y1 - y0, z1 - z0))
-    area = sum((r[1] - r[0]) * (r[3] - r[2]) for r in t['rects'])
-    tcx = sum((r[0] + r[1]) / 2 * (r[1] - r[0]) * (r[3] - r[2]) for r in t['rects']) / area
-    tcy = sum((r[2] + r[3]) / 2 * (r[1] - r[0]) * (r[3] - r[2]) for r in t['rects']) / area
-    o = '  <link name="tote">\n' + inertial(*box_props(1.05 * area / (0.35 * 0.48), (0.3, 0.3, 0.12), (tcx, tcy, 0.04))) + tv + tc + '  </link>\n'
-    o += joint('tote_fixed', 'fixed', 'base_link', 'tote', f"0 0 {t['z'][0]:.6g}")
+    T_ = MH.BASE_TOTE                                  # the whole-deck L tote with sloped edges (mono_holder.tote_solid)
+    o = '  <link name="tote">\n' + inertial(*TOTE1['inertial']) + ''.join(vis_mesh(f, c) for f, c in TOTE1['vis']) + \
+        ''.join(col_mesh(f) for f in TOTE1['col']) + '  </link>\n'
+    o += joint('tote_fixed', 'fixed', 'base_link', 'tote', '0 0 0')
     CX, CY, yaw = SINGLE_CX, SINGLE_CY, f'0 0 {SINGLE_YAW:.6g}'
     o += '  <link name="column">\n' + inertial(*combine(CB_PROPS['column'])) + ''.join(vis_mesh(f, c) for f, c in CB_VIS['column']) + CB_FOOT_VIS + \
          cprim(f'0 0 {CB_L/2:.6g}', bx(0.04, 0.08, CB_L)) + cprim(*CB_BOTTOM_BOX) + cprim(*CB_FOOT_BOX) + '  </link>\n'
@@ -554,6 +551,27 @@ def lift_single():
 
 
 SHOLDER = {k: dict(vis=[], col=[], props=[]) for k in ('holder',)}
+TOTE1 = dict(vis=[], col=[])
+
+
+def _tote_links():
+    """The one-arm robot's tote (mono_holder.tote_solid, robot frame): visual mesh; collision = floor + slopes and the
+    walls as separate convex pieces (a hull over a floor + wall corner would fill the corner)."""
+    for f in os.listdir(VIS) + os.listdir(COL):
+        if f.startswith('mtote_'):
+            for d in (VIS, COL):
+                if os.path.exists(os.path.join(d, f)): os.remove(os.path.join(d, f))
+    t = MH.BASE_TOTE; ts = MH.tote_solid(t); z0, w = t['z'][0] * 1000, t['wall'] * 1000
+    inner = union([box(r[0] * 1000, r[1] * 1000, r[2] * 1000, r[3] * 1000, z0 - 1, z0 + 1000) for r in t['rects']])
+    floor = ts ^ inner; wall = ts - inner
+    V, F = mesh_m(ts); write_stl(os.path.join(VIS, 'mtote_tote.stl'), V, F); TOTE1['vis'].append(('mtote_tote', BLUE[:3]))
+    k = 0
+    for part, cell in ((floor, 45.0), (wall, 45.0)):
+        for hh in convex_pieces(part, cell=cell):
+            Vc, Fc = mesh_arrays(hh); fn = f'mtote_c{k:02d}'; k += 1
+            write_stl(os.path.join(COL, fn + '.stl'), Vc * MM, Fc); TOTE1['col'].append(fn)
+    area = sum((r[1] - r[0]) * (r[3] - r[2]) for r in t['rects'])
+    TOTE1['inertial'] = mass_props(V / MM, F, mass=round(1.05 * area / (0.35 * 0.48) * 1.3, 3))   # sheet + the slope inserts
 
 
 def _single_holder_links():
@@ -590,6 +608,7 @@ def _holder_links():
 
 _holder_links()
 _single_holder_links()
+_tote_links()
 
 
 def _scene_cam_xml(layout, mast_T=None):

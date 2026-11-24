@@ -214,9 +214,10 @@ def use(layout):
         # x -0.13..0.09, |y| <= 0.21..0.24, + the left leg x 0.09..0.25, y 0.06..0.24), floor TOTE_FLOOR as the ring
         # robot's. STOW: offline search (scratch stow_search.py, collide.Checker): clear at lift 0 .. 0.871 with the L tote
         STOW = _q(10, 110, 60, 0, 0.20)
-        TOTE_FLAT = (-0.020, 0.0)                        # drop spot: the middle of the part behind the arm
-        TOTE_BOX = (-0.123, 0.243, -0.203, 0.233)        # bounding box of the inside (in_tote() for the L shape)
-        TOTE_RECTS = [(-0.123, 0.083, -0.203, 0.233), (0.083, 0.243, 0.067, 0.233)]
+        # 2026-11-24: base 0.45, shoulder x 0.155, the L tote over the whole deck (inner faces), sloped beyond 0.27 m
+        TOTE_FLAT = (-0.045, 0.0)                        # drop spot: behind the arm, 0.20 from the shoulder (flat floor)
+        TOTE_BOX = (-0.218, 0.218, -0.218, 0.218)        # bounding box of the inside (in_tote() for the L shape)
+        TOTE_RECTS = [(-0.218, 0.065, -0.218, 0.218), (0.065, 0.218, 0.06, 0.218)]
     elif layout == 'prototype_mono_ring_side':
         cx, cy = K.SHOULDER['left']
         SHELF['reach'] = (cx + 0.51, cy + 0.10)          # front: (0.69, 0.10) = column + (0.51, 0.10)

@@ -16,9 +16,18 @@ import assets as SA
 
 K.use('prototype_mono_arm')
 SIDE = 'left'                 # the mono arm's joint prefix
+# the hand may enter a shelf this many deg off straight in (user 2026-11-24, "angled entry"). ROUND products only: the
+# product sits in the hand turned by the entry angle, which the hand-down drop into the tote turns into a roll about the
+# lying product's long axis (no wrist joint undoes it): a box falls flat, is re-grasped square and goes back on the
+# shelf turned by the entry angle (Isaac 2026-11-24: +15 deg); a round product doesn't care
+ENTRY = {'round': 30, 'bottle': 30, 'box': 0, 'flat': 0}
+
+
+def entry_max(pkg):
+    return ENTRY.get(SA.PRODUCTS[pkg].get('shape', 'box'), 0)
 TOP_H = 0.070
 APPROACH = 0.10               # side: straight-in length; top: height above the grasp
-FRONT_MIN = 0.28              # furniture front at least this far ahead of the base centre: bumper 0.259 + 2 cm (the mono
+FRONT_MIN = 0.255              # furniture front at least this far ahead of the base centre: bumper 0.259 + 2 cm (the mono
                               # holder's scene camera is inside the footprint, x ~0.14; with the ring it reached 0.341 -> 0.36)
 
 

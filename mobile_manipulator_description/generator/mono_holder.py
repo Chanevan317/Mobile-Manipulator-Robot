@@ -34,9 +34,11 @@ import dual_holder as DH
 
 ARM_DX = 122.0                    # column axis -> shoulder axis (carriage -x); the arm base pillar ends 3 mm before the
                                   # top end mount's footprint (x >= -30), so the lift keeps its full 0.871 m
-ROBOT_X = 0.18                    # m: the column and the shoulder sit this far FORWARD of the base centre (urdf_build
-                                  # SINGLE_CX). 0.12 until 2026-11-24 (the camera then stood in front of the carriage); with
-                                  # the camera over the arm the carriage's front (plate, legs: 75 mm ahead) sets the limit
+BASE = 0.45                       # m: square mecanum base (user 2026-11-24: "resize 450 x 450 ... if needed"; was 0.50):
+                                  # the hand reaches ~as much of the deck (0.098 vs 0.103 m2) and wastes less (52 vs 45 %)
+ROBOT_X = round(BASE / 2 - 0.07, 3)   # m: the column and the shoulder sit this far FORWARD of the base centre (urdf_build
+                                  # SINGLE_CX): 0.07 behind the deck's front edge, as 0.18 was on the 0.50 base (0.12 until
+                                  # 2026-11-24); the carriage's front (plate, legs: 75 mm ahead) ends at the bumper
 AZ = DH.AZ                        # 65.5: arm frame origin (servo mid-plane), as the dual holder
 BASE_Z = DH.BASE_Z                # 25.5: base underside
 PAD = DH.PAD                      # (13.5, 25.5)
@@ -64,32 +66,66 @@ def _derive():
 
 
 _derive()
-# the tote on the robot's BASE (robot frame, m), L-SHAPED (user 2026-11-24: "size the tote to the reachable area", then
-# "expand the tote to the free side next to the arm"): where the hand pointing down reaches (deck map, scratch
-# deck_map.py): behind the shoulder (x ROBOT_X - 0.28 .. ROBOT_X - 0.13, |y| <= 0.18) and the free left side beside the arm
-# (x 0.10 .. 0.25, y 0.08 .. 0.25), + room for the products. Part A behind the arm ends 15 mm before the holder's rear legs
-# (ROBOT_X - 0.075); the left leg B runs from it to the deck's front edge. The right / front-right is the column's.
+# the tote on the robot's BASE (robot frame, m), L-SHAPED over the WHOLE deck (user 2026-11-24: "let us have L shaped
+# and we use the whole base, ... slightly slanted area so that near edges slightly falls to accessible edge"): part A
+# across the deck behind the arm (back edge .. 15 mm before the holder's rear legs), part B along the free left side to
+# the front edge; the column / holder corner (front right) is the column's. The floor is FLAT where the hand pointing
+# down reaches inside the tote (TOTE_FLAT: traced from reach_test's tote map, smoothed) and rises at TOTE_SLOPE from
+# there to the walls (the back strip, the corners, the right), so a product that slides there (braking, a drop off
+# target) comes back down to where the arm gets it. A round flat floor (0.27..0.33 m from the shoulder) reached less.
+TOTE_FLAT = [  # robot frame, m: two convex parts (each its own funnel; together the reachable patch)
+    [(-0.048, -0.177), (0.005, -0.152), (0.017, -0.100), (0.004, -0.043), (0.008, 0.014), (0.027, 0.071), (-0.095, 0.137),
+     (-0.126, 0.084), (-0.138, 0.031), (-0.140, -0.032), (-0.125, -0.089), (-0.092, -0.136)],          # behind the shoulder
+    [(0.027, 0.071), (0.073, 0.099), (0.127, 0.116), (0.179, 0.148), (0.185, 0.187), (0.127, 0.202), (0.063, 0.201),
+     (0.004, 0.198), (-0.050, 0.180), (-0.095, 0.137)],                                                 # left of the arm
+]
+TOTE_FLAT_GROW = 0.05             # m: the flat floor reaches this far past TOTE_FLAT (room for the hand + open jaws
+                                  # beside the slope; slopes right at the reach edge made the edge cells unreachable)
+TOTE_DEPTH = 0.12                 # m: deck top .. rim
+TOTE_SLOPE = 30.0                 # deg: cardboard / plastic on PP or PETG slide from ~20-25 deg
+
+
 def base_tote():
-    A = (round(ROBOT_X - 0.31, 3), round(ROBOT_X - 0.09, 3), -0.21, 0.24)
-    B = (A[1], 0.25, 0.06, 0.24)
-    return dict(rects=[A, B], x=(A[0], B[1]), y=(A[2], A[3]), z=(0.256, 0.376), wall=0.007)
+    e = round(BASE / 2 - 0.007, 3)                    # the walls' inner faces 7 mm inside the deck edge
+    A = (-e, round(ROBOT_X - 0.09, 3), -e, e)
+    B = (A[1], e, 0.06, e)
+    return dict(rects=[A, B], x=(A[0], B[1]), y=(A[2], A[3]), z=(0.256, round(0.256 + TOTE_DEPTH, 3)), wall=0.007)
 
 
-def tote_walls(t):
-    """The L tote's floor and walls as boxes (x0, x1, y0, y1, z0, z1) in the robot frame (m)."""
-    (ax0, ax1, ay0, ay1), (bx0, bx1, by0, by1) = t['rects']; w = t['wall']; z0, z1 = t['z']
-    return [(ax0, ax1, ay0, ay1, z0, z0 + w), (bx0, bx1, by0, by1, z0, z0 + w),       # floors
-            (ax0, ax0 + w, ay0, ay1, z0, z1),                                       # back
-            (ax0, ax1, ay0, ay0 + w, z0, z1),                                       # right
-            (ax1 - w, ax1, ay0, by0 + w, z0, z1),                                   # front of A (right of the leg)
-            (ax1 - w, bx1, by0, by0 + w, z0, z1),                                   # the leg's inner side
-            (bx1 - w, bx1, by0, by1, z0, z1),                                       # the leg's front
-            (ax0, bx1, ay1 - w, ay1, z0, z1)]                                       # left
+def _flat_cs():
+    return [CS([[(x * 1000, y * 1000) for x, y in P]]).hull().offset(TOTE_FLAT_GROW * 1000, circular_segments=64) for P in TOTE_FLAT]
+
+
+def tote_floor_z(t, x, y):
+    """Floor top (m) at (x, y): flat over TOTE_FLAT, rising at TOTE_SLOPE with the distance from it."""
+    import numpy as np
+    d = 1e9
+    for P in TOTE_FLAT:
+        P = np.array(P); n = len(P); inside = True; dd = 1e9
+        for i in range(n):
+            a, b = P[i], P[(i + 1) % n]; e_ = b - a; v = np.array((x, y)) - a
+            cr = e_[0] * v[1] - e_[1] * v[0]
+            if cr < 0: inside = False
+            u = min(1.0, max(0.0, float(v @ e_ / (e_ @ e_)))); dd = min(dd, float(np.linalg.norm(v - u * e_)))
+        d = min(d, 0.0 if inside else max(0.0, dd - TOTE_FLAT_GROW))
+    return t['z'][0] + t['wall'] + d * math.tan(math.radians(TOTE_SLOPE))
+
+
+def tote_solid(t):
+    """The tote (mm, robot frame): walls round the L (rects = INNER faces), floor + the slopes: the cavity is a funnel
+    over each convex part of TOTE_FLAT (its outline at the floor, grown by H / tan(slope) at the rim), clipped to the L."""
+    w, (z0, z1) = t['wall'] * 1000, (v * 1000 for v in t['z'])
+    inner = union([box(r[0] * 1000, r[1] * 1000, r[2] * 1000, r[3] * 1000, z0 + w, z1 + 1) for r in t['rects']])
+    outer = union([box(r[0] * 1000 - w, r[1] * 1000 + w, r[2] * 1000 - w, r[3] * 1000 + w, z0, z1) for r in t['rects']])
+    H = z1 + 1 - (z0 + w); grow = H / math.tan(math.radians(TOTE_SLOPE))
+    funnels = [M.hull(c.extrude(0.01).translate((0, 0, z0 + w)) + c.offset(grow, circular_segments=64).extrude(0.01).translate((0, 0, z0 + w + H - 0.01)))
+               for c in _flat_cs()]
+    return outer - (inner ^ union(funnels))
 
 
 def in_tote(t, x, y, margin=0.0):
     """(x, y) inside the L tote's walls (robot frame), margin further in."""
-    w = t['wall'] + margin
+    w = margin
     return any(r[0] + w < x < r[1] - w and r[2] + w < y < r[3] - w for r in t['rects']) or \
         (t['rects'][0][1] - w <= x <= t['rects'][0][1] + w and t['rects'][1][2] + w < y < t['rects'][1][3] - w)
 
@@ -142,11 +178,9 @@ def holder():
 
 
 def base_tote_C(lift=0.0):
-    """The base tote's outline (both rectangles, full height) in the carriage frame at this lift (robot x = carriage y +
-    ROBOT_X, y = -carriage x - ARM_DX, z = carriage z + 420 + lift)."""
-    t = BASE_TOTE; X0 = ROBOT_X * 1000
-    return union([box(-(r[3] * 1000 + ARM_DX), -(r[2] * 1000 + ARM_DX), r[0] * 1000 - X0, r[1] * 1000 - X0,
-                      t['z'][0] * 1000 - 420 - lift * 1000, t['z'][1] * 1000 - 420 - lift * 1000) for r in t['rects']])
+    """The base tote in the carriage frame at this lift (robot x = carriage y + ROBOT_X, y = -carriage x - ARM_DX,
+    z = carriage z + 420 + lift)."""
+    return xf(tote_solid(BASE_TOTE), T(-ARM_DX, -ROBOT_X * 1000, -420.0 - lift * 1000) @ Rz(90.0))
 
 
 def mast_parts():
@@ -248,6 +282,15 @@ def export(out):
     _write(os.path.join(ctx, 'arm_base_01_02.stl'), CONTEXT['base'])
     _write(os.path.join(ctx, 'lift_kit_gantry_wheels_beam.stl'), union([GANTRY, WHEELS, COLUMN ^ box(-30, 30, -50, 50, -110, 140)]))
     _write(os.path.join(ctx, 'scene_camera_mast.stl'), CONTEXT['mast'])
+    os.makedirs(os.path.join(out, 'tote'), exist_ok=True)              # the base's tote (made by the base team, not printed)
+    _write(os.path.join(out, 'tote', 'tote_L_sloped.stl'), tote_solid(BASE_TOTE))
+    with open(os.path.join(out, 'tote', 'tote.csv'), 'w', newline='') as f:
+        w = csv.writer(f); t = BASE_TOTE
+        w.writerow(['what', 'x0_mm', 'x1_mm', 'y0_mm', 'y1_mm', 'note'])
+        for nm, r in zip(('A (behind the arm, full width)', 'B (left side, to the front edge)'), t['rects']):
+            w.writerow([nm] + [round(v * 1000) for v in r] + ['inner wall faces, robot frame (x forward, y left, base centre)'])
+        w.writerow(['floor', '', '', '', '', f"deck top {t['z'][0]*1000:.0f} mm + {t['wall']*1000:.0f} mm floor; flat within "
+                    f"the hand's reach (TOTE_FLAT), rising {TOTE_SLOPE:.0f} deg to the walls; rim {t['z'][1]*1000:.0f} mm"])
     with open(os.path.join(out, 'printed_parts.csv'), 'w', newline='') as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0])); w.writeheader(); w.writerows(rows)
     with open(os.path.join(out, 'fasteners.csv'), 'w', newline='') as f:

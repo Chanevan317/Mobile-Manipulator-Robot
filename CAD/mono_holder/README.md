@@ -10,16 +10,19 @@ Made by `mobile_manipulator_description/generator/mono_holder.py` (shape, checks
 
 ## Layout on the robot
 
-- The lift column stands **0.18 m in front of the base centre and 0.122 m to the right** of the centreline. It is
+- The base is **0.45 × 0.45 m**. The lift column stands **0.155 m in front of the base centre and 0.122 m to the right** of the centreline. It is
   turned so its gantry plate (the carriage) **faces the centre**: the arm's shoulder then sits on the centreline, level
   with the column. The carriage's front (plate, legs) ends at the bumper.
 - The arm's zero pose points **left**, away from the column. Its ±115° covers the front, the left and the back; the
   blind sector faces the column.
 - The **scene camera sits straight above the shoulder**, on a bar 10 mm over the arm's highest point, looking forward.
-  Nothing sticks out in front of the carriage, so the robot can stand 0.28 m from furniture (2 cm past its bumper).
-- The **tote stays on the base**, as in the original design, **L-shaped**: behind the arm (x −0.13 … 0.09 m) plus a leg
-  along the free left side up to the front edge (x 0.09 … 0.25 m, y 0.06 … 0.24 m), 0.12 m deep: the area the hand
-  reaches pointing down plus room for the products. The lift lowers the hand into it.
+  Nothing sticks out in front of the carriage, so the robot can stand 0.255 m from furniture (2 cm past its bumper).
+- The **tote stays on the base**, as in the original design, **L-shaped over the whole deck**: behind the arm
+  (x −0.218 … 0.065 m, full width) plus the free left side up to the front edge (x 0.065 … 0.218 m, y 0.06 … 0.218 m),
+  walls 0.12 m. Its floor is flat where the hand reaches pointing down (plus 50 mm of room for the hand) and rises at
+  30° from there to the walls, so products that slide into a corner come back to where the arm gets them. The lift
+  lowers the hand into it. The shape is in `tote/` (`tote_L_sloped.stl`, `tote.csv`); the base team builds it (sheet +
+  sloped inserts), it is not a print.
 - Nothing stands over the beam above the plate's top, so the lift keeps its full travel (0–0.871 m).
 
 ## What it is (heights above the gantry plate's top)
