@@ -8,6 +8,7 @@
     ... --headless --all | --stations a,b   try several stations in one session (products put back between), PASS / FAIL
     ... --all_stations                 window: list every station, not only the 16 that pass
     ... --random 10                    window: 10 random shelf / rack products, each picked into the tote and put back
+    ... --random -1                    the same, forever (panel 'Stop random' or close the window to end)
 
 In the window, a "Pick to tote" panel: choose a product, "Pick into the tote" (drives there from wherever the robot is,
 picks, places, folds); before each pick every product that moved goes back to its start spot. "Put products back",
@@ -32,7 +33,7 @@ ap.add_argument('--out', default='pick_to_tote')
 ap.add_argument('--all', action='store_true', help='headless: try every station in one session, print PASS / FAIL')
 ap.add_argument('--stations', default='', help='headless: comma-separated stations to try in one session')
 ap.add_argument('--place', action='store_true', help='headless: after each pick, put the product back from the tote')
-ap.add_argument('--random', type=int, default=0, help='window: start with N random shelf / rack picks, each put back (the panel button runs more)')
+ap.add_argument('--random', type=int, default=0, help='window: start with N random shelf / rack picks, each put back (-1 = forever; the panel buttons run more)')
 ap.add_argument('--all_stations', action='store_true', help='window: offer every station, not only the pickable ones')
 args = ap.parse_args()
 os.environ['MM_SCENE_CAM'] = args.scene_cam          # read by cameras.py when the robot's cameras are made
@@ -104,6 +105,7 @@ with win.frame:
             ui.Button('Pick + place back', clicked_fn=lambda: state.update(req='both') if not state['busy'] else None)
         with ui.HStack(height=26, spacing=6):
             ui.Button('Random shelf picks (10)', clicked_fn=lambda: state.update(random=10))
+            ui.Button('Random forever', clicked_fn=lambda: state.update(random=-1))
             ui.Button('Stop random', clicked_fn=lambda: state.update(random=0))
         with ui.HStack(height=26, spacing=6):
             ui.Button('Put products back', clicked_fn=lambda: state.update(req='restore') if not state['busy'] else None)
@@ -122,10 +124,10 @@ try:
         if _quit_at and time.time() > _quit_at:
             import omni.kit.app; omni.kit.app.get_app().post_quit(); _quit_at = None
         req, state['req'] = state['req'], None
-        if req is None and state['random'] > 0 and not state['busy'] and shelf_choices:
-            sid_ = _rnd.choice(shelf_choices); state['sel'] = choices.index(sid_); state['random'] -= 1
+        if req is None and state['random'] != 0 and not state['busy'] and shelf_choices:      # < 0: forever
+            sid_ = _rnd.choice(shelf_choices); state['sel'] = choices.index(sid_); state['random'] -= state['random'] > 0
             combo.model.get_item_value_model().set_value(state['sel'])
-            print(f"random pick: {sid_} ({state['random']} more)", flush=True); req = 'both'
+            print(f"random pick: {sid_} ({state['random'] if state['random'] >= 0 else 'forever'} more)", flush=True); req = 'both'
         if req == 'both' and choices[state['sel']] in PP.PICK_ONLY:
             status.text = f"{PP.label(choices[state['sel']])}: can't be placed back yet; use \"Pick into the tote\""
             req = None
