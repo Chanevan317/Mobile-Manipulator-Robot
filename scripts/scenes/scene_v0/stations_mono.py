@@ -16,7 +16,9 @@ camera reaching 0.34 m forward, + MARGIN), and gets an APPROACH point nearby wit
 clear all round): legs go station -> its approach -> (straight across, turning on the way) -> the next approach ->
 straight in. When the straight line between two approach points is not clear for a turning robot, the leg goes via
 HUB (the middle of the aisle).
-Checked: kinematics (scara_ik, joint limits) and footprints (2-D boxes). NOT checked: the arm against the furniture.
+Checked: kinematics (scara_ik, joint limits), footprints (2-D boxes) and the grasp poses (approach, grasp, lift, jaws
+open) against the robot itself, the furniture and the other task products (collide.Checker); among the stops that pass,
+the one with the most comfortable arm wins (COMFORT_R). NOT checked: the moves between the poses (pick_place plans those).
 """
 import json, math, os, sys
 import numpy as np
@@ -26,8 +28,10 @@ sys.path.insert(0, here)
 import assets as SA
 import scene as SC
 import grasp_plan_mono as G
+import scara_ik as K
 
-FOOT = dict(back=0.25, front=0.34, side=0.25)   # robot frame: base 0.50 x 0.50, scene camera to x 0.341
+FOOT = dict(back=0.25, front=0.26, side=0.25)   # robot frame: base 0.50 x 0.50 + bumper (mono holder: the scene camera is
+                                                # inside, x ~0.14; with the ring it reached x 0.341 -> front 0.34)
 MARGIN = 0.02
 TURN_R = math.hypot(FOOT['front'], FOOT['side']) + 0.03     # clearance needed to turn on the spot
 HUB = (-1.20, 0.0)
@@ -85,25 +89,63 @@ def line_clear(p, q, yaw_deg=None, step=0.02, skip_start=False):
     return True
 
 
+COMFORT_R = 0.20     # m: preferred wrist-pan axis distance from the shoulder at the grasp (0.155 folded .. 0.26 stretched)
+
+
+def _env(bx, by, heading_deg, skip_pkg):
+    """Furniture + every OTHER task product where it rests, in the base frame of a stop at (bx, by, heading): what the
+    pick planner checks against (fillers keep >= scene.TASK_GAP from task products, so they are left out)."""
+    furn = G.CO().boxes_to_base(SC.furniture_boxes(), (bx, by), math.radians(heading_deg), margin=0.005)
+    prods = []
+    surf = {sf[0]: sf for sf in SC._surfaces()}
+    for pkg, (z, x, y, hd) in SC.REST.items():
+        if pkg == skip_pkg:
+            continue
+        sx, sy, sz = (v / 1000 for v in SA.size(pkg)); w = max(sx, sy)
+        if y is None:                                  # shelf task product: 40 mm in from the board's front (scene.build)
+            front = surf[SC.TASK_BOARD[pkg]][3]
+            y = front + (0.04 + G.dims(pkg)[1] / 2) * (1 if hd == 90.0 else -1)
+        prods.append((pkg, (x, y, z + sz / 2), (w, w, sz)))
+    return furn + G.CO().boxes_to_base(prods, (bx, by), math.radians(heading_deg))
+
+
 def base_for(pkg, centre, surface, heading_deg, front_dist, dz):
-    """First base pose (x, y, yaw) from which the arm picks the product at `centre` (world) and the robot's outline is
-    clear. front_dist: furniture front edge -> product centre along the heading."""
+    """Base pose (x, y, yaw) from which the arm picks the product at `centre` (world). Every candidate stop must keep the
+    robot's outline clear and reach the grasp (approach, grasp, lift) without touching the robot; of those, the stop
+    with the most comfortable arm (wrist-pan axis closest to COMFORT_R from the shoulder) whose grasp poses also clear
+    the furniture and the other task products wins (2026-11-24: the closest stop folded the forearm into the board above
+    / stretched the arm to 0.64 m once the shoulder moved forward). front_dist: furniture front edge -> product centre."""
     narrow, deep, h = G.dims(pkg); gz, fz = G.grip_heights(surface, h)
     c, s = math.cos(math.radians(heading_deg)), math.sin(math.radians(heading_deg))
-    for d in np.arange(0.40, 0.95, 0.01):
+    jaw = min(0.045, narrow / 2 + 0.015)
+    sx_, sy_ = K.SHOULDER['left']
+    cands = []
+    for d in np.arange(0.28, 0.95, 0.01):
         if d - front_dist < G.FRONT_MIN:
             continue
-        for b in (0.0, 0.02, -0.02, 0.05, -0.05, 0.10, -0.10, 0.15, -0.15, 0.20, -0.20):
+        for b in (0.0, 0.02, -0.02, 0.05, -0.05, 0.10, -0.10, 0.15, -0.15, 0.20, -0.20, 0.25, -0.25, 0.30, -0.30):
             if h <= G.TOP_H:
-                ok = any(G._ok(G.top_poses((d, b), yaw, fz, dz)) for yaw in (0.0, math.pi))
-                kind = 'top'
+                opts = [(G.top_poses((d, b), yaw, fz, 0.025), 'top') for yaw in (0.0, math.pi)]
             else:
-                ok = G._ok(G.side_poses((d, b), 0.0, deep, gz, dz)); kind = 'side'
-            if not ok:
-                continue
+                opts = [(G.side_poses((d, b), 0.0, deep, gz, dz), 'side')]
             bx, by = centre[0] - c * d + s * b, centre[1] - s * d - c * b
-            if not hits(footprint(bx, by, heading_deg)):
-                return dict(x=round(bx, 3), y=round(by, 3), yaw=heading_deg, grasp=kind, reach=round(float(d), 3), offset=b)
+            if hits(footprint(bx, by, heading_deg)):
+                continue
+            for P, kind in opts:
+                e = G._ok(P, clear=True)
+                if not e:
+                    continue
+                q = K.ik('left', *P[1], elbow=e)
+                wx, wy = P[1][0] - (0.04 + 0.215 * math.cos(P[1][4])) * math.cos(P[1][3]), P[1][1] - (0.04 + 0.215 * math.cos(P[1][4])) * math.sin(P[1][3])
+                r = math.hypot(wx - sx_, wy - sy_)
+                cands.append((abs(r - COMFORT_R), float(d), b, bx, by, kind, P, e))
+    for score, d, b, bx, by, kind, P, e in sorted(cands, key=lambda t: t[0]):
+        env = _env(bx, by, heading_deg, pkg)
+        # from above, the grasp pose has the fingertips 1 mm over the board the product stands on (inside the furniture
+        # margin): its approach and lift-off poses are checked, the grasp is straight down between them
+        chk_poses = (P[0], P[2]) if kind == 'top' else P
+        if all(not G._CHK[0].check({**K.ik('left', *p_, elbow=e), 'jaw': jaw}, env) for p_ in chk_poses):
+            return dict(x=round(bx, 3), y=round(by, 3), yaw=heading_deg, grasp=kind, reach=round(d, 3), offset=b)
     return None
 
 

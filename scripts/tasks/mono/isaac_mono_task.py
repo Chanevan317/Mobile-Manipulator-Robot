@@ -1,4 +1,4 @@
-"""One-arm pick-and-place task for the mono-arm EXPERIMENT (layout prototype_mono_arm: the shoulder is a ring around the
+"""One-arm pick-and-place task for the mono-arm EXPERIMENT (layout prototype_mono_ring, PARKED 2026-11-23: the shoulder is a ring around the
 lift column). The robot stands still (free base, wheels hold it); one arm:
    1. picks a product from the table in front (hand down)
    2. swings round the column (~160 deg) and drops it into the tote behind
@@ -18,7 +18,7 @@ import argparse, math, os, sys
 ap = argparse.ArgumentParser()
 here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(here, '..', '..', 'common')); import repo_paths as RP   # every script folder + repo paths
-ap.add_argument('--urdf', default=os.path.join(RP.URDF_DIR, 'mobile_manipulator_prototype_mono_arm.urdf'))
+ap.add_argument('--urdf', default=os.path.join(RP.URDF_DIR, 'mobile_manipulator_prototype_mono_ring.urdf'))
 ap.add_argument('--headless', action='store_true')
 ap.add_argument('--table_h', type=float, default=0.75)
 ap.add_argument('--no_self_collision', action='store_true')
@@ -35,12 +35,13 @@ from isaacsim.core.api.objects import DynamicCuboid, FixedCuboid
 sys.path.insert(0, here)
 from proto_task import Task
 import mono_poses as MP
+MP.use('prototype_mono_ring')                  # planned for the (parked) ring robot, 2026-11-23
 
 ITEM = np.array([0.045, 0.045, MP.ITEM_H]); ITEM_MASS = 0.15
 H = args.table_h
 JAW_OPEN, JAW_CLOSED = 0.030, 0.0
 
-task = Task(app, args.urdf, args.headless, fix_base=False, self_collision=not args.no_self_collision, layout='prototype_mono_arm')
+task = Task(app, args.urdf, args.headless, fix_base=False, self_collision=not args.no_self_collision, layout='prototype_mono_ring')
 w = task.world
 task.profile = 'trap'     # trapezoid moves: full allowed speed after a 0.3 s ramp (same limits)
 task.settle_mode = 'still'   # a move is done once the joints stop (the wrist pitch's gravity sag never gets within 2 deg)

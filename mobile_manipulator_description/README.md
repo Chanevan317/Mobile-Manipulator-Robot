@@ -13,12 +13,13 @@ robot itself. Run them from the repository root, for example `python scripts/rob
 |---|---|
 | `urdf/mobile_manipulator_prototype.urdf` | **Prototype layout** (the current design): Isaac Sim, PyBullet, MuJoCo (`compile`), Gazebo. Mesh paths are relative (`../meshes/...`). |
 | `urdf/mobile_manipulator_prototype_ros.urdf` | The same robot for ROS 2 / RViz, with `package://mobile_manipulator_description/...` paths. |
-| `urdf/mobile_manipulator_prototype_mono_arm.urdf` (+ `_ros`) | **Experiment:** one arm whose shoulder is a ring around the lift column. See [Mono-arm experiment](#mono-arm-experiment-prototype_mono_arm). |
+| `urdf/mobile_manipulator_prototype_mono_arm.urdf` (+ `_ros`) | **One-arm prototype** (the official prototype): the lift column shifted to the right, the carriage facing the centre with one arm on it, the tote on the base. See [One-arm prototype](#one-arm-prototype-prototype_mono_arm). |
+| `urdf/mobile_manipulator_prototype_mono_ring.urdf` (+ `_ros`) | **Parked:** the earlier one-arm robot whose shoulder was a ring around the lift column. See [Parked: shoulder ring](#parked-shoulder-ring-prototype_mono_ring). |
 | `meshes/visual/` | STL files in metres. Shared by both arms. |
 | `meshes/collision/` | Convex pieces of every part, about 350 per arm. Each one is ready for PhysX. |
 | `../scripts/common/drives.py` | The motor gains, in one place. Both Isaac scripts use it. |
 | `../scripts/viewers/isaac_view.py` | Opens Isaac Sim with both robots side by side (two-arm and one-arm, `--layout` for one of them) and nothing else: no motion, every joint holds its zero pose (`--paused`, `--fix_base`, `--self_collision`). |
-| `../scripts/viewers/isaac_arm_view.py` | One arm alone on a fixed stand (no base or lift), opening and closing its gripper slowly (`--period S`, default 20 s per cycle; `--layout prototype_mono_arm` for the one-arm robot's arm with its ring). |
+| `../scripts/viewers/isaac_arm_view.py` | One arm alone on a fixed stand (no base or lift), opening and closing its gripper slowly (`--period S`, default 20 s per cycle; `--layout prototype_mono_arm` for the one-arm robot's arm). |
 | `../scenes/scene_v0/` | The store scene (outside this robot package, in the repository's `scenes/` folder) for the one-arm (mono) prototype, from free NVIDIA SimReady assets: a room with three walls and store lighting, a table, two racks, two shelves, 15 task products the arm can reach and random filler products. Its own README: download the assets, look at it, check it, save it as `scene_v0.usda`. |
 | `../scripts/robot_tests/isaac_import_and_test.py` | Imports the robot into Isaac Sim, sets the motor drives, adds a floor, and plays a looping motion demo (`--duration S` stops it, `--save` writes a USD). |
 | `../scripts/robot_tests/isaac_joint_test.py` | Tests every joint one at a time, or holds poses under gravity (`--hold`). |
@@ -27,9 +28,9 @@ robot itself. Run them from the repository root, for example `python scripts/rob
 | `../scripts/tasks/dual/isaac_shelf_task.py` | Full task: drive to shelf A, pick a product, put it in the tote, drive to shelf B, place it there (`--layout prototype` uses `shelf_task_prototype.py`). |
 | `../scripts/tasks/dual/isaac_table_task.py` | Prototype: drive to table A, both arms pick a product each (top-down) at the same time into the tote, drive to table B, place both there (`--table_h`, `--sequential`). |
 | `../scripts/planning/reach_test.py` | No simulator: maps which spots on tables and shelf boards each arm can reach (IK + collision checks), writes a CSV and a PNG. |
-| `../scripts/tasks/mono/isaac_mono_task.py`, `isaac_mono_table_task.py`, `isaac_mono_shelf_task.py` | Mono-arm experiment: table → tote → table without driving, and the table and shelf tasks above done with one arm. |
-| `../scripts/tasks/mono/lib/mono_poses.py` | Mono-arm experiment: the planned poses and moves for those tasks. |
-| `../scripts/common/smooth_path.py` | Mono-arm experiment: blends the planned moves into smooth, time-optimal motions (TOPP-RA; `pip install toppra`). On by default in the stationary and shelf tasks (`--no_smooth` turns it off); off in the table task since 2026-11-13 (`--smooth` turns it on). |
+| `../scripts/tasks/mono/isaac_mono_task.py`, `isaac_mono_table_task.py`, `isaac_mono_shelf_task.py` | Parked ring robot (`prototype_mono_ring`): table → tote → table without driving, and the table and shelf tasks above done with one arm. |
+| `../scripts/tasks/mono/lib/mono_poses.py` | The one-arm poses: travel fold, tote spot (both one-arm layouts, `use(layout)`), and the planned moves of the ring-robot tasks. |
+| `../scripts/common/smooth_path.py` | Ring-robot tasks: blends the planned moves into smooth, time-optimal motions (TOPP-RA; `pip install toppra`). On by default in the stationary and shelf tasks (`--no_smooth` turns it off); off in the table task since 2026-11-13 (`--smooth` turns it on). |
 | `../scripts/robot_tests/isaac_dual_load_test.py` | Two-arm robot: the forces and torques both arm bases put on the dual-arm holder (for `generator/dual_holder_strength.py`). |
 | `../scripts/robot_tests/isaac_mono_load_test.py` | Mono arm: the forces and torques through the ring while the arm works with a payload (for `generator/mono_ring_strength.py`). |
 | `../scripts/common/proto_task.py`, `../scripts/tasks/dual/lib/proto_poses.py` | Prototype task helpers (time-synchronised moves, IK lines, reporting) and the planned poses and routes. |
@@ -38,7 +39,7 @@ robot itself. Run them from the repository root, for example `python scripts/rob
 | `launch/display.launch.py`, `rviz/display.rviz`, `package.xml`, `CMakeLists.txt` | ROS 2 package: `ros2 launch mobile_manipulator_description display.launch.py` opens RViz with the robot and a slider for every joint |
 | `../scripts/ros/ros_joint_check.py` | ROS 2: checks joint limits, the zero pose and the direction of every joint, through TF |
 | `arm_link_masses.json` | Mass and centre of mass of each arm link |
-| `preview_prototype_dual.png`, `preview_prototype_mono.png` | Pictures of the two-arm prototype and of the mono-arm experiment (two views: facing the front / turned 150° toward the tote). `generator/render_robot.py` draws any layout from its URDF |
+| `preview_prototype_dual.png`, `preview_prototype_mono.png` | Pictures of the two-arm prototype and of the one-arm prototype (two views: reaching forward / hand down in the tote). `generator/render_robot.py` draws any layout from its URDF |
 | `preview_piper_mono.png`, `preview_piper_dual.png` | Pictures only: our body with AgileX PiPER arms instead of the SCARA arms. Mono: one PiPER on a plate on our shoulder ring, so it turns around the column (facing the front / turned 150° toward the tote). Dual: one on each side bracket, each base on a 30° wedge so the arm leans out to its side, away from the lift, each in a different pose (≥ 49 mm from the column and carriage, 136 mm between the arms). PiPER model from agilexrobotics/piper_ros (MIT); not part of this package |
 
 ## Layout (prototype)
@@ -237,13 +238,57 @@ fl = (vx - vy - (LX+LY)·wz) / R      fr = (vx + vy + (LX+LY)·wz) / R
 rl = (vx + vy - (LX+LY)·wz) / R      rr = (vx - vy + (LX+LY)·wz) / R
 ```
 
-## Mono-arm experiment (`prototype_mono_arm`)
+## One-arm prototype (`prototype_mono_arm`)
 
-An experiment next to the prototype, not a replacement: **one arm, whose shoulder is a ring bearing around the lift
+The official prototype since 2026-11-23: **one arm on the lift carriage, the lift column shifted to the side.** Moved
+forward and the camera put over the arm on 2026-11-24.
+
+| | |
+|---|---|
+| Lift column | **0.18 m in front** of the base centre and **0.122 m to the right** of the centreline, turned so the gantry plate (the carriage) **faces the centre**; the carriage's front ends at the bumper |
+| Carriage | the kit's gantry plate + the printed **mono holder** (`../CAD/mono_holder/`): the arm base (01 + 02) on a pad, a post behind the beam and a bar over the arm for the scene camera |
+| Arm | the prototype's own arm (shoulder ±115°, elbow ±125°, wrist pan ±122°, 130 + 130 mm links), its shoulder on the robot's centreline at x 0.18; zero pose points **left**, so the blind sector faces the column |
+| Tote | on the **base**, as in the original design (the lift lowers the hand into it); **L-shaped**, sized to where the hand reaches: behind the arm (x −0.13 … 0.09, y −0.21 … 0.24) plus a leg along the free left side up to the front edge (x 0.09 … 0.25, y 0.06 … 0.24), 0.12 m deep |
+| Lift travel | 0–0.871 m (nothing stands over the beam) |
+| Scene camera | OAK-D Pro W on a pitch servo, on a 98 mm mast on the holder's bar: **straight above the shoulder**, 10 mm over the arm's highest point, lens 0.33 m over the carriage, looking forward; nothing sticks out in front of the carriage |
+
+![one-arm robot](preview_prototype_mono.png)
+
+Joint names are the normal arm's (`left_shoulder_pan`, `left_elbow_pan`, `left_wrist_pan`, ...). The LeRobot names in
+`../train_pipeline/` are `shoulder.pos`, `elbow.pos`, `wrist_pan.pos` (datasets from the ring robot don't mix with these).
+Gains: the normal arm's (`drives.py`). Travel fold `mono_poses.STOW` (shoulder 10°, elbow 110°, wrist pan 60°, hand
+level): inside the footprint, clear from lift 0 to 0.871 m.
+
+**Reach** (`reach_test.py --layout prototype_mono_arm --edge 0.28 --shelf_edge 0.28`: furniture as close as the robot
+can stand, 0.28 m from the base centre):
+
+| | Tables (hand down) | Shelf boards 0.70 / 1.10 m (hand level, straight in) | Tote floor |
+|---|---|---|---|
+| Area | 0.074 m², up to 0.21 m past the edge, 0.42 m wide at 0.10 m | 0.025 m², a 0.15 m strip left of the centre | 0.047 m² (42 % of the L tote's floor; a plain tote behind the arm gave 0.032; the rest is room for the products beside the walls) |
+| Shoulder at x 0.12 (2026-11-23) | 0.048 m² | 0.025 m² | — |
+| Ring robot (furniture at 0.36 m: its camera stuck out) | 0.060 m² | 0.045 m² | — |
+
+Shelves are limited by the arm itself, not by where it sits: with the hand pointing straight in, the middle and the right
+need the forearm to point backward, past the wrist pan's ±122° (shoulder forward, mount turned ±20–30°: all 0.020–0.026
+m²). The ring robot's extra joint got round that. The robot drives sideways to each shelf product instead
+(`stations_mono.py`: every one of the 19 stations reachable).
+
+**Isaac Sim results (headless):**
+
+| Test | Result |
+|---|---|
+| Joint sweep (2026-11-23) | 8/8 OK; shoulder / elbow / wrist pan reach their limits, lift 0–870.7 of 871 mm |
+| Hold, 3 poses × 30 s (2026-11-23) | 21/21 OK, no drift |
+| Store scene, pick into the tote and put back (`pick_to_tote_mono.py --place --all`) | **14 / 14** pickable stations: picked, dropped in the tote, picked out and put back 1–14 mm from where each stood, nothing else knocked. `shelf_b2_milk_c01` is picked but not put back (the round bottle leans in the tote). Not pickable: `rack_b0_boxedFood_d01` (only a far stop at 0.64 m is free; the jaws missed it), and as on the ring robot `shelf_b1_yogurt_a01`, `shelf_b2_yogurt_c01`, `rack2_b0_cannedFood_h01` (packed run) |
+
+## Parked: shoulder ring (`prototype_mono_ring`)
+
+**Parked on 2026-11-23** (replaced by the one-arm prototype above; its files stay, and the three mono task scripts
+below still run on it). It was **one arm, whose shoulder is a ring bearing around the lift
 column**, so the arm can swing all the way round the robot (front, both sides, the tote behind). The rest of the arm
 (elbow to gripper) is the same CAD as the prototype's. The prototype URDFs are not changed by it.
 
-| | Prototype | Mono arm |
+| | Prototype | Ring robot |
 |---|---|---|
 | Arms | 2, beside the column, zero pose 45° toward the tote | 1, shoulder ring around the column, zero pose forward |
 | Shoulder | STS3215 in the arm base, ±115° | a **ring** around the column on 2 × 6820-2RS bearings, driven by an STS3215 through a 72 / 18 PETG gear (4:1), ±180° (cables in a reversing loop, no slip ring; needs the servo's multi-turn mode), torque limited to 60 % (4.6 N·m) for the gear teeth; **then the prototype's own arm base on a shelf on the ring, 161 mm out, with its shoulder servo (±115°)** |
@@ -252,7 +297,7 @@ column**, so the arm can swing all the way round the robot (front, both sides, t
 | Lift travel | 0–0.871 m | 0–0.81 m (the ring's clamp meets the lift's top end mount above 0.815 m) |
 | Scene camera | OAK-D Pro on a pitch servo, mast on the holder's front bridge | the same camera and head, shorter mast on a pedestal on the ring clamp |
 
-![mono-arm robot](preview_prototype_mono.png)
+(Its picture was `preview_prototype_mono.png` before 2026-11-23; see git history.)
 
 **Joint names** stay those of the 3-pan arm, so every script and the IK work unchanged:
 
@@ -269,7 +314,7 @@ the prototype arm base (fixed to the rotor), `left_forearm` = the 130 mm link wi
 **The ring** is the printable design in `../CAD/mono_ring/` (README there: parts, assembly, strength). The URDF uses
 those parts directly; the L bracket bolts through four of the real gantry plate's holes.
 
-**Reach** (`reach_test.py --layout prototype_mono_arm`, hand down on tables / level into shelves):
+**Reach** (`reach_test.py --layout prototype_mono_ring`, hand down on tables / level into shelves):
 
 | | Prototype, both arms together | Mono, one arm |
 |---|---|---|
@@ -284,11 +329,11 @@ those parts directly; the L bracket bolts through four of the real gantry plate'
 python ../scripts/tasks/mono/isaac_mono_task.py               # stationary: table in front -> tote behind -> table
 python ../scripts/tasks/mono/isaac_mono_table_task.py         # the table-to-table task, 2 products, one arm
 python ../scripts/tasks/mono/isaac_mono_shelf_task.py         # the shelf task, 1 product, one arm
-python ../scripts/robot_tests/isaac_joint_test.py --layout prototype_mono_arm [--hold]
-python ../scripts/robot_tests/isaac_import_and_test.py --layout prototype_mono_arm
-python ../scripts/planning/reach_test.py --layout prototype_mono_arm
+python ../scripts/robot_tests/isaac_joint_test.py --layout prototype_mono_ring [--hold]
+python ../scripts/robot_tests/isaac_import_and_test.py --layout prototype_mono_ring
+python ../scripts/planning/reach_test.py --layout prototype_mono_ring
 ```
-Add `--headless` for no window. In RViz: `ros2 launch mobile_manipulator_description display.launch.py layout:=prototype_mono_arm`.
+Add `--headless` for no window. In RViz: `ros2 launch mobile_manipulator_description display.launch.py layout:=prototype_mono_ring` (`layout:=prototype_mono_arm` for the one-arm prototype).
 
 **Isaac Sim results (2026-11-13, ring layout B, headless):**
 
@@ -369,7 +414,7 @@ At zero, each arm points along its zero heading (±135°, toward the rear and pa
 
 ## Masses (per arm: 2.09 kg in the URDF, a conservative estimate)
 
-| Link | Two-arm prototype (each arm) | One-arm experiment (shoulder ring) |
+| Link | Two-arm prototype (each arm), also the one-arm prototype | Parked ring robot |
 |---|---|---|
 | `<side>_base` | 382 g | 512 g (ring base, drive servo, board) |
 | `<side>_upper_arm` | 389 g | 482 g (with the ring rotor and the collar round it) |

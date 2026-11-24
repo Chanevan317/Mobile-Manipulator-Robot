@@ -4,7 +4,8 @@ A wheeled mobile manipulator for restocking retail shelves: a mecanum base, a C-
 arms (STS3215 servos), with a small leader arm for teleoperation. Work in progress: the arms are being printed, and
 the robot is tested in simulation (Isaac Sim, ROS 2).
 
-**One-arm prototype** (the official prototype: one arm on a ring bearing around the lift column):
+**One-arm prototype** (the official prototype: the lift column shifted to the right, the carriage facing the centre with
+one arm on it, the tote on the base behind the arm):
 
 ![one-arm robot](mobile_manipulator_description/preview_prototype_mono.png)
 
@@ -17,9 +18,10 @@ the robot is tested in simulation (Isaac Sim, ROS 2).
 | Folder | What |
 |---|---|
 | `CAD/SCARA_arm/` | the follower arm: print files, STEP, assembly, fastener lists |
+| `CAD/mono_holder/` | one-arm robot: printed holder for the arm base and the scene camera mast on the C-Beam carriage |
 | `CAD/dual_holder/` | two-arm robot: printed holder for both arm bases on the C-Beam carriage (and the scene camera mast) |
 | `CAD/scene_cam/` | scene camera: OAK-D Pro W on a pitch servo, on a swappable printed mast on the carriage |
-| `CAD/mono_ring/` | shoulder ring for the one-arm version: the arm's own base on a shelf on the ring, 2 bought 6820-2RS bearings |
+| `CAD/mono_ring/` | PARKED (replaced by the mono holder on 2026-11-23): the shoulder ring around the lift column |
 | `CAD/leader_arm/` | the leader arm for teleoperation |
 | `CAD/lift_stick/` | one-hand controller for the lift: thumbstick, dead-man and stored-position buttons |
 | `mobile_manipulator_description/` | the robot model (URDF, meshes) and the CAD generator |

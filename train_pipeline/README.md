@@ -148,15 +148,17 @@ The 7 values, in this order and in SI units. **The real robot's driver must use 
 
 | # | Name | Joint in the URDF | Unit |
 |---|---|---|---|
-| 0 | `lift.pos` | `lift` | m (0–0.81) |
-| 1 | `ring.pos` | `left_shoulder_pan` (the ring around the column) | rad |
-| 2 | `shoulder.pos` | `left_elbow_pan` | rad |
-| 3 | `elbow.pos` | `left_wrist_pan` | rad |
+| 0 | `lift.pos` | `lift` | m (0–0.871) |
+| 1 | `shoulder.pos` | `left_shoulder_pan` | rad |
+| 2 | `elbow.pos` | `left_elbow_pan` | rad |
+| 3 | `wrist_pan.pos` | `left_wrist_pan` | rad |
 | 4 | `wrist_pitch.pos` | `left_wrist_pitch` | rad |
 | 5 | `wrist_roll.pos` | `left_wrist_roll` | rad |
 | 6 | `gripper.pos` | `left_finger_right` + `left_finger_left` | m, jaw opening (0–0.09) |
 
-(The mono arm's URDF joint names are shifted by one because the ring took the shoulder's name; see CLAUDE.md.)
+(Since 2026-11-23 the one-arm robot is the mono HOLDER robot: the arm's own shoulder, elbow and wrist pan. Datasets
+recorded with the ring robot named the same three URDF joints `ring` / `shoulder` / `elbow` and its arm sat elsewhere:
+record them again, they don't mix.)
 
 Each file also stores what is needed to rebuild its start (every joint, the base pose, the product's pose, the light),
 the instruction (for example "pick the milk carton and put it in the tote") and the randomisation used.

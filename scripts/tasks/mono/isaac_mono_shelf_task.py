@@ -18,8 +18,8 @@ import argparse, math, os, sys
 ap = argparse.ArgumentParser()
 here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(here, '..', '..', 'common')); import repo_paths as RP   # every script folder + repo paths
-ap.add_argument('--layout', default='prototype_mono_arm', choices=('prototype_mono_arm', 'prototype_mono_side'),
-                help='prototype_mono_side = TEST layout: column on the right side, tote along the left (2026-11-18)')
+ap.add_argument('--layout', default='prototype_mono_ring', choices=('prototype_mono_ring', 'prototype_mono_ring_side'),
+                help='the PARKED ring robot (these plans were made for it); _side = its TEST layout: column on the right side (2026-11-18)')
 ap.add_argument('--urdf', default=None, help='default: the layout\'s URDF')
 ap.add_argument('--headless', action='store_true')
 ap.add_argument('--no_self_collision', action='store_true')

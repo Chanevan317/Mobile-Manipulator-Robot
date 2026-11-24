@@ -17,7 +17,7 @@ import argparse, json, math, os, sys
 ap = argparse.ArgumentParser()
 here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(here, '..', 'common')); import repo_paths as RP   # every script folder + repo paths
-ap.add_argument('--urdf', default=os.path.join(RP.URDF_DIR, 'mobile_manipulator_prototype_mono_arm.urdf'))
+ap.add_argument('--urdf', default=os.path.join(RP.URDF_DIR, 'mobile_manipulator_prototype_mono_ring.urdf'))
 ap.add_argument('--headless', action='store_true')
 ap.add_argument('--payload', type=float, default=0.5, help='kg held at the TCP')
 ap.add_argument('--out', default=None)
@@ -34,7 +34,7 @@ sys.path.insert(0, here)
 from proto_task import Task, DT
 from isaacsim.core.utils.types import ArticulationAction
 
-task = Task(app, args.urdf, args.headless, fix_base=True, self_collision=False, layout='prototype_mono_arm')
+task = Task(app, args.urdf, args.headless, fix_base=True, self_collision=False, layout='prototype_mono_ring')
 stage = omni.usd.get_context().get_stage()
 hand = stage.GetPrimAtPath('/mobile_manipulator/left_hand')
 mapi = UsdPhysics.MassAPI(hand)

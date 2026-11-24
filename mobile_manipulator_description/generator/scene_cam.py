@@ -41,7 +41,12 @@ FL = dict(wx=40.0, wy=44.0, t=6.0, bx=14.0, by=17.0)   # flange; bolts on (MX +-
 BOX = dict(x0=26.0, x1=62.0, wy=26.0, wall=3.0, chamfer=14.0)
 FL0 = dict(t=6.0, cb=3.2, screw=10, note='mast to its mount (from above, beside the box; ball-end key)')   # bottom flange: on the dual robot it sits in the holder's 2 mm pocket
 CABLE_WIN = dict(wy=16.0, h=14.0)             # cable window in the front face under the top chamfer (USB-C plug passes)
-MOUNT = {'prototype': dict(z=23.5, L=240.0), 'prototype_mono_arm': dict(z=90.0, L=173.0)}   # mount face (holder bridge pocket floor dual_holder.CAM_Z / clamp pedestal), mast length
+# mount face + mast length per layout: dual holder bridge pocket (dual_holder.CAM_Z); one-arm robot since 2026-11-23 = the
+# mono holder's camera arm pocket (same face height, same 240 mast, turned 90 deg: mono_holder.MAST_T); the parked
+# mono ring layout = a pedestal on its clamp (173 mast)
+MOUNT = {'prototype': dict(z=23.5, L=240.0), 'prototype_mono_ring': dict(z=90.0, L=173.0),
+         # mono holder (2026-11-24): on the bar over the arm (mono_holder.CAM_Z 165), lens again ~0.330 over the carriage
+         'prototype_mono_arm': dict(z=165.0, L=98.0)}
 AX = MX + 23.0                                # tilt axis x: 23 mm in front of the mast (the USB-C plug clears the beam at 80 deg)
 HEAD_AXIS = 62.0                              # head flange face -> tilt axis (the USB-C plug under the camera clears the crossbar)
 LENS_DZ = 330.0                               # lens over the carriage origin (study: 0.30-0.35 best, scene_cam README)
@@ -255,12 +260,19 @@ def pitched(sol_C, deg, zh):
 
 def mount_context(layout):
     """The robot side under the mast, carriage frame: (fixed solids dict, turning solids for the mono ring or None)."""
+    if layout == 'prototype_mono_arm':           # mono holder: its parts, moved into the mast's own frame
+        import mono_holder as MH
+        MH.build_all()
+        inv = np.linalg.inv(MH.MAST_T)
+        fixed = {'holder': xf(MH.PARTS['holder']['solid'], inv), 'base tote at lift 0': xf(MH.base_tote_C(0.0), inv),
+                 'arm_base': xf(MH.CONTEXT['base'], inv)}
+        return fixed, None
     if layout == 'prototype':
         import dual_holder as DH
         DH.build_all()
         fixed = {'holder_left': DH.PARTS['holder_left']['solid'], 'holder_right': DH.PARTS['holder_right']['solid'], 'arm_bases': DH.CONTEXT['bases']}
         return fixed, None
-    import mono_ring as MR
+    import mono_ring as MR                       # 'prototype_mono_ring' (parked since 2026-11-23)
     MR.build_all()
     fixed = {k: p['solid'] for k, p in MR.PARTS.items() if not p['moving']}
     turning = union([p['solid'] for p in MR.PARTS.values() if p['moving']])
@@ -302,9 +314,12 @@ def check(layout):
     sweep = [pitched(turning, d, zh) for d in range(int(PITCH[0]), int(PITCH[1]) + 1, 10)]
     ours = union(list(fixed.values()) + sweep)
     # beam + both end mounts (x <= 20, |y| <= 40) at any lift, kit carriage plate / wheels
-    for nm, sol in (('beam / end mounts (any lift)', box(-30.0, 20.0, -40.0, 40.0, -600.0, 1200.0)),
+    kit_checks = (('beam / end mounts (any lift)', box(-30.0, 20.0, -40.0, 40.0, -600.0, 1200.0)),
                     ('gantry plate', box(-27.5, -21.5, -62.5, 62.5, -105.0, 20.0)),
-                    ('V-wheels', union([box(-16.0, 0.5, 38.0, 62.0, -105.0, 20.0), box(-16.0, 0.5, -62.0, -38.0, -105.0, 20.0)]))):
+                    ('V-wheels', union([box(-16.0, 0.5, 38.0, 62.0, -105.0, 20.0), box(-16.0, 0.5, -62.0, -38.0, -105.0, 20.0)])))
+    if layout == 'prototype_mono_arm':           # turned mast: the kit is checked in the carriage frame by mono_holder.check()
+        kit_checks = ()
+    for nm, sol in kit_checks:
         v = (ours ^ sol).volume()
         if v > 0.1: res.append(f'camera mount x {nm}: {v:.1f} mm3')
     # the mount under it (holder + arm bases / mono ring: fixed parts, and the rotor + tray all the way round)
@@ -345,12 +360,17 @@ def export(out):
         for f in os.listdir(os.path.join(out, d)):
             if f.endswith('.stl'): os.remove(os.path.join(out, d, f))
     rows, fast = [], collections.Counter()
+    build_all('prototype_mono_ring'); ring_mast = dict(PARTS[f"mast_{int(MOUNT['prototype_mono_ring']['L'])}"])
     build_all('prototype_mono_arm'); mono_mast = dict(PARTS[f"mast_{int(MOUNT['prototype_mono_arm']['L'])}"])
+    for m_ in (ring_mast, mono_mast):                    # back to the mast's own frame (lower flange face at z 0)
+        m_['solid'] = m_['solid'].translate((0, 0, -m_['solid'].bounding_box()[2]))
     build_all('prototype')
-    order = [f"mast_{int(MOUNT['prototype']['L'])}", 'mono', 'head', 'servo_strap', 'camera_cradle']
+    order = [f"mast_{int(MOUNT['prototype']['L'])}", 'mono', 'ring', 'head', 'servo_strap', 'camera_cradle']
     for i, nm in enumerate(order, 1):
         if nm == 'mono':
-            nm = f"mast_{int(MOUNT['prototype_mono_arm']['L'])}"; p = mono_mast
+            nm = f"mast_{int(MOUNT['prototype_mono_arm']['L'])}_mono"; p = mono_mast
+        elif nm == 'ring':
+            nm = f"mast_{int(MOUNT['prototype_mono_ring']['L'])}_mono_ring_parked"; p = ring_mast
         else:
             p = PARTS[nm]
         num = f'C{i:02d}_{nm}'
@@ -363,7 +383,7 @@ def export(out):
         _write(os.path.join(out, 'print_ready_stl', num + '.stl'), s)
         rows.append(dict(file=num + '.stl', part=nm, material=p['material'], size_mm=f'{bb[3]-bb[0]:.1f} x {bb[4]-bb[1]:.1f} x {bb[5]-bb[2]:.1f}',
                          volume_cm3=round(p['solid'].volume() / 1000, 1), note=p['note']))
-        if nm.startswith('mast') and p is mono_mast: continue                      # one robot's set: count the dual mast only
+        if nm.startswith('mast') and (p is mono_mast or p is ring_mast): continue   # one robot's set: count the dual mast only
         for it in p['reg'].items:
             fast[(it['kind'], it['size'], it['length'], it['note'])] += 1
     fast[('servo', 'Feetech STS3215 7.4 V', '', 'camera pitch')] = 1
@@ -425,13 +445,15 @@ def render(path):
     cam, zh = scene('prototype', 20)
     draw(fig.add_subplot(1, 3, 1, projection='3d'), kit + dual_mount + cam, 16, -55,
          f"two-arm robot: mast {int(MOUNT['prototype']['L'])} on the holder's front bridge", (np.array([20.0, 0.0, 150.0]), 175.0))
-    # one-arm: mono ring (fixed + rotor + tray)
-    import mono_ring as MR
-    MR.build_all()
-    mono_mount = [(tris_of(p['solid']), p['color']) for p in MR.PARTS.values()]
+    # one-arm (official since 2026-11-23): the short mast turned 90 deg on the mono holder's bar over the arm (2026-11-24)
+    import mono_holder as MH
+    MH.build_all()
+    mono_mount = [(tris_of(xf(MH.PARTS['holder']['solid'], np.linalg.inv(MH.MAST_T))), MH.PARTS['holder']['color']),
+                  (tris_of(xf(MH.CONTEXT['base'], np.linalg.inv(MH.MAST_T))), (0.93, 0.55, 0.20))]
+    kit_m = [(np.einsum('ij,ntj->nti', np.linalg.inv(MH.MAST_T)[:3, :3], t) + np.linalg.inv(MH.MAST_T)[:3, 3], c) for t, c in kit]
     cam, zh = scene('prototype_mono_arm', 20)
-    draw(fig.add_subplot(1, 3, 2, projection='3d'), kit + mono_mount + cam, 16, -55,
-         f"one-arm robot: mast {int(MOUNT['prototype_mono_arm']['L'])} on the ring clamp's pedestal", (np.array([20.0, 0.0, 150.0]), 175.0))
+    draw(fig.add_subplot(1, 3, 2, projection='3d'), kit_m + mono_mount + cam, 16, -55,
+         f"one-arm robot: mast {int(MOUNT['prototype_mono_arm']['L'])} on the mono holder's bar over the arm", (np.array([40.0, 40.0, 120.0]), 230.0))
     # head close-up, tilted down
     cam, zh = scene('prototype', 55)
     draw(fig.add_subplot(1, 3, 3, projection='3d'), cam, 20, -40, 'head: STS3215 pitch, camera 55 deg down',
@@ -445,7 +467,7 @@ if __name__ == '__main__':
     args = [a for a in sys.argv[1:] if not a.startswith('--')]
     out = args[0] if args else os.path.join('..', '..', 'CAD', 'scene_cam')
     bad = []
-    for lay in ('prototype', 'prototype_mono_arm'):
+    for lay in ('prototype', 'prototype_mono_arm', 'prototype_mono_ring'):
         SC.build_all(lay)
         res, info = SC.check(lay)
         for line in info: print(line)

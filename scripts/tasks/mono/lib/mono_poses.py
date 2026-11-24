@@ -1,16 +1,27 @@
-"""Poses for the one-arm experiment tasks (layout prototype_mono_arm):
+"""Poses for the one-arm robot.
+
+Layouts (use(layout)):
+  prototype_mono_arm   THE one-arm prototype since 2026-11-23 (mono holder): the arm's own shoulder on the robot's
+                       centreline 0.12 m forward, zero pose to the LEFT, the column 0.122 m to its right, the tote on the
+                       BASE behind the arm (as the ring robot's, floor TOTE_FLOOR). Used by scene_v0 (pick_place_mono,
+                       stations_mono) and train_pipeline: STOW, TOTE_FLAT, TOTE_BOX. (The task plans further down,
+                       table_steps / shelf_*_steps, are the ring's.)
+  prototype_mono_ring  PARKED: the shoulder ring around the column, tote on the base (the tasks below were planned for it)
+  prototype_mono_ring_side  PARKED test: the ring robot with the column on the right side edge
+
+The ring-era tasks (they call use('prototype_mono_ring')):
   isaac_mono_task.py        stationary: table in front -> tote behind -> table
   isaac_mono_table_task.py  the prototype table-to-table task with one arm (2 products, drive between tables)
   isaac_mono_shelf_task.py  the prototype shelf task with one arm (1 product, drive between shelves)
 Pure Python (scara_ik only), so the offline collision check and the Isaac task use exactly the same plan.
 
-Base frame (base_link), robot parked. The shoulder ring is on the column axis (0.18, 0); its zero pose points forward.
+Base frame (base_link), robot parked. Ring robot: the shoulder ring is on the column axis (0.18, 0), zero pose forward.
 Spots come from reach_test.py --layout prototype_mono_arm (hand down, any of 8 headings, either elbow).
 """
 import math
 import scara_ik as K
 
-K.use('prototype_mono_arm')
+K.use('prototype_mono_ring')                  # the task plans below were made for the ring; use() at the end picks the layout
 D = math.radians
 P = math.pi / 2
 ITEM_H = 0.070                       # 45 x 45 x 70 mm product, grasped at its middle
@@ -178,6 +189,15 @@ def shelf_place_steps(target, grab_yaw, grab_elbow=None, item_in_tote=None, item
 
 TOTE_BOX = (-0.238, 0.098, -0.233, 0.233)   # tote inside (x0, x1, y0, y1), for the task reports
 LAYOUT = 'prototype_mono_arm'
+TOTE_RECTS = None                      # mono holder: the L tote's inside as rectangles (x0, x1, y0, y1)
+
+
+def in_tote(x, y):
+    """(x, y) (base frame) over the tote's inside: the L tote's rectangles, else TOTE_BOX."""
+    for x0, x1, y0, y1 in (TOTE_RECTS or [TOTE_BOX]):
+        if x0 < x < x1 and y0 < y < y1:
+            return True
+    return False
 
 
 def use(layout):
@@ -186,15 +206,24 @@ def use(layout):
     left side). The side values are the front ones turned with the column: the same arm moves relative to the column
     (shelf reach), the tote spot 90 deg from the shelf instead of 180, and its own fold (searched offline: inside the
     footprint, clear at lift 0 / 0.2 / 0.81)."""
-    global LAYOUT, STOW, TOTE_FLAT, TOTE_BOX
+    global LAYOUT, STOW, TOTE_FLAT, TOTE_BOX, TOTE_RECTS
+    TOTE_RECTS = None
     LAYOUT = layout; K.use(layout)
-    if layout == 'prototype_mono_side':
+    if layout == 'prototype_mono_arm':
+        # mono holder (2026-11-24: shoulder at x 0.18): the L tote on the base (mono_holder.base_tote(): behind the arm
+        # x -0.13..0.09, |y| <= 0.21..0.24, + the left leg x 0.09..0.25, y 0.06..0.24), floor TOTE_FLOOR as the ring
+        # robot's. STOW: offline search (scratch stow_search.py, collide.Checker): clear at lift 0 .. 0.871 with the L tote
+        STOW = _q(10, 110, 60, 0, 0.20)
+        TOTE_FLAT = (-0.020, 0.0)                        # drop spot: the middle of the part behind the arm
+        TOTE_BOX = (-0.123, 0.243, -0.203, 0.233)        # bounding box of the inside (in_tote() for the L shape)
+        TOTE_RECTS = [(-0.123, 0.083, -0.203, 0.233), (0.083, 0.243, 0.067, 0.233)]
+    elif layout == 'prototype_mono_ring_side':
         cx, cy = K.SHOULDER['left']
         SHELF['reach'] = (cx + 0.51, cy + 0.10)          # front: (0.69, 0.10) = column + (0.51, 0.10)
         STOW = _q(50, 40, 120, 0, 0.20)                  # arm folded over the tote, x -0.135..0.143, y -0.254..0.111
         TOTE_FLAT = (0.0, 0.06)                          # tote centre (0, 0.075); 0.24 m from the column, on its left
         TOTE_BOX = (-0.233, 0.233, -0.093, 0.243)
-    else:
+    else:                                                # prototype_mono_ring
         SHELF['reach'] = (0.69, 0.10)
         STOW = _q(-80, -100, -30, 0, 0.20)
         TOTE_FLAT = (-0.043, 0.0)
@@ -224,3 +253,6 @@ def run(task, steps, jaw_open=JAW_OPEN, on_jaw=None, debug=None, smooth=False):
             a = K.fk('left', task.arm_now('left'))
             task.cart_move('left', np.array([a[0], a[1], a[2], tgt[3], tgt[4]]), np.array(tgt[:5]), tgt[5], tgt[6] if len(tgt) > 6 else None)
         if debug: debug(label)
+
+
+use('prototype_mono_arm')             # the official one-arm prototype by default (the ring-era tasks call use('prototype_mono_ring'))

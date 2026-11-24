@@ -1,5 +1,9 @@
 # Mono-arm shoulder ring
 
+> **Parked (2026-11-23).** The one-arm robot now uses the simpler **mono holder** (`../mono_holder/`): the lift
+> column shifted to the side, the carriage facing the centre with the arm's own base on it. These files stay for
+> reference; the robot model keeps this design as the layout `prototype_mono_ring`.
+
 The one-arm robot's shoulder ring on the real C-Beam XLarge lift (layout B, chosen 2026-11-13). It replaces the earlier
 draft with printed ball races and a collar on the arm; that draft is in git history.
 

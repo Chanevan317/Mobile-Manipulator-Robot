@@ -14,7 +14,7 @@ The "Robot stations" panel:
     Home      drive back to the start
     Stop      stop at the next waypoint (a Go from there goes straight on, or via the hub if the line isn't clear)
     Random    drive to a random other station
-    Up / Down arrow keys   move the lift while held, at its real speed (0.10 m/s), within 0 .. 0.81 m; also while
+    Up / Down arrow keys   move the lift while held, at its real speed (0.10 m/s), within the lift's range (0 .. 0.871 m); also while
               driving. Click into the viewport first if a dropdown still has the keyboard.
     Left / Right arrow keys  tilt the scene camera up / down while held (its pitch servo, -10 .. 80 deg).
     View      Free / Scene cam / Wrist cam: what the viewport looks through (the robot's cameras at their real specs,
@@ -113,7 +113,7 @@ def set_view(name):
 import carb.input, omni.appwindow
 import scara_ik as K
 import proto_task as PT
-LIFT_RANGE = (0.0, K.LIFT_MAX['prototype_mono_arm'])
+LIFT_RANGE = K.LIMITS['lift']                           # (0, 0.871) on the mono holder robot
 LIFT_V = 0.10 * 0.9                                    # m/s: the URDF lift speed with drives.rate_limit's margin
 keys = {'up': False, 'down': False, 'left': False, 'right': False}
 TILT_V = math.radians(30)                              # rad/s, scene camera pitch while Left / Right is held

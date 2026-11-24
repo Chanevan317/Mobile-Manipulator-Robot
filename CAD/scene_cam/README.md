@@ -3,7 +3,8 @@
 A **Luxonis OAK-D Pro W (OV9782, 127° × 80°)** on a **Feetech STS3215 7.4 V** pitch servo, on a printed mast standing on the **carriage**
 in front of the C-Beam. It rides up and down with the arms (as the old scene camera did) and tilts to look ahead or
 down at the work. Fits both robots: on the two-arm robot the mast bolts to the dual holder's front bridge, on the
-one-arm robot to a pedestal on the ring clamp.
+one-arm robot to the mono holder's bar over the arm (turned 90° so the camera looks forward, its tilt axis straight
+above the arm's shoulder), on a short 98 mm mast (C02). Both put the lens 0.33 m over the carriage.
 
 ![scene camera mount](preview_scene_cam.png)
 
@@ -20,15 +21,16 @@ the part below, on a 28 × 34 mm pattern. So a different set-up is one replaceme
 | # | File | What | Swap it to… |
 |---|---|---|---|
 | C01 | `C01_mast_240.stl` | two-arm robot: 36 × 26 hollow mast, 3 mm walls (cables inside), 240 mm flange to flange | **change the height**: the lens sits at **mount + L + 67 mm** over the carriage origin. Two-arm: 0.33 m with L 240 (L 190 → 0.28 m, L 290 → 0.38 m) |
-| C02 | `C02_mast_173.stl` | one-arm robot: the same, 173 mm (its mount is 64.5 mm higher) | one-arm: 0.33 m with L 173 |
-| C03 | `C03_head.stl` | flange, crossbar reaching 23 mm forward, the servo's cradle (output face toward the camera, body hanging down) and the pivot upright | a forward offset or a different tilt mechanism: a new head |
-| C04 | `C04_servo_strap.stl` | holds the servo in the head (2 case screws on its idler face + 2 M2 into the head) | — |
-| C05 | `C05_camera_cradle.stl` | holds the camera by its two back M4 holes on 3 mm standoffs (the cooling fins stay open); one arm on the servo horn (4 × M3), the other on an M5 pivot bolt; the bottom (USB-C plug) left open | another camera: a new cradle |
+| C02 | `C02_mast_98_mono.stl` | one-arm robot: the same, 98 mm (it stands on the mono holder's bar, 165 mm over the plate top) | one-arm: 0.33 m with L 98 |
+| C03 | `C03_mast_173_mono_ring_parked.stl` | only for the PARKED ring robot: the same, 173 mm. Not needed now | — |
+| C04 | `C04_head.stl` | flange, crossbar reaching 23 mm forward, the servo's cradle (output face toward the camera, body hanging down) and the pivot upright | a forward offset or a different tilt mechanism: a new head |
+| C05 | `C05_servo_strap.stl` | holds the servo in the head (2 case screws on its idler face + 2 M2 into the head) | — |
+| C06 | `C06_camera_cradle.stl` | holds the camera by its two back M4 holes on 3 mm standoffs (the cooling fins stay open); one arm on the servo horn (4 × M3), the other on an M5 pivot bolt; the bottom (USB-C plug) left open | another camera: a new cradle |
 
 The mounts are part of the robot's own prints (re-exported with this change):
 - two-arm: `../dual_holder/D01 / D02`: a 2 mm pocket across the front bridge top for the flange, 4 inserts in its floor;
-- one-arm: `../mono_ring/M03_clamp_ring.stl`: a pedestal rising from inside the cable drum to z 90 (over the turning
-  cable tray and rotor ribs), 4 inserts on top.
+- one-arm: `../mono_holder/H01_holder.stl`: the same 2 mm pocket on its bar over the arm, 4 inserts in its floor (the
+  parked ring robot used a pedestal on its clamp, `../mono_ring/M03_clamp_ring.stl`, with the 173 mm mast).
 
 All PETG. Print orientations: masts **lying on their front face** (the box front is flush with both flanges, the cavity
 is peaked at the back, so no supports; bending then runs along the layers, which is stiffer and stronger than across
@@ -91,7 +93,7 @@ Range −10° (looking slightly up) to +80° (down).
 ## Checked (`generator/scene_cam.py` and the robot model)
 
 - No clashes between the parts, nor with the beam / end mounts (at any lift), the kit's gantry plate and V-wheels, the
-  dual holder and both arm bases, or the ring's fixed parts; the ring's rotor and cable tray turn all the way round
+  dual holder and both arm bases, the mono holder, its arm base and the base tote, or the (parked) ring's fixed parts; the ring's rotor and cable tray turn all the way round
   past the pedestal.
 - Tilt: free from −40° to +120° (the range used is −10° to +80°), including the USB-C plug under the camera.
 - Lens 0.330 m over the carriage origin, 80 mm in front of the column axis (both robots).

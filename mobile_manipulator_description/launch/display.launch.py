@@ -22,6 +22,6 @@ def nodes(context):
 
 def generate_launch_description():
     return LaunchDescription([
-        DeclareLaunchArgument('layout', default_value='prototype', description='prototype (the only layout since 2026-11-09)'),
+        DeclareLaunchArgument('layout', default_value='prototype', description='prototype (two arms), prototype_mono_arm (one arm, mono holder) or prototype_mono_ring (parked)'),
         OpaqueFunction(function=nodes),
     ])

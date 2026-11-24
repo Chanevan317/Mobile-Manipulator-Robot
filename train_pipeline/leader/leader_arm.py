@@ -4,10 +4,11 @@ Plain Python + scservo_sdk (feetech-servo-sdk), so it runs in BOTH envs: env_isa
 lerobot_env. No LeRobot code: the leader's zero is a POSE (calibrate.py), not LeRobot's "middle of the range".
 
 Servo IDs (the SO-100 leader's order, which this arm was assembled in):
-    1 J1 shoulder (turns the follower's ring)      4 wrist pitch
-    2 J2 elbow    (follower 'shoulder.pos')        5 wrist roll
-    3 J3 wrist pan (follower 'elbow.pos')          6 gripper (finger-loop jaw)
-The follower's mono joint names are shifted by one (CLAUDE.md item 23): leader J1 -> ring, J2 -> shoulder, J3 -> elbow.
+    1 J1 shoulder  (follower 'shoulder.pos')       4 wrist pitch
+    2 J2 elbow     (follower 'elbow.pos')          5 wrist roll
+    3 J3 wrist pan (follower 'wrist_pan.pos')      6 gripper (finger-loop jaw)
+Since 2026-11-23 (mono holder) the follower is the leader's own kind of arm: J1 -> shoulder, J2 -> elbow, J3 -> wrist pan
+(the ring robot mapped J1 -> ring, J2 -> shoulder, J3 -> elbow).
 
 Angles: angle = sign * (raw - zero) in degrees, wrapped to +-180 around the zero pose. So the encoder seam (+180 -> -180) is never
 inside a joint's travel: J1 has its end stop at +-174 (README), the other joints can't reach +-180, and the roll,
@@ -27,9 +28,9 @@ TICKS = 4096
 
 # leader joint, servo id, follower name (train_pipeline/common.py), follower limits (URDF prototype_mono_arm)
 JOINTS = [
-    ('J1',          1, 'ring.pos',        (-180.0, 180.0)),
-    ('J2',          2, 'shoulder.pos',    (-115.0, 115.0)),
-    ('J3',          3, 'elbow.pos',       (-122.0, 122.0)),
+    ('J1',          1, 'shoulder.pos',    (-115.0, 115.0)),
+    ('J2',          2, 'elbow.pos',       (-125.0, 125.0)),
+    ('J3',          3, 'wrist_pan.pos',   (-122.0, 122.0)),
     ('wrist_pitch', 4, 'wrist_pitch.pos', (-15.0, 115.0)),
     ('wrist_roll',  5, 'wrist_roll.pos',  (-120.0, 120.0)),
     ('gripper',     6, 'gripper.pos',     None),
@@ -259,7 +260,8 @@ def selftest():
     check('roll back to -100', d['wrist_roll'], -100)
     c = L.command(at(gripper=20)); check('gripper half open -> 45 mm', c['gripper.pos'] * 1000, 45, 1.0)
     c = L.command(at(gripper=-3)); check('gripper past closed -> 0', c['gripper.pos'] * 1000, 0, 0.01)
-    c = L.command(at(J2=130)); check('J2 +130 clamped to the follower +115', math.degrees(c['shoulder.pos']), 115)
+    c = L.command(at(J2=130)); check('J2 +130 clamped to the follower +125', math.degrees(c['elbow.pos']), 125)
+    c = L.command(at(J1=150)); check('J1 +150 clamped to the follower shoulder +115', math.degrees(c['shoulder.pos']), 115)
     print('selftest', 'PASSED' if ok else 'FAILED')
     return ok
 

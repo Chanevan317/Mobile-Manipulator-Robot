@@ -17,7 +17,7 @@ import argparse, math, os, sys
 ap = argparse.ArgumentParser()
 here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(here, '..', 'common')); import repo_paths as RP   # every script folder + repo paths
-ap.add_argument('--layout', default='prototype', choices=('prototype', 'prototype_mono_arm'), help='robot layout (urdf/mobile_manipulator_<layout>.urdf)')
+ap.add_argument('--layout', default='prototype', choices=('prototype', 'prototype_mono_arm', 'prototype_mono_ring'), help='robot layout (urdf/mobile_manipulator_<layout>.urdf)')
 ap.add_argument('--urdf', default=None, help='URDF path (overrides --layout)')
 ap.add_argument('--headless', action='store_true')
 ap.add_argument('--save', default='')

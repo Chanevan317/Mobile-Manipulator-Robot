@@ -10,14 +10,14 @@ Run from this package folder:
     (this machine: OMNI_KIT_ACCEPT_EULA=YES conda run --no-capture-output -n env_isaaclab python scripts/viewers/isaac_arm_view.py)
 Options:
     --period S        seconds per open + close cycle (default 20: about 4.5 mm/s per jaw at the fastest)
-    --layout prototype | prototype_mono_arm   which robot's arm (default prototype; the mono one includes its ring)
+    --layout prototype | prototype_mono_arm | prototype_mono_ring   which robot's arm (default prototype; the ring one includes its ring)
 """
 import argparse, math, os, sys
 ap = argparse.ArgumentParser()
 here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(here, '..', 'common')); import repo_paths as RP   # every script folder + repo paths
 ap.add_argument('--period', type=float, default=20.0)
-ap.add_argument('--layout', default='prototype', choices=('prototype', 'prototype_mono_arm'))
+ap.add_argument('--layout', default='prototype', choices=('prototype', 'prototype_mono_arm', 'prototype_mono_ring'))
 args = ap.parse_args()
 
 from isaacsim import SimulationApp

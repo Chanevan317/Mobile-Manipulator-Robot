@@ -18,7 +18,8 @@ K.use('prototype_mono_arm')
 SIDE = 'left'                 # the mono arm's joint prefix
 TOP_H = 0.070
 APPROACH = 0.10               # side: straight-in length; top: height above the grasp
-FRONT_MIN = 0.36              # furniture front at least this far ahead of the base centre (camera at x 0.341, bumper 0.259)
+FRONT_MIN = 0.28              # furniture front at least this far ahead of the base centre: bumper 0.259 + 2 cm (the mono
+                              # holder's scene camera is inside the footprint, x ~0.14; with the ring it reached 0.341 -> 0.36)
 
 
 def dims(pkg):
@@ -26,9 +27,27 @@ def dims(pkg):
     return min(sx, sy), max(sx, sy), sz            # narrow (across the jaws), deep (along the approach), height
 
 
-def _ok(poses):
+_CHK = []
+
+
+def CO():
+    import collide
+    return collide
+
+
+def _clear(poses, e):
+    """The arm in these poses touches nothing of the robot itself (collide.Checker, no scene). Since 2026-11-23 (mono
+    holder): with the shoulder on the carriage, a straight-in move that starts close to the robot folds the forearm onto
+    the carriage, which kinematics alone allow."""
+    if not _CHK:
+        _CHK.append(CO().Checker('prototype_mono_arm'))
+    return not any(_CHK[0].check({**K.ik(SIDE, *p, elbow=e), 'jaw': 0.03}) for p in poses)
+
+
+def _ok(poses, clear=False):
+    """The elbow (+1 / -1) that reaches every pose (and, with clear, without touching the robot), or None."""
     for e in (1, -1):
-        if all(K.ik(SIDE, *p, elbow=e) for p in poses):
+        if all(K.ik(SIDE, *p, elbow=e) for p in poses) and (not clear or _clear(poses, e)):
             return e
     return None
 
@@ -84,7 +103,7 @@ def rest_reach(pkg, surface, front, dz):
     the furniture's front edge to the product centre along the approach. Product deep side along the approach.
     Returns dict(top, d, b, elbow) (product centre at (d, b) in the base frame) or None."""
     narrow, deep, h = dims(pkg); gz, fz = grip_heights(surface, h)
-    for d in np.arange(0.40, 0.95, 0.01):
+    for d in np.arange(0.28, 0.95, 0.01):
         if d - front < FRONT_MIN:
             continue
         for b in (0.0, 0.02, -0.02, 0.05, -0.05, 0.10, -0.10, 0.15, -0.15):

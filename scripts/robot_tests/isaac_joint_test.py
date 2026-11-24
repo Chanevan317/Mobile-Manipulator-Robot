@@ -18,7 +18,7 @@ import argparse, csv, math, os, sys
 ap = argparse.ArgumentParser()
 here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(here, '..', 'common')); import repo_paths as RP   # every script folder + repo paths
-ap.add_argument('--layout', default='prototype', choices=('prototype', 'prototype_mono_arm'), help='robot layout (urdf/mobile_manipulator_<layout>.urdf)')
+ap.add_argument('--layout', default='prototype', choices=('prototype', 'prototype_mono_arm', 'prototype_mono_ring'), help='robot layout (urdf/mobile_manipulator_<layout>.urdf)')
 ap.add_argument('--urdf', default=None, help='URDF path (overrides --layout)')
 ap.add_argument('--joint', default='', help='test only joints whose name contains this text')
 ap.add_argument('--headless', action='store_true')
@@ -112,7 +112,9 @@ missing = [j for j in ('lift', 'left_shoulder_pan', 'left_elbow_pan', 'left_wris
 if missing:
     print('WARNING: joints missing after import:', missing)
 
-home = np.zeros(n)
+# rest pose: 0 where the joint allows it, else its nearest limit (the mono holder robot's lift starts at 0.15: its low
+# tote clears the base deck from there; 2026-11-23)
+home = np.where(np.isfinite(lower) & np.isfinite(upper), np.clip(np.zeros(n), lower, upper), 0.0)
 CTRL_HZ = 60
 SUBSTEPS = max(1, round((1.0 / CTRL_HZ) / world.get_physics_dt()))
 
@@ -166,7 +168,7 @@ def hold_test():
     Pass: drift < 1 deg (1 mm for the lift) and error within the sweep tolerance (3 deg / 2 mm).
     """
     def pose(**kw):
-        q = np.zeros(n)
+        q = home.copy()
         for side in ('left', 'right'):
             for j, v in kw.items():
                 k = f'{side}_{j}' if f'{side}_{j}' in names else j
@@ -221,7 +223,7 @@ for i in driven:
     robot.set_joint_positions(home); robot.set_joint_velocities(np.zeros(n))
     log = []
     ok = True
-    for tgt in (lo, hi, 0.0):
+    for tgt in (lo, hi, home[i]):
         t = home.copy(); t[i] = tgt
         ok = step_to(t, move_t, i, log) and ok
     cmd = np.array([l[0] for l in log]); act = np.array([l[1] for l in log]); finite = all(l[2] for l in log)
@@ -230,7 +232,7 @@ for i in driven:
     unit, scale = ('mm', 1000.0) if lin else ('deg', 180.0 / math.pi)
     reached_lo, reached_hi = act.min() * scale, act.max() * scale
     max_err = err.max() * scale
-    end_err = abs(act[-1] - 0.0) * scale
+    end_err = abs(act[-1] - home[i]) * scale
     tol = 2.0 if lin else 3.0
     status = 'OK'
     follow = ''

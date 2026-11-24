@@ -17,7 +17,7 @@ import argparse, math, os, sys
 ap = argparse.ArgumentParser()
 here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(here, '..', '..', 'common')); import repo_paths as RP   # every script folder + repo paths
-ap.add_argument('--urdf', default=os.path.join(RP.URDF_DIR, 'mobile_manipulator_prototype_mono_arm.urdf'))
+ap.add_argument('--urdf', default=os.path.join(RP.URDF_DIR, 'mobile_manipulator_prototype_mono_ring.urdf'))
 ap.add_argument('--headless', action='store_true')
 ap.add_argument('--table_h', type=float, default=0.75)
 ap.add_argument('--no_self_collision', action='store_true')
@@ -33,6 +33,7 @@ from isaacsim.core.api.objects import DynamicCuboid, FixedCuboid
 sys.path.insert(0, here)
 from proto_task import Task
 import mono_poses as MP
+MP.use('prototype_mono_ring')                  # planned for the (parked) ring robot, 2026-11-23
 
 D = math.radians
 P = math.pi / 2
@@ -47,7 +48,7 @@ def world(goal, xy):
     return np.array([goal[0] + c * xy[0] - s * xy[1], goal[1] + s * xy[0] + c * xy[1]])
 
 
-task = Task(app, args.urdf, args.headless, fix_base=False, self_collision=not args.no_self_collision, layout='prototype_mono_arm')
+task = Task(app, args.urdf, args.headless, fix_base=False, self_collision=not args.no_self_collision, layout='prototype_mono_ring')
 w = task.world
 task.profile = 'trap'     # trapezoid moves: full allowed speed after a 0.3 s ramp (same limits)
 task.settle_mode = 'still'   # a move is done once the joints stop (the wrist pitch's gravity sag never gets within 2 deg)

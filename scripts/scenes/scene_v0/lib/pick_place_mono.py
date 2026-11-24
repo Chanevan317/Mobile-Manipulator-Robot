@@ -24,7 +24,9 @@ import assets as SA
 P = math.pi / 2
 READY_GAP = 0.12        # m: the hand this far in front of the furniture while the arm unfolds / folds
 STOW_LEFT = {**MP.STOW, 'shoulder_pan': -MP.STOW['shoulder_pan'], 'elbow_pan': -MP.STOW['elbow_pan'],
-             'wrist_pan': -MP.STOW['wrist_pan']}   # the travel fold mirrored: clear at lift 0 .. 0.81 (offline check)
+             'wrist_pan': -MP.STOW['wrist_pan']}   # ring robot: the travel fold mirrored, clear at lift 0 .. 0.81 (offline check)
+if MP.LAYOUT == 'prototype_mono_arm':     # mono holder: the shoulder's +-115 never wraps past the back, one fold for every grasp
+    STOW_LEFT = MP.STOW
 PLAN_SPEED = 0.4        # planned (waypoint) moves run at this fraction of the joint speeds
 PAUSE = 0.4             # fixed pauses (before a pick, after releasing, before checking where the product ended) x this
 SETTLE_CAP = 1.0        # s: the longest a move waits for the arm to stop (it hunted for up to 8 s holding a product)
@@ -125,6 +127,32 @@ def product_for(sid):
     return name, cand
 
 
+SHIFT = {}           # sid -> (dx, dy) world: the base stood this far from the station for its product (restation)
+
+
+def restation(sid, name):
+    """Move the base along the floor so the product sits where the station planned it (station reach / offset in the
+    base frame). The station is computed from where the scene SHOULD put the product; one that rests elsewhere (the
+    chocolate lying flat rests 83 mm nearer than planned, an old scene placement bug) made the arm fold too tight after
+    the shoulder moved forward (2026-11-24). Only when the move is > 20 mm and the robot's outline stays clear."""
+    import stations_mono as ST
+    S = st[sid]
+    bp, byaw = task.base_pose()
+    c = task.to_base(R.positions({name: watch[name]})[name])[:2]
+    ex, ey = c[0] - S['reach'], c[1] - S.get('offset', 0.0)
+    if math.hypot(ex, ey) < 0.02:
+        return
+    gx, gy = bp[0] + math.cos(byaw) * ex - math.sin(byaw) * ey, bp[1] + math.sin(byaw) * ex + math.cos(byaw) * ey
+    if ST.hits(ST.footprint(gx, gy, S['yaw'])):
+        task.report('re-stationed', f'the product is {ex * 1000:+.0f} / {ey * 1000:+.0f} mm from the plan, but the base '
+                    'cannot move there (outline not clear): picking from the station')
+        return
+    task.drive_to(np.array([gx, gy, math.radians(S['yaw'])]), f'{sid} (moved to the product)')
+    SHIFT[sid] = (gx - S['x'], gy - S['y'])
+    task.report('re-stationed', f'the product is {ex * 1000:+.0f} / {ey * 1000:+.0f} mm (forward / left) from where the '
+                'station planned it: the base moved by that much')
+
+
 # ---------------------------------------------------------------- one pick
 def pick(sid):
     """Drive to station sid, pick its product, put it in the tote, fold. Raises RuntimeError when it can't."""
@@ -164,6 +192,7 @@ def pick(sid):
             R.leg(task, st, ROBOT['at'], sid)
         ROBOT['at'] = sid
         _hook('pick_start', sid=sid, name=name)
+        restation(sid, name)
         p0 = R.positions(watch)
         c = task.to_base(p0[name])[:2]
         if HOOKS.get('grasp_offset'):                 # train_pipeline noise: aim a little off the product, like a person
@@ -210,18 +239,24 @@ def pick(sid):
             # hand heading that puts the product's narrow side across the jaws (scene.product_yaw, inverted), base frame
             sx_, sy_, _ = SA.size(pkg)
             hb = K.wrap(math.radians(items[name].get('yaw', 0.0) - (90.0 if sx_ < sy_ else 0.0)) - byaw)
+            why = []
             for dz in np.arange(0.08, 0.0249, -0.005):
                 for yaw in (hb, K.wrap(hb + math.pi)):
                     a, b, up = G.top_poses(c, yaw, fz, dz)
                     a = up = (a[0], a[1], fz + dz, a[3], a[4])
                     e = G._ok((a, b, up))
-                    if e and not chk.check({**now(0.0), **K.ik('left', *a, elbow=e)}, env):
-                        break
+                    if e:
+                        hit = chk.check({**now(0.0), **K.ik('left', *a, elbow=e)}, env)
+                        if not hit:
+                            break
+                        why.append((round(float(dz), 3), round(math.degrees(yaw)), hit[:3]))
+                    else:
+                        why.append((round(float(dz), 3), round(math.degrees(yaw)), 'no IK'))
                     e = None
                 if e: break
             if not e:
                 raise RuntimeError('top grasp: no approach from above fits (hand down, the forearm rides ~0.36 m over the '
-                                   'fingertips and would hit the board above): this product cannot be picked here')
+                                   f'fingertips): this product cannot be picked here; {why[:2]} .. {why[-2:]}')
             out = up
             slow = None
             held = CO.held_box((fz - S['surface'] - h / 2, 0.0, 0.0), (h, narrow, deep))   # hanging under the TCP (tcp x = down)
@@ -259,7 +294,7 @@ def pick(sid):
                     plan = cand
             if plan is None:
                 print(f'      planning "{label}" (offline collision search; the first time at a station can take a few minutes)', flush=True)
-                plan = planner.transfer(q0, q1, env_, held_, lifts=np.arange(0.0, K.LIFT_MAX['prototype_mono_arm'] + 1e-6, 0.05))
+                plan = planner.transfer(q0, q1, env_, held_, lifts=np.arange(K.LIMITS['lift'][0], K.LIMITS['lift'][1] + 1e-6, 0.05))
                 if plan is not None:
                     CACHE[key] = [{k: float(v) for k, v in m.items()} for m in plan]
                     os.makedirs(os.path.dirname(CACHE_FILE), exist_ok=True)
@@ -346,8 +381,7 @@ def pick(sid):
         task.wait(1.0 * PAUSE)
         _tilt('lift at the fold height')
         pb = task.to_base(R.positions(watch)[name])
-        x0, x1, y0, y1 = MP.TOTE_BOX
-        inside = x0 < pb[0] < x1 and y0 < pb[1] < y1 and pb[2] < 0.376
+        inside = MP.in_tote(pb[0], pb[1]) and pb[2] < MP.TOTE_FLOOR + 0.113   # under the rim
         task.report('in the tote', f'product at ({pb[0]:+.3f}, {pb[1]:+.3f}, {pb[2]:.3f}) in the base frame', ok=inside)
         moved = {n: d for n, d in R.knocked(watch, p0).items() if n != name}
         task.report('nothing else moved', ', '.join(f'{n} {d*1000:.0f} mm' for n, d in moved.items()) or 'none over 10 mm', ok=not moved)
@@ -364,6 +398,10 @@ def pick(sid):
                         R.leg(task, st, ROBOT['at'], 'home'); ROBOT['at'] = 'home'
                     task.joint_move('left', dict(stow)); ROBOT['stow'] = stow
                 R.leg(task, st, ROBOT['at'], sid); ROBOT['at'] = sid
+                if sid in SHIFT:                          # back to where the base stood for the pick
+                    S_ = st[sid]
+                    task.drive_to(np.array([S_['x'] + SHIFT[sid][0], S_['y'] + SHIFT[sid][1], math.radians(S_['yaw'])]),
+                                  f'{sid} (where the pick was)')
             print(f"\nPlace back: {name} from the tote to its spot at {sid}\n", flush=True)
             _hook('place_start', sid=sid, name=name)
             (pr, Rr), (pn, Rn) = rel_b, pose_b(cand[name])
@@ -404,18 +442,33 @@ def pick(sid):
             task.report('picked from the tote', f'jaw gap {gap2:.1f} mm, lifted {rise2:.0f} mm',
                         ok=narrow * 500 < gap2 < narrow * 1000 + 8 and rise2 > 15)
             shot('re-grasped from the tote')
+            # slip in the jaws: the product's place in the hand now vs at the release (the hand-product relation the shelf
+            # moves were planned with). A product sitting 5 mm low snagged the board edge on the way in and was pushed
+            # 23 mm (shelf2_b2_ketchup_a02, 2026-11-24): shift the shelf moves by the slip (in the hand frame, turned to
+            # the shelf heading), up only (never lower the fingers toward the board), at most 15 mm
+            pa = pose_b(cand[name])[0]
+            rot = lambda v, a_: np.array([math.cos(a_) * v[0] - math.sin(a_) * v[1], math.sin(a_) * v[0] + math.cos(a_) * v[1], v[2]])
+            dh = rot(pa - np.array([g[0], g[1], hig]), -yg) - rot(pr - np.array([tx, ty, zr]), -yt)
+            fix = -rot(dh, b[3]); fix[2] = max(fix[2], 0.0)
+            if np.linalg.norm(fix) > 0.015:
+                fix *= 0.015 / np.linalg.norm(fix)
+            task.report('slip in the jaws', f'product {dh[0]*1000:+.0f} / {dh[1]*1000:+.0f} / {dh[2]*1000:+.0f} mm (hand '
+                        f'forward / left / up) from the pick: shelf moves shifted {fix[0]*1000:+.0f} / {fix[1]*1000:+.0f} / '
+                        f'{fix[2]*1000:+.0f} mm')
+            sh = lambda p_: (p_[0] + fix[0], p_[1] + fix[1], p_[2] + fix[2], p_[3], p_[4])
+            out_, up_ = sh(out), sh(up)
             # the pick's shelf moves backwards; set down 5 mm over the grasp height (the product drops onto the board)
-            b5 = (b[0], b[1], b[2] + 0.005, b[3], b[4])
+            b5 = sh((b[0], b[1], b[2] + 0.005, b[3], b[4]))
             if S['grasp'] == 'side':
-                start = (ready[0], ready[1], out[2], out[3], out[4]) if ready is not a else out
+                start = (ready[0], ready[1], out_[2], out_[3], out_[4]) if ready is not a else out_
                 go(task.ik('left', start, e), 'swing back to the shelf', held, jaw_held, env_held)
                 if ready is not a:
-                    task.cart_move('left', start, out, e)
-                task.cart_move('left', out, up, e, slow)
-                task.cart_move('left', up, b5, e, slow)
+                    task.cart_move('left', start, out_, e)
+                task.cart_move('left', out_, up_, e, slow)
+                task.cart_move('left', up_, b5, e, slow)
             else:
-                go(task.ik('left', up, e), 'swing back to the shelf', held, jaw_held, env_held)
-                task.cart_move('left', up, b5, e, 1.5)
+                go(task.ik('left', up_, e), 'swing back to the shelf', held, jaw_held, env_held)
+                task.cart_move('left', up_, b5, e, 1.5)
             task.jaw('left', jopen, 0.8)
             task.wait(0.4 * PAUSE)
             shot('set down')
@@ -424,7 +477,7 @@ def pick(sid):
                 if ready is not a:
                     task.cart_move('left', a, ready, e)
             else:
-                task.cart_move('left', b5, up, e)
+                task.cart_move('left', b5, up_, e)
             task.jaw('left', 0.0, 0.5)
             go({**stow, 'lift': task.arm_now('left')['lift']}, 'fold after placing', env_=env)   # product back on its shelf
             task.joint_move('left', {'lift': stow['lift']})
@@ -535,15 +588,19 @@ def run_place():
 # ---------------------------------------------------------------- what can be picked
 # Stations where the whole pick + place passes (headless, all 19 in one session with put-back between, 2026-11-19); --all_stations
 # offers every station. Impossible here: see CLAUDE.md item 29.
+# Isaac-checked on the mono holder robot (2026-11-24, shoulder at x 0.18; the 4 below fail as on the ring robot)
 PICKABLE = {'rack_b0_boxedCereal_l01', 'rack_b0_box_cracker_a01', 'rack_b0_boxedFood_b01', 'rack_b0_boxedFood_c01',
-            'rack_b0_boxedFood_d01', 'shelf_b1_milk_b01', 'shelf_b2_milk_c01', 'rack2_b0_chocolate_e01',
+            'shelf_b1_milk_b01', 'shelf_b2_milk_c01', 'rack2_b0_chocolate_e01',
             'shelf2_b1_ketchup_c01', 'shelf2_b1_ketchup_i01', 'shelf2_b2_ketchup_a02', 'shelf2_b2_ketchup_c01',
             'table_cannedFood_h01', 'table_coffeeCup_b01', 'table_yogurt_a01', 'table_yogurt_c01'}
 # picked fine, but the place back fails: the round bottle pivots about the jaw axis as the jaws open in the tote and
 # ends leaning 51 deg (P2T_DEBUG=1 traces it), so it can't be re-grasped from above
 PICK_ONLY = {'shelf_b2_milk_c01'}
 # not pickable: shelf_b1_yogurt_a01 (forearm vs the board above), shelf_b2_yogurt_c01 (no IK for the grasp from that
-# station), rack2_b0_cannedFood_h01 (packed run, no room for the open jaws)
+# station), rack2_b0_cannedFood_h01 (packed run, no room for the open jaws); rack_b0_boxedFood_d01 on the mono holder
+# robot since 2026-11-24 (shoulder at 0.18): the hand pushed straight in reaches shelf products only on the arm's LEFT
+# from a closer stop, and at the rack's end the table keeps the base from standing there; from the one stop left (0.64 m
+# out, to the right front) the jaws missed it in Isaac
 NAMES = {p['package']: p['name'] for p in SC.PRODUCTS.values()}
 
 

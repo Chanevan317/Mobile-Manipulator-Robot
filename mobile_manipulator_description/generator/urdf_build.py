@@ -26,6 +26,14 @@ PROTO_CX, PROTO_ARM_Y, PROTO_YAW = 0.18, 0.15, math.radians(135.0)
 # swing to the tote (front layout: ~180), and the scene camera sits 0.18 m further back from what it looks at.
 SIDE_CX, SIDE_CY = 0.0, -0.18               # column axis in base_link (front layout: (PROTO_CX, 0))
 SIDE_TOTE = (0.0, 0.075, math.pi / 2)       # tote centre x, y and yaw (0.48 along x, y -0.10 .. 0.25)
+# ONE-ARM PROTOTYPE since 2026-11-23 (user: the ring replaced by the mono HOLDER; front only; "the lift slightly on the
+# side to keep the carriage at center", the carriage facing the side it was shifted from): mono_holder.py. The column
+# stands MH.ARM_DX right of the centre, turned -90 deg (its gantry plate faces the centre); the arm's own shoulder on the
+# centreline, zero pose to the LEFT; the tote on the BASE behind the arm, as in the original design (MH.BASE_TOTE). Layout name 'prototype_mono_arm' (the ring layouts are parked as
+# 'prototype_mono_ring' / 'prototype_mono_ring_side').
+import mono_holder as MH
+SINGLE_CX, SINGLE_CY = MH.ROBOT_X, -MH.ARM_DX * 0.001   # column axis in base_link: ROBOT_X forward, 0.122 right (shoulder at (ROBOT_X + ARM_DY, 0))
+SINGLE_YAW = -math.pi / 2                   # column / carriage yaw: carriage +y = robot front, carriage -x = robot left
 # lift speed limit (m/s): 0.10 since 2026-11-06 (user decision; 8 mm-lead C-Beam + closed-loop NEMA 23 at ~750 rpm).
 # Was 0.05 until then. Re-time on the real lift and keep sim and real equal (it shapes the motion policies learn).
 LIFT_SPEED = 0.10
@@ -400,7 +408,7 @@ CB_PROPS['column'].append(box_props(0.20, (CB_FOOT['t'], CB_FOOT['w'], CB_FOOT['
 MONO_LIFT_MAX = 0.81                                  # mono ring (layout B): its clamp meets the top end mount between 0.815 and 0.820
 
 
-def base_xml(mono=False, side=False):
+def base_xml(mono=False, side=False, single=False):
     o = frame_link('base_link')
     B = 0.50
     v = vprim('0 0 0.22', bx(B, B, 0.04), SHELL) + vprim('0 0 0.243', bx(B - 0.01, B - 0.01, 0.006), TRIM)
@@ -450,8 +458,18 @@ def base_xml(mono=False, side=False):
     # lidar
     o += '  <link name="lidar_link">\n' + inertial(*cyl_props(0.17, 0.035, 0.055)) + vprim('0 0 0', cy(0.035, 0.055), TRIM) + '  </link>\n'
     o += joint('lidar_fixed', 'fixed', 'base_link', 'lidar_link', '0.04 0 0.165')
-    o += lift_prototype(mono, side)
+    o += lift_single() if single else lift_prototype(mono, side)
     return o
+
+
+def tote_link(L, Wt, H, t):
+    """The open tote on the base deck (simple boxes, estimated mass), link origin at its floor's underside centre."""
+    tv = vprim(f'0 0 {t/2}', bx(L, Wt, t), BLUE)
+    for sx in (1, -1): tv += vprim(f'{sx*(L/2-t/2)} 0 {H/2}', bx(t, Wt, H), BLUE)
+    for sy in (1, -1): tv += vprim(f'0 {sy*(Wt/2-t/2)} {H/2}', bx(L - 2 * t, t, H), BLUE)
+    tc = cprim(f'0 0 {t/2}', bx(L, Wt, t)) + ''.join(cprim(f'{sx*(L/2-t/2)} 0 {H/2}', bx(t, Wt, H)) for sx in (1, -1)) + \
+         ''.join(cprim(f'0 {sy*(Wt/2-t/2)} {H/2}', bx(L - 2 * t, t, H)) for sy in (1, -1))
+    return '  <link name="tote">\n' + inertial(*box_props(1.05 * L / 0.35, (L, Wt, H), (0, 0, 0.04))) + tv + tc + '  </link>\n'
 
 
 def lift_prototype(mono=False, side=False):
@@ -461,12 +479,7 @@ def lift_prototype(mono=False, side=False):
     CX, CY = (SIDE_CX, SIDE_CY) if side else (PROTO_CX, 0)
     # tote behind the column (x -0.245 .. 0.105), full width
     L, Wt, H, t = 0.35, 0.48, 0.12, 0.007; TX = -0.07
-    tv = vprim(f'0 0 {t/2}', bx(L, Wt, t), BLUE)
-    for sx in (1, -1): tv += vprim(f'{sx*(L/2-t/2)} 0 {H/2}', bx(t, Wt, H), BLUE)
-    for sy in (1, -1): tv += vprim(f'0 {sy*(Wt/2-t/2)} {H/2}', bx(L - 2 * t, t, H), BLUE)
-    tc = cprim(f'0 0 {t/2}', bx(L, Wt, t)) + ''.join(cprim(f'{sx*(L/2-t/2)} 0 {H/2}', bx(t, Wt, H)) for sx in (1, -1)) + \
-         ''.join(cprim(f'0 {sy*(Wt/2-t/2)} {H/2}', bx(L - 2 * t, t, H)) for sy in (1, -1))
-    o += '  <link name="tote">\n' + inertial(*box_props(1.05, (L, Wt, H), (0, 0, 0.04))) + tv + tc + '  </link>\n'
+    o += tote_link(L, Wt, H, t)
     if side:                      # turned lengthwise along the left side, beside the column
         o += joint('tote_fixed', 'fixed', 'base_link', 'tote', f'{SIDE_TOTE[0]} {SIDE_TOTE[1]} 0.256', f'0 0 {SIDE_TOTE[2]:.6g}')
     else:
@@ -485,7 +498,7 @@ def lift_prototype(mono=False, side=False):
     o += joint('top_beam_fixed', 'fixed', 'base_link', 'top_beam', f'{CX} {CY} {CB_Z0 + CB_L:.6g}')
     o += '  <link name="estop">\n' + inertial(*cyl_props(0.03, 0.022, 0.02)) + vprim('0 0 0', cy(0.022, 0.02), RED) + '  </link>\n'
     o += joint('estop_fixed', 'fixed', 'top_beam', 'estop', '-0.005 0 0.022')
-    o += SCENE_XML['prototype_mono_arm' if mono else 'prototype']
+    o += SCENE_XML['prototype_mono_ring' if mono else 'prototype']
     # carriage (origin on the column axis): the kit's gantry plate (125 x 125 x 6, 1.5 mm behind the beam's open face) with
     # its 4 V-wheels in the beam's V-grooves and the lead-screw nut block, + (two-arm robot) the printed dual-arm holder
     # (dual_holder.py, since 2026-11-13; was two estimated 8 mm aluminium brackets). The plate's top is at carriage
@@ -507,6 +520,58 @@ def lift_prototype(mono=False, side=False):
     return o
 
 
+def lift_single():
+    """One-arm prototype (mono_holder.py): column at (0, SINGLE_CY) turned SINGLE_YAW, carriage = kit plate + the mono
+    holder, the scene camera mast on the holder's camera arm; the tote on the base behind the arm (MH.BASE_TOTE)."""
+    t = MH.BASE_TOTE                                   # the L tote (mono_holder.base_tote): boxes in the robot frame
+    tv = tc = ''
+    for (x0, x1, y0, y1, z0, z1) in MH.tote_walls(t):
+        c_ = f'{(x0 + x1) / 2:.6g} {(y0 + y1) / 2:.6g} {(z0 + z1) / 2 - t["z"][0]:.6g}'
+        tv += vprim(c_, bx(x1 - x0, y1 - y0, z1 - z0), BLUE); tc += cprim(c_, bx(x1 - x0, y1 - y0, z1 - z0))
+    area = sum((r[1] - r[0]) * (r[3] - r[2]) for r in t['rects'])
+    tcx = sum((r[0] + r[1]) / 2 * (r[1] - r[0]) * (r[3] - r[2]) for r in t['rects']) / area
+    tcy = sum((r[2] + r[3]) / 2 * (r[1] - r[0]) * (r[3] - r[2]) for r in t['rects']) / area
+    o = '  <link name="tote">\n' + inertial(*box_props(1.05 * area / (0.35 * 0.48), (0.3, 0.3, 0.12), (tcx, tcy, 0.04))) + tv + tc + '  </link>\n'
+    o += joint('tote_fixed', 'fixed', 'base_link', 'tote', f"0 0 {t['z'][0]:.6g}")
+    CX, CY, yaw = SINGLE_CX, SINGLE_CY, f'0 0 {SINGLE_YAW:.6g}'
+    o += '  <link name="column">\n' + inertial(*combine(CB_PROPS['column'])) + ''.join(vis_mesh(f, c) for f, c in CB_VIS['column']) + CB_FOOT_VIS + \
+         cprim(f'0 0 {CB_L/2:.6g}', bx(0.04, 0.08, CB_L)) + cprim(*CB_BOTTOM_BOX) + cprim(*CB_FOOT_BOX) + '  </link>\n'
+    o += joint('column_fixed', 'fixed', 'base_link', 'column', f'{CX} {CY} {CB_Z0:.6g}', yaw)
+    o += '  <link name="top_beam">\n' + inertial(*combine(CB_PROPS['top_beam'])) + ''.join(vis_mesh(f, c) for f, c in CB_VIS['top_beam']) + \
+         cprim('-0.005 0 0.006', bx(0.05, 0.08, 0.012)) + '  </link>\n'
+    o += joint('top_beam_fixed', 'fixed', 'base_link', 'top_beam', f'{CX} {CY} {CB_Z0 + CB_L:.6g}', yaw)
+    o += '  <link name="estop">\n' + inertial(*cyl_props(0.03, 0.022, 0.02)) + vprim('0 0 0', cy(0.022, 0.02), RED) + '  </link>\n'
+    o += joint('estop_fixed', 'fixed', 'top_beam', 'estop', '-0.005 0 0.022')
+    cv = ''.join(vis_mesh(f, c) for f, c in CB_VIS['carriage']) + ''.join(vis_mesh(f, c) for f, c in SHOLDER['holder']['vis'])
+    cc_ = cprim(f'{CB_PX:.6g} 0 {CB_PZ:.6g}', bx(0.006, 0.125, 0.125)) + ''.join(col_mesh(f) for f in SHOLDER['holder']['col'])
+    for sy in (1, -1):
+        cc_ += cprim(f'{CB_WX:.6g} {sy*CB_WY:.6g} {CB_PZ:.6g}', bx(CB_WDX, CB_WDY, 0.125))
+    o += '  <link name="carriage">\n' + inertial(*combine(list(CB_PROPS['carriage']) + SHOLDER['holder']['props'])) + cv + cc_ + '  </link>\n'
+    o += joint('lift', 'prismatic', 'base_link', 'carriage', f'{CX} {CY} 0.42', yaw, axis='0 0 1',
+               lim=(MH.LIFT_MIN, CB_TRAVEL, 300.0, LIFT_SPEED, 50.0, 5.0))
+    o += SCENE_XML['prototype_mono_arm']
+    return o
+
+
+SHOLDER = {k: dict(vis=[], col=[], props=[]) for k in ('holder',)}
+
+
+def _single_holder_links():
+    """mono_holder.py's holder (-> carriage), PETG, carriage frame."""
+    for f in os.listdir(VIS) + os.listdir(COL):
+        if f.startswith('mholder_'):
+            for d in (VIS, COL):
+                if os.path.exists(os.path.join(d, f)): os.remove(os.path.join(d, f))
+    MH.build_all()
+    for nm, p in MH.PARTS.items():
+        fname = 'mholder_' + nm; L_ = SHOLDER[nm]
+        V, F = mesh_m(p['solid']); write_stl(os.path.join(VIS, fname + '.stl'), V, F)
+        L_['vis'].append((fname, p['color'])); L_['props'].append(mass_props(V / MM, F, rho=RHO_PETG))
+        for k, h in enumerate(convex_pieces(p['solid'])):
+            Vc, Fc = mesh_arrays(h); fn = f'{fname}_c{k:02d}'
+            write_stl(os.path.join(COL, fn + '.stl'), Vc * MM, Fc); L_['col'].append(fn)
+
+
 import dual_holder as DH
 HOLDER = dict(vis=[], col=[], props=[])
 
@@ -524,9 +589,10 @@ def _holder_links():
 
 
 _holder_links()
+_single_holder_links()
 
 
-def _scene_cam_xml(layout):
+def _scene_cam_xml(layout, mast_T=None):
     """Scene camera (scene_cam.py): OAK-D Pro on an STS3215 pitch servo, on a mast on the carriage (two-arm: the dual
     holder's front bridge; one-arm: the ring clamp's pedestal); it moves with the lift. scene_mast (fixed to the
     carriage) -> scene_camera_pitch (revolute about y, + = tilt down, -10 .. +80 deg) -> scene_camera (origin on the
@@ -557,7 +623,12 @@ def _scene_cam_xml(layout):
     def link(name, L):
         return (f'  <link name="{name}">\n' + inertial(*combine(L['props'])) + ''.join(vis_mesh(f, c) for f, c in L['vis']) +
                 ''.join(col_mesh(f) for f in L['col']) + '  </link>\n')
-    o = link('scene_mast', mast) + joint('scene_mast_fixed', 'fixed', 'carriage', 'scene_mast', '0 0 0')
+    if mast_T is None:
+        o = link('scene_mast', mast) + joint('scene_mast_fixed', 'fixed', 'carriage', 'scene_mast', '0 0 0')
+    else:                                                    # mono holder: the mast turned onto its camera arm
+        r_, p_, y_ = rpy_from_R(mast_T[:3, :3])
+        o = link('scene_mast', mast) + joint('scene_mast_fixed', 'fixed', 'carriage', 'scene_mast', f3(mast_T[:3, 3] * MM),
+                                             f'{r_:.6g} {p_:.6g} {y_:.6g}')
     o += link('scene_camera', cam)
     ax = (SC.AX * MM, 0.0, (SC.CONTEXT['zh'] + SC.HEAD_AXIS) * MM)
     o += joint('scene_camera_pitch', 'revolute', 'scene_mast', 'scene_camera', f3(ax), axis='0 1 0',
@@ -572,7 +643,8 @@ for _f in os.listdir(VIS) + os.listdir(COL):
     if _f.startswith('scene_'):
         for _d in (VIS, COL):
             if os.path.exists(os.path.join(_d, _f)): os.remove(os.path.join(_d, _f))
-SCENE_XML = {lay: _scene_cam_xml(lay) for lay in ('prototype', 'prototype_mono_arm')}
+SCENE_XML = {lay: _scene_cam_xml(lay) for lay in ('prototype', 'prototype_mono_ring')}
+SCENE_XML['prototype_mono_arm'] = _scene_cam_xml('prototype_mono_arm', MH.MAST_T)
 _mono_links()
 MINERTIA = {k: combine(v['props']) for k, v in MLINKS.items()}
 
@@ -594,8 +666,12 @@ def _mono_body(side=False):
                                joint('left_arm_mount', 'fixed', 'carriage', 'left_base', f"0 0 {MONO['az']*MM:.6g}"))
 
 
-BODY['prototype_mono_arm'] = _mono_body()
-BODY['prototype_mono_side'] = _mono_body(side=True)      # TEST layout: column on the right side, tote along the left
+# PARKED since 2026-11-23 (the one-arm prototype is the mono holder now): the ring layouts, URDF only
+BODY['prototype_mono_ring'] = _mono_body()
+BODY['prototype_mono_ring_side'] = _mono_body(side=True)  # TEST layout (2026-11-18): column on the right side, tote along the left
+# THE one-arm prototype: mono holder (mono_holder.py); the prototype's own arm, shoulder on the centreline
+BODY['prototype_mono_arm'] = (base_xml(single=True) + arm_xml('left') +
+                              joint('left_arm_mount', 'fixed', 'carriage', 'left_base', f'{-MH.ARM_DX * MM:.6g} {MH.ARM_DY * MM:.6g} {ARM_Z}', f'0 0 {math.radians(MH.ARM_YAW):.6g}'))
 
 mats = ''.join(f'  <material name="{n}"><color rgba="{f3(k)}"/></material>\n' for k, n in MATS.items())
 xml = ('<?xml version="1.0" encoding="utf-8"?>\n'

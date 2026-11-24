@@ -46,8 +46,8 @@ CTRL_HZ = 60
 SYNC_SPEED = 0.3                       # x the joint speeds until the arm has reached the leader's pose (as teleop_sim)
 SYNC_TOL = math.radians(2)
 # leader joint, follower command name (leader_arm.JOINTS / train_pipeline/common.py), URDF joint
-MAP = [('J1', 'ring.pos', 'left_shoulder_pan'), ('J2', 'shoulder.pos', 'left_elbow_pan'),
-       ('J3', 'elbow.pos', 'left_wrist_pan'), ('wrist_pitch', 'wrist_pitch.pos', 'left_wrist_pitch'),
+MAP = [('J1', 'shoulder.pos', 'left_shoulder_pan'), ('J2', 'elbow.pos', 'left_elbow_pan'),
+       ('J3', 'wrist_pan.pos', 'left_wrist_pan'), ('wrist_pitch', 'wrist_pitch.pos', 'left_wrist_pitch'),
        ('wrist_roll', 'wrist_roll.pos', 'left_wrist_roll')]
 JAWS = ('left_finger_right', 'left_finger_left')          # gripper.pos = both jaws together: each gets half
 

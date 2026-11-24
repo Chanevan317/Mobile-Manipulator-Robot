@@ -96,7 +96,7 @@ if DUMMY:
 ARM = [(k, u) for k, (n, u) in enumerate(C.JOINTS) if n != 'lift.pos']   # (index in the 7-vector, URDF joint(s))
 ARM_IDX = [task.idx[u] for _, u in ARM if isinstance(u, str)]           # the 5 arm joints (not the fingers)
 LI = task.idx['lift']
-LIFT_RANGE = (0.0, K.LIFT_MAX['prototype_mono_arm'])
+LIFT_RANGE = K.LIMITS['lift']                           # (0, 0.871) on the mono holder robot
 LIFT_V = 0.10 * 0.9                                     # m/s, the URDF lift speed with drives.rate_limit's margin
 SYNC_SPEED = 0.3                                        # the slow move to the leader's pose: this x the joint speeds
 SYNC_TOL = math.radians(2)

@@ -6,6 +6,11 @@ Run with ROS 2 sourced and conda deactivated (do NOT run display.launch.py at th
     python3 scripts/ros/ros_joint_check.py                  # prototype layout
 """
 import math, os, signal, subprocess, tempfile, time, xml.etree.ElementTree as ET
+# own ROS domain, this machine only (2026-11-23): another ROS 2 stack on the network (Nav2, its own robot_state_publisher
+# on domain 0) published /tf frames with the same names, and the check read ITS left_tcp. Set before rclpy and the
+# robot_state_publisher subprocess start; a domain already chosen by the caller is kept.
+os.environ.setdefault('ROS_DOMAIN_ID', '87')
+os.environ['ROS_AUTOMATIC_DISCOVERY_RANGE'] = 'LOCALHOST'
 import yaml
 import rclpy
 from rclpy.node import Node
@@ -45,12 +50,26 @@ def lim(n):
     l = joints[n].find('limit'); return float(l.get('lower')), float(l.get('upper'))
 
 def pos(q, frame):
+    """Publish q, then read the frame from a TF at least as new as the first q message (robot_state_publisher stamps its
+    TF with the joint_states stamp). A fixed wait read the PREVIOUS pose when the machine was busy (2026-11-23)."""
     msg = JointState(); msg.name = movable; msg.position = [q.get(n, 0.0) for n in movable]
-    for _ in range(40):
-        msg.header.stamp = node.get_clock().now().to_msg(); pub.publish(msg)
+    t0 = last = None
+    for k in range(500):                                  # up to ~10 s
+        now = node.get_clock().now()
+        t0 = t0 or now
+        msg.header.stamp = now.to_msg(); pub.publish(msg)
         rclpy.spin_once(node, timeout_sec=0.02)
-    t = buf.lookup_transform('base_link', frame, rclpy.time.Time()).transform.translation
-    return (t.x, t.y, t.z)
+        if k >= 5:
+            try:
+                tf = buf.lookup_transform('base_link', frame, rclpy.time.Time())
+            except Exception:
+                continue
+            if rclpy.time.Time.from_msg(tf.header.stamp) >= t0:
+                t = tf.transform.translation; p = (t.x, t.y, t.z)
+                if last is not None and math.dist(p, last) < 1e-6:   # two fresh readings agree (the first one after
+                    return p                                         # start-up was sometimes 31 mm off)
+                last = p
+    raise RuntimeError(f'no fresh TF for {frame}')
 
 fails = []
 def check(label, ok, detail):

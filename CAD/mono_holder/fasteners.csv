@@ -1,0 +1,4 @@
+kind,size,length_mm,qty,where
+insert,M3,8,4,scene camera mast flange (pocket floor)
+SHCS,M5,20,4,"arm base (01 + 02) to the pad, from below into its M5 x 8 inserts"
+SHCS+nyloc,M5,25,4,legs to the gantry plate (its 5.2 mm holes at y +-50)

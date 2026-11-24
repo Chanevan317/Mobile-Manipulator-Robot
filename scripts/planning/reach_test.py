@@ -14,7 +14,7 @@ Collision shapes are the URDF collision meshes, so the result matches Isaac Sim'
 Run from the package folder with a Python that has numpy + manifold3d (env_isaaclab):
     python scripts/planning/reach_test.py                                   # prototype, tables 0.45/0.60/0.75/0.90, shelves 0.30/0.70/1.10
     python scripts/planning/reach_test.py --tables 0.75 --shelves "" --step 0.02
-    python scripts/planning/reach_test.py --layout prototype_mono_arm         # the one-arm experiment (shoulder ring around the column)
+    python scripts/planning/reach_test.py --layout prototype_mono_arm         # the one-arm prototype (mono holder); prototype_mono_ring = the parked ring robot
 The tote behind the column is tested too (hand down, TCP 20 mm over its floor); --no_tote skips it.
 Writes reach_test_<layout>.csv and reach_test_<layout>.png next to the package (or --out PREFIX).
 """
@@ -25,7 +25,7 @@ here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(here, '..', 'common')); import repo_paths as RP   # every script folder + repo paths
 pkg = RP.PKG
 ap = argparse.ArgumentParser()
-ap.add_argument('--layout', default='prototype', choices=('prototype', 'prototype_mono_arm'))
+ap.add_argument('--layout', default='prototype', choices=('prototype', 'prototype_mono_arm', 'prototype_mono_ring'))
 ap.add_argument('--tables', default='0.45,0.60,0.75,0.90', help='table heights (m), comma separated; "" for none')
 ap.add_argument('--shelves', default='0.30,0.70,1.10', help='shelf board heights (m); "" for none')
 ap.add_argument('--edge', type=float, default=0.30, help='table front edge, m in front of the base centre')
@@ -46,6 +46,11 @@ import scara_ik as K                              # noqa: E402
 K.use(args.layout)
 SIDES = list(K.SHOULDER)                          # ['left', 'right'], or ['left'] for the mono-arm experiment
 TOTE = dict(x=(-0.238, 0.098), y=0.233, floor=0.263)   # tote interior / floor top in base_link (urdf_build lift_prototype)
+if args.layout == 'prototype_mono_arm':          # mono holder: its own L-shaped base tote, mono_holder.base_tote()
+    import mono_holder as _MH
+    _t = _MH.base_tote(); _w = _t['wall']
+    TOTE = dict(x=(_t['x'][0] + _w, _t['x'][1] - _w), y=max(abs(_t['y'][0]), _t['y'][1]) - _w, floor=_t['z'][0] + _w,
+                inside=lambda x, y: _MH.in_tote(_t, x, y))
 D = math.radians
 ARM = ['upper_arm', 'forearm', 'wrist', 'tilt', 'hand', 'finger_right', 'finger_left']
 PARK = dict(shoulder_pan=D(45), elbow_pan=0.0, wrist_pan=0.0, wrist_pitch=0.0, wrist_roll=0.0)
@@ -137,7 +142,8 @@ if __name__ == '__main__':
     XS['tote'] = np.arange(TOTE['x'][0] + args.step / 2, TOTE['x'][1], args.step)
     YS = {'table': ys, 'shelf': ys, 'tote': ys[np.abs(ys) <= TOTE['y']]}
     cases = [('table', h) for h in tables] + [('shelf', h) for h in shelves] + ([] if args.no_tote else [('tote', TOTE['floor'])])
-    jobs = [(s, k, h, float(x), float(y)) for k, h in cases for s in SIDES for x in XS[k] for y in YS[k]]
+    INSIDE = TOTE.get('inside', lambda x, y: True)
+    jobs = [(s, k, h, float(x), float(y)) for k, h in cases for s in SIDES for x in XS[k] for y in YS[k] if k != 'tote' or INSIDE(x, y)]
     t0 = time.time()
     print(f'reach test, layout {args.layout}: {len(cases)} cases, {len(jobs)} checks on {args.jobs} processes', flush=True)
     with Pool(args.jobs, initializer=init) as p:
@@ -162,7 +168,8 @@ if __name__ == '__main__':
         def width_at(d):
             i = int(np.argmin(np.abs(xs - (edge_of(k) + d)))); return E[i].sum() * args.step if abs(xs[i] - edge_of(k) - d) < args.step else 0.0
         if k == 'tote':
-            print(f'{k:8s} {h:6.2f} | {E.sum()*cell:9.3f} m2 {B.sum()*cell:5.3f} m2 | {100*E.mean():.0f} % of the tote floor reachable')
+            M = np.array([[INSIDE(x, y) for y in yk] for x in xs])
+            print(f'{k:8s} {h:6.2f} | {E.sum()*cell:9.3f} m2 {B.sum()*cell:5.3f} m2 | {100*E.sum()/max(1, M.sum()):.0f} % of the tote floor reachable')
             continue
         print(f'{k:8s} {h:6.2f} | {E.sum()*cell:9.3f} m2 {B.sum()*cell:5.3f} m2 | {deep:15.2f} m {width_at(0.10):14.2f} m {width_at(0.20):14.2f} m')
     try:

@@ -24,7 +24,7 @@ import argparse, os, sys, tempfile
 ap = argparse.ArgumentParser()
 here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(here, '..', 'common')); import repo_paths as RP   # every script folder + repo paths
-ap.add_argument('--layout', default='both', choices=('both', 'prototype', 'prototype_mono_arm'))
+ap.add_argument('--layout', default='both', choices=('both', 'prototype', 'prototype_mono_arm', 'prototype_mono_ring'))
 ap.add_argument('--paused', action='store_true')
 ap.add_argument('--fix_base', action='store_true')
 ap.add_argument('--self_collision', action='store_true')
