@@ -1,17 +1,25 @@
 # Scene camera mount
 
-A **Luxonis OAK-D Pro W (OV9782, 127° × 80°)** on a **Feetech STS3215 7.4 V** pitch servo, on a printed mast standing on the **carriage**
+An **Orbbec Gemini 2** (colour 86° × 55°, depth 91° × 66°, active stereo) on a **Feetech STS3215 7.4 V** pitch servo, on a printed mast standing on the **carriage**
 in front of the C-Beam. It rides up and down with the arms (as the old scene camera did) and tilts to look ahead or
 down at the work. Fits both robots: on the two-arm robot the mast bolts to the dual holder's front bridge, on the
-one-arm robot to the mono holder's bar over the arm (turned 90° so the camera looks forward, its tilt axis straight
-above the arm's shoulder), on a short 98 mm mast (C02). Both put the lens 0.33 m over the carriage.
+one-arm robot to the mono holder's bar over the arm (turned 90° so the camera looks forward, its tilt axis **60 mm
+behind and 15 mm left of the shoulder**: further back the camera sees more of the work), on a short 103 mm mast (C02).
+Both put the lens 0.33 m over the carriage.
+
+**Camera since 2026-11-24: Orbbec Gemini 2** (the OAK-D Pro W it was designed for was sold out in India; the Gemini 2
+bought for the reBot arm is reused, held by 2 screws so it can move between the robots). Its USB-C port is in the
+camera's **right end** (seen from behind), which faces the lift column. So the head is mirrored compared with the
+OAK-D version: the **servo is on the camera's left end**, the **pivot arm on the right end, 40 mm out**, leaving room
+for the USB plug and for the cable to turn back. The cable runs through a slot in the cradle's back plate and is held
+by a cable tie on a bridge behind it, so it moves with the camera and never pulls on the port.
 
 ![scene camera mount](preview_scene_cam.png)
 
-Made by `mobile_manipulator_description/generator/scene_cam.py`. The camera shape comes from Luxonis' own STEP files
-([OAK-D Pro, depthai-hardware repo](https://github.com/luxonis/depthai-hardware/tree/master/DM9098_OAK-D-Pro/3D_Models));
-a mesh of it is in `generator/oakd/`. The mount was drawn for the OAK-D Pro AF; the Pro W is the same DM9098 board in the
-same housing (back M4 pair 75 mm apart, USB-C underneath), so it fits unchanged. Check the M4 spacing on your unit.
+Made by `mobile_manipulator_description/generator/scene_cam.py` (`CAMERA = 'gemini2'`; `MM_SCENE_HW=oakd` builds the
+OAK-D version). The Gemini 2's dimensions come from Orbbec's drawing and STEP model ([CAD download page, "Gemini 2 &
+Gemini 335", V2.0](https://doc.orbbec.com/documentation/Orbbec%20Gemini%20330%20Series%20Documentation/Download%20CAD%20Files%20(Gemini%20330%20Series))).
+Check the M3 hole spacing (45 mm) and the USB-C end on the real camera before printing the cradle.
 
 ## Swappable parts
 
@@ -20,12 +28,12 @@ the part below, on a 28 × 34 mm pattern. So a different set-up is one replaceme
 
 | # | File | What | Swap it to… |
 |---|---|---|---|
-| C01 | `C01_mast_240.stl` | two-arm robot: 36 × 26 hollow mast, 3 mm walls (cables inside), 240 mm flange to flange | **change the height**: the lens sits at **mount + L + 67 mm** over the carriage origin. Two-arm: 0.33 m with L 240 (L 190 → 0.28 m, L 290 → 0.38 m) |
-| C02 | `C02_mast_98_mono.stl` | one-arm robot: the same, 98 mm (it stands on the mono holder's bar, 165 mm over the plate top) | one-arm: 0.33 m with L 98 |
-| C03 | `C03_mast_173_mono_ring_parked.stl` | only for the PARKED ring robot: the same, 173 mm. Not needed now | — |
+| C01 | `C01_mast_244.stl` | two-arm robot: 36 × 26 hollow mast, 3 mm walls (cables inside), 244 mm flange to flange | **change the height**: the lens sits at **mount + L + 62 mm** over the carriage origin. Two-arm: 0.33 m with L 244 (L 194 → 0.28 m, L 294 → 0.38 m) |
+| C02 | `C02_mast_103_mono.stl` | one-arm robot: the same, 103 mm (it stands on the mono holder's bar, 165 mm over the plate top) | one-arm: 0.33 m with L 103 |
+| C03 | `C03_mast_178_mono_ring_parked.stl` | only for the PARKED ring robot: the same, 178 mm. Not needed now | — |
 | C04 | `C04_head.stl` | flange, crossbar reaching 23 mm forward, the servo's cradle (output face toward the camera, body hanging down) and the pivot upright | a forward offset or a different tilt mechanism: a new head |
 | C05 | `C05_servo_strap.stl` | holds the servo in the head (2 case screws on its idler face + 2 M2 into the head) | — |
-| C06 | `C06_camera_cradle.stl` | holds the camera by its two back M4 holes on 3 mm standoffs (the cooling fins stay open); one arm on the servo horn (4 × M3), the other on an M5 pivot bolt; the bottom (USB-C plug) left open | another camera: a new cradle |
+| C06 | `C06_camera_cradle.stl` | holds the camera by its two back M3 holes on 2 mm standoffs (the cooling fins stay open); one arm on the servo horn (4 × M3), the other on an M5 pivot bolt 40 mm past the USB end; a slot for the cable and a cable-tie bridge on the back | another camera: a new cradle |
 
 The mounts are part of the robot's own prints (re-exported with this change):
 - two-arm: `../dual_holder/D01 / D02`: a 2 mm pocket across the front bridge top for the flange, 4 inserts in its floor;
@@ -51,7 +59,7 @@ The arm sweep against the bigger mast found no new contacts: the same 91 of 396 
 The camera moves with the lift, so the lift height for each job was taken from where the arm works (hand down 0.12 m
 over a table item, hand level 35 mm over a shelf board), and the camera's height **above the carriage** was varied.
 Coverage of the OAK-D Pro AF (colour camera 69° × 55°, depth minimum 0.35 m, ideal 0.7–3 m) at the best tilt (this study was
-made for the AF; the Pro W's 127° × 80° sees more at every height, so the height stays):
+made for the AF; the Gemini 2's colour camera, 86° × 55°, is wider, and its depth works from 0.15 m, so the height stays):
 
 | Camera over the carriage origin | Tables 0.45–0.90 m: seen / in the ideal depth range | Shelves 0.30–1.10 m seen | Floor 0.6–3 m (lift 0.2) |
 |---|---|---|---|
@@ -65,15 +73,15 @@ ideal depth range at any height. Moving the camera further forward (0.14 m) lowe
 does the rest: about 0° for driving, 40–45° for the floor ahead, 50–60° for tables, 15–35° for shelves.
 Range −10° (looking slightly up) to +80° (down).
 
-## Camera facts used (from Luxonis' STEP file and datasheet)
+## Camera facts used (Orbbec Gemini 2: datasheet v1.1, drawing V2.0 20241107, STEP model)
 
 | | |
 |---|---|
-| Size, weight | 97 × 29.7 × 23.4 mm (with the front bezel), 91 g |
-| Mounting | 2 × M4 on the back, 75 mm apart (VESA 75), on two flat pads in the cooling fins; 1/4"-20 tripod thread in the bottom near the left end (not used) |
-| USB-C | in the **bottom**, 13.5 mm right of the centre: the plug and cable leave downward (the cradle leaves it open). Tilted down, the plug swings back toward the beam: the tilt axis sits 23 mm in front of the mast so a straight plug with its strain relief (28 mm) clears the beam at 80° |
-| Power | 4–7.5 W; the IR dot projector and flood LED need Luxonis' USB Y-adapter for extra power |
-| Lenses | stereo pair 75 mm apart, colour camera in the middle, 4.8 mm above the body's centre line |
+| Size, weight | 89.46 × 25 × 30 mm, rounded ends; 97 g; under 2 W on average (7 W peak) over the USB-C cable |
+| Mounting | 2 × M3 on the back (the finned face), **45 mm apart** on the centre line, **max 3 mm deep**; 1/4"-20 in the bottom (max 5 mm, not used) |
+| USB-C | in the camera's **right end** seen from behind (the end away from the colour lens), centred; 2 × M2 cable-lock threads 15 mm apart (max 3 mm). The 8-pin sync port is in the other end (not used) |
+| Lenses | IR pair ±25 mm (50 mm baseline), colour camera 11 mm left of centre (seen from behind), IR projector at the centre; all on the body's centre line |
+| Views | colour 86° × 55° (16:9, 1920 × 1080, rolling shutter); depth 91° × 66°, active stereo IR, 0.15–10 m (best 0.2–5 m), aligned to colour on the camera |
 
 ## Assembly
 
@@ -82,21 +90,25 @@ Range −10° (looking slightly up) to +80° (down).
 2. Mast on its mount (two-arm: into the holder's pocket): 4 × M3 × 10 (heads sunk 3.2 mm in the flange; a ball-end key
    reaches them past the top flange).
 3. Head on the mast: 4 × M3 × 14 through the access holes in the crossbar.
-4. Camera onto the cradle: 2 × M4 × 12 through the back plate into the camera's back holes (about 5 mm of thread).
+4. Camera onto the cradle: 2 × M3 × 8 through the back plate and standoffs into the camera's back holes (2 mm of
+   thread: the holes are only 3 mm deep, so don't use longer screws).
 5. Servo into the head's cradle, output face toward the middle; strap on its back (2 × M2 × 6 case screws + 2 × M2 × 6
    into the head).
 6. Cradle onto the servo horn (4 × M3 × 8), the other arm on the pivot: M5 × 16 through the upright into the arm's
    insert, with a washer (the bolt turns in the upright).
-7. USB and servo cables into the window at the top of the mast's front face, down inside it and out of the opening at
-   its bottom (-y side). The window and the cavity (30 × 20 mm) pass the USB-C plug.
+7. USB cable: plug into the camera's right end, turn the cable back through the slot in the cradle's back plate, down
+   the back, and tie it to the bridge there (one cable tie). Leave a loose loop down to the mast so the camera can tilt
+   from −10° to +80°. Then the USB and servo cables into the window at the top of the mast's front face, down inside it
+   and out of the opening at its bottom.
 
 ## Checked (`generator/scene_cam.py` and the robot model)
 
 - No clashes between the parts, nor with the beam / end mounts (at any lift), the kit's gantry plate and V-wheels, the
   dual holder and both arm bases, the mono holder, its arm base and the base tote, or the (parked) ring's fixed parts; the ring's rotor and cable tray turn all the way round
   past the pedestal.
-- Tilt: free from −40° to +120° (the range used is −10° to +80°), including the USB-C plug under the camera.
-- Lens 0.330 m over the carriage origin, 80 mm in front of the column axis (both robots).
+- Tilt: free from −40° to +120° (the range used is −10° to +80°), including the USB plug and the cable down to its tie.
+- Lens 0.330 m over the carriage origin. One-arm robot: the whole tilt sweep also clears the lift's top end mount at
+  full lift, the holder and the arm base (`mono_holder.py` check).
 - Arms (500 random poses each, lift 0.1–0.7): every pose where an arm touches the new mast or camera was already
   blocked by the carriage, column or its own base, so the mast takes away no reach (the old post: 20 such poses on the
   two-arm robot, the new one 26, all blocked anyway; one-arm 0 / 1).

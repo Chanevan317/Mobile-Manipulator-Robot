@@ -1,5 +1,7 @@
-"""Scene camera (user 2026-11-13; camera = OAK-D Pro W OV9782 since 2026-11-19, the same DM9098 board and housing
-as the OAK-D Pro AF it was drawn for): a Luxonis OAK-D Pro on a pitch servo (Feetech STS3215 7.4 V), riding on the
+"""Scene camera (user 2026-11-13). Camera since 2026-11-24: ORBBEC GEMINI 2 (user: the OAK-D Pro W was sold out in India;
+"we ordered orbbec gemini2 for reBot arm ... reuse it for the scene"; "the camera normally mounted and create a mount or support
+for cable"); before: OAK-D Pro W OV9782 (2026-11-19) / OAK-D Pro AF (drawn for). `CAMERA` picks the set (CAMS). On a pitch
+servo (Feetech STS3215 7.4 V), riding on the
 CARRIAGE (it moves up and down with the arms, as the old scene camera did), in front of the column. Built from
 SWAPPABLE printed parts joined by the same flange, so a different height (or later a forward offset) is one
 replacement part.
@@ -19,8 +21,16 @@ dual_holder.py and mono_ring.py).
                   arm on the servo horn (4 x M3), the other on an M5 pivot bolt; the bottom (USB-C plug) left open
 FLANGE: 40 (x) x 44 (y) x 6, 4 x M3 from above into M3 x 8 inserts in the part below, on (MX +-14, +-17); x 22..62:
 clear of the beam and of the lift's top end mount (both x <= 20).
-Camera (from Luxonis' STEP, generator/oakd/): 97 x 29.7 x 23.4 with the bezel, lenses 4.8 mm above the body centre,
-back M4 pair 75 mm apart, USB-C in the bottom 13.5 mm right of centre, tripod 1/4-20 in the bottom near the left end.
+Cameras (CAMS):
+  gemini2  Orbbec Gemini 2 (G20155; Orbbec CAD package Gemini2&Gemini335_CAD_Files_V2.0: drawing 20241107 + STEP, mesh in
+           generator/gemini2/): 89.46 x 25 x 30, 97 g; back 2 x M3 45 mm apart on the centre line, MAX 3 mm deep; 1/4-20 in
+           the bottom (max 5 mm); USB-C in the camera's RIGHT end (seen from behind; the end away from the colour lens),
+           centred, 2 x M2 cable-lock threads 15 mm apart (max 3 mm); colour lens 11 mm LEFT of centre, IR pair +-25, the IR
+           projector at the centre. Colour 86 x 55 deg (16:9, rolling shutter), depth 91 x 66 deg (active stereo, 0.15-10 m).
+           Mounted upright (user): the USB end faces the lift column, so the SERVO sits on the camera's LEFT end and the
+           pivot arm on the right end PLUG_CLR beyond the end face, with the cable led back through the cradle (CABLE).
+  oakd     Luxonis OAK-D Pro (W): 97 x 29.7 x 23.4 with the bezel, lenses 4.8 mm above the body centre, back M4 pair 75 mm
+           apart, USB-C in the bottom 13.5 mm right of centre (servo on the right, pivot on the left).
 
     python3 scene_cam.py [out_dir]     checks + export (default ../../CAD/scene_cam)
 """
@@ -44,23 +54,41 @@ CABLE_WIN = dict(wy=16.0, h=14.0)             # cable window in the front face u
 # mount face + mast length per layout: dual holder bridge pocket (dual_holder.CAM_Z); one-arm robot since 2026-11-23 = the
 # mono holder's camera arm pocket (same face height, same 240 mast, turned 90 deg: mono_holder.MAST_T); the parked
 # mono ring layout = a pedestal on its clamp (173 mast)
-MOUNT = {'prototype': dict(z=23.5, L=240.0), 'prototype_mono_ring': dict(z=90.0, L=173.0),
+MOUNT = {'prototype': dict(z=23.5), 'prototype_mono_ring': dict(z=90.0),
          # mono holder (2026-11-24): on the bar over the arm (mono_holder.CAM_Z 165), lens again ~0.330 over the carriage
-         'prototype_mono_arm': dict(z=165.0, L=98.0)}
+         'prototype_mono_arm': dict(z=165.0)}
 AX = MX + 23.0                                # tilt axis x: 23 mm in front of the mast (the USB-C plug clears the beam at 80 deg)
 HEAD_AXIS = 62.0                              # head flange face -> tilt axis (the USB-C plug under the camera clears the crossbar)
 LENS_DZ = 330.0                               # lens over the carriage origin (study: 0.30-0.35 best, scene_cam README)
-# camera (camera frame C: origin at the body centre, x forward along the lenses, y left, z up)
-CAM = dict(x=(-11.68, 11.68), y=(-48.55, 48.55), z=(-14.86, 14.86), lens=(11.7, 0.0, 4.8), vesa=[(-37.5, -0.8), (37.5, -0.8)],
-           usb=dict(y=13.5, x=4.7), axis_x=-3.0)
-STANDOFF, BACK_T = 3.0, 4.0
+# cameras (camera frame C: origin at the body centre, x forward along the lenses, y left, z up). servo: the end of the
+# camera the pitch servo is on (+1 = camera left, -1 = right); plug_clr: room between the pivot-side end face and the
+# pivot arm (the Gemini's USB plug + its cable turning back); holes: back mounting threads (y, z), size, max depth
+CAMS = {
+    'oakd': dict(name='Luxonis OAK-D Pro W (OV9782)', x=(-11.68, 11.68), y=(-48.55, 48.55), z=(-14.86, 14.86), front=11.68,
+                 lens=(11.7, 0.0, 4.8), holes=[(-37.5, -0.8), (37.5, -0.8)], hole='M4', hole_depth=5.0, standoff=3.0,
+                 usb=dict(kind='bottom', y=13.5, x=4.7), axis_x=-3.0, servo=-1, plug_clr=0.0, mass=0.091,
+                 mesh=('oakd', 'oakd_pro_enclosure.stl'), r_end=0.0),
+    'gemini2': dict(name='Orbbec Gemini 2', x=(-15.1, 15.1), y=(-44.73, 44.73), z=(-12.5, 12.5), front=15.1,
+                    lens=(15.1, 11.0, 0.0), holes=[(-22.5, 0.0), (22.5, 0.0)], hole='M3', hole_depth=3.0, standoff=2.0,
+                    usb=dict(kind='end', side=-1, x=1.1, z=0.0, plug=(10.0, 22.0, 26.0)), axis_x=-3.0, servo=1,
+                    plug_clr=40.0, mass=0.097, mesh=None, r_end=12.5),
+}
+CAMERA = os.environ.get('MM_SCENE_HW', 'gemini2')
+CAM = CAMS[CAMERA]
+SS = CAM['servo']                             # servo side: +1 = +y (camera left)
+STANDOFF, BACK_T = CAM['standoff'], 4.0
 ARM_T, ARM_GAP = 6.0, 1.0
 ARM_TP = 8.0                                  # the pivot-side arm (room for the M5 x 6 insert)
 PITCH = (-10.0, 80.0)                         # deg, + = tip down (as the arm's wrist pitch)
-# the servo: output face toward +y (the camera), body hanging down (servo -x = down)
-HORN_Y = -(CAM['y'][1] + ARM_GAP + ARM_T)     # horn face y = the horn-side arm's outer face (-55.55)
-SRV_Y = HORN_Y - OUT_FACE                     # servo origin y
-PIVOT_Y = CAM['y'][1] + ARM_GAP               # the idler-side arm's inner face (+49.55)
+# the servo: output face toward the camera, body hanging down (servo -x = down); SS = the side it is on
+HALF_Y = CAM['y'][1]
+HORN_Y = SS * (HALF_Y + ARM_GAP + ARM_T)      # horn face y = the horn-side arm's outer face (OAK-D: -55.55)
+SRV_Y = HORN_Y + SS * OUT_FACE                # servo origin y
+PIVOT_Y = -SS * (HALF_Y + ARM_GAP + CAM['plug_clr'])   # the idler-side arm's inner face (OAK-D: +49.55)
+LIP = lambda a, b: (min(a, b), max(a, b))
+
+for _m in MOUNT.values():                     # mast length: the lens LENS_DZ over the carriage origin (OAK-D: 240 / 173 / 98)
+    _m['L'] = float(round(LENS_DZ - _m['z'] - HEAD_AXIS - CAM['lens'][2]))
 
 PARTS, CONTEXT = {}, {}
 
@@ -111,8 +139,8 @@ def head_frame(z_head):
 
 
 def servo_frame(z_head):
-    """STS3215: servo z = -y (output face toward +y), servo x = +z (body hangs down along servo -x), origin on the axis."""
-    return T(AX, SRV_Y, z_head + HEAD_AXIS) @ basis((0, 0, 1), (-1, 0, 0), (0, -1, 0))
+    """STS3215: servo z = SS * y (output face toward the camera), servo x = +z (body hangs down along servo -x), origin on the axis."""
+    return T(AX, SRV_Y, z_head + HEAD_AXIS) @ basis((0, 0, 1), (SS, 0, 0), (0, SS, 0))
 
 
 # ------------------------------------------------------------------ parts
@@ -146,70 +174,107 @@ def head(zh):
     flange_screws(zh + FL['t'], r, 'head to the mast (into its inserts)')
     za = zh + HEAD_AXIS
     Fs = servo_frame(zh)
-    bar = box(MX - 14.0, AX + 14.8, SRV_Y - RIM - 4.0, PIVOT_Y + ARM_TP + 9.0, zh + FL['t'] - 0.01, zh + FL['t'] + 10.0)
+    bar = box(MX - 14.0, AX + 14.8, *LIP(SRV_Y + SS * (RIM + 4.0), PIVOT_Y - SS * (ARM_TP + 9.0)), zh + FL['t'] - 0.01, zh + FL['t'] + 10.0)
     # servo cradle: walls round the case (servo y +-12.4 -> world x; servo x -35.2 .. 10.2 -> world z), open toward +y
     # (the horn) with lips over the output-face rim corners, a floor under its rear end, a strap on the idler face
     W = 2.4
-    yi, yo = SRV_Y - RIM, SRV_Y + RIM                          # idler face (outer), output face rim (inner)
-    walls = box(AX - 12.4 - W, AX + 12.4 + W, yi, yo + 2.0, min(za - 35.2 - W, zh + FL['t'] + 9.99), za + 10.2 + W)
-    pocket = box(AX - 12.45, AX + 12.45, yi - 1, yo + 0.01, za - 35.25, za + 10.25)
-    horn_win = box(AX - 10.4, AX + 10.4, yo - 0.01, yo + 3.0, za - 35.3, za + 10.3)        # lips stay at |x| > 10.4
-    up = box(AX - 10.0, AX + 10.0, PIVOT_Y + ARM_TP + 1.0, PIVOT_Y + ARM_TP + 9.0, zh + FL['t'], za + 14.0)  # pivot upright
-    s = union([f, bar, walls, up, xf(along(cyl(14.0, PIVOT_Y + ARM_TP + 1.0, PIVOT_Y + ARM_TP + 9.0), 'y'), T(AX, 0, za))])
-    cut = fcut + [pocket, horn_win, xf(along(cyl(2.65, PIVOT_Y, PIVOT_Y + ARM_TP + 12.0, hole=True), 'y'), T(AX, 0, za)),     # M5 pivot (5.3)
-                  box(AX - 6.0, AX + 6.0, yi - 1, yi + 6.0, za - 30.0, za - 10.0)]          # servo cable out of the strap side
+    yi, yo = SRV_Y + SS * RIM, SRV_Y - SS * RIM                # idler face (outer), output face rim (inner, toward the camera)
+    walls = box(AX - 12.4 - W, AX + 12.4 + W, *LIP(yi, yo - SS * 2.0), min(za - 35.2 - W, zh + FL['t'] + 9.99), za + 10.2 + W)
+    pocket = box(AX - 12.45, AX + 12.45, *LIP(yi + SS * 1.0, yo - SS * 0.01), za - 35.25, za + 10.25)
+    horn_win = box(AX - 10.4, AX + 10.4, *LIP(yo + SS * 0.01, yo - SS * 3.0), za - 35.3, za + 10.3)        # lips stay at |x| > 10.4
+    pu = LIP(PIVOT_Y - SS * (ARM_TP + 1.0), PIVOT_Y - SS * (ARM_TP + 9.0))
+    up = box(AX - 10.0, AX + 10.0, *pu, zh + FL['t'], za + 14.0)                              # pivot upright
+    s = union([f, bar, walls, up, xf(along(cyl(14.0, *pu), 'y'), T(AX, 0, za))])
+    cut = fcut + [pocket, horn_win, xf(along(cyl(2.65, *LIP(PIVOT_Y, PIVOT_Y - SS * (ARM_TP + 12.0)), hole=True), 'y'), T(AX, 0, za)),     # M5 pivot (5.3)
+                  box(AX - 6.0, AX + 6.0, *LIP(yi + SS * 1.0, yi - SS * 6.0), za - 30.0, za - 10.0)]          # servo cable out of the strap side
     # strap across the idler face at the case screws (SO-100 idler pattern (-29, +-10.25)), M2 into the walls
     sr = Reg(); zs = za - 29.0
-    strap = box(AX - 21.0, AX + 21.0, yi - 3.0, yi, zs - 5.0, zs + 5.0)
+    strap = box(AX - 21.0, AX + 21.0, *LIP(yi + SS * 3.0, yi), zs - 5.0, zs + 5.0)
     sc = []
     for (xc, yc) in SO100['idler']:
         pc = Fs @ np.array([xc, yc, RIM + 2.0, 1.0])
-        sc.append(case_screw(tuple(pc[:3]), (0, 1, 0), sr, 'servo case (idler face)', cb=1.0))
+        sc.append(case_screw(tuple(pc[:3]), (0, -SS, 0), sr, 'servo case (idler face)', cb=1.0))
     for sx in (-1, 1):
-        p = (AX + sx * 17.6, yi - 3.0, zs)
-        sc.append(screw_cut(p, (0, 1, 0), 'M2', 3.0 + 3.0, cb=0.0)); sr.add('SHCS', 'M2', p, (0, 1, 0), 6, 'strap to cradle')
-        cut.append(insert_cut((AX + sx * 17.6, yi, zs), (0, 1, 0), 'M2', length=4)); r.add('insert', 'M2', (AX + sx * 17.6, yi, zs), (0, 1, 0), 4, 'strap')
-    r.add('SHCS', 'M5', (AX, PIVOT_Y + ARM_TP + 9.0, za), (0, -1, 0), 16, 'pivot bolt (into the cradle arm insert; turns in the upright: washer)')
+        p = (AX + sx * 17.6, yi + SS * 3.0, zs)
+        sc.append(screw_cut(p, (0, -SS, 0), 'M2', 3.0 + 3.0, cb=0.0)); sr.add('SHCS', 'M2', p, (0, -SS, 0), 6, 'strap to cradle')
+        cut.append(insert_cut((AX + sx * 17.6, yi, zs), (0, -SS, 0), 'M2', length=4)); r.add('insert', 'M2', (AX + sx * 17.6, yi, zs), (0, -SS, 0), 4, 'strap')
+    r.add('SHCS', 'M5', (AX, PIVOT_Y - SS * (ARM_TP + 9.0), za), (0, SS, 0), 16, 'pivot bolt (into the cradle arm insert; turns in the upright: washer)')
     add('head', s - union(cut), (0.55, 0.57, 0.60), r, 'flange + crossbar + STS3215 cradle (output toward the camera) + pivot upright; prints flange down')
     add('servo_strap', strap - union(sc), (0.55, 0.57, 0.60), sr, 'holds the pitch servo in the head; prints flat')
     CONTEXT['servo'] = xf(SERVO, Fs)
 
 
+CABLE = dict(d=5.0, bend=6.0, tie=dict(w=5.0, h=2.0))   # USB cable (Gemini 2: its USB-C plug, then turned back behind the
+                                                          # camera, through the cradle's back plate, tied to it)
+
+
+def _cable_y():
+    """y of the cable's run back from the end plug (between the camera end and the pivot arm)."""
+    u = CAM['usb']
+    return u['side'] * (HALF_Y + u['plug'][2] + CABLE['bend'])
+
+
 def cradle(zh):
-    """Camera frame C (origin body centre, at zero pitch: x forward, y left, z up); the axis sits at C (axis_x, 0, 0)."""
+    """Camera frame C (origin body centre, at zero pitch: x forward, y left, z up); the axis sits at C (axis_x, 0, 0).
+    Horn arm on the SS side (outer face = the horn face HORN_Y), pivot arm on the other (inner face PIVOT_Y)."""
     r = Reg(); C = CAM
     bx0 = C['x'][0] - STANDOFF - BACK_T
-    back = box(bx0, C['x'][0] - STANDOFF, C['y'][0] - ARM_GAP - ARM_T, C['y'][1] + ARM_GAP + ARM_TP, C['z'][0], C['z'][1])
-    offs = [xf(along(cyl(4.5, C['x'][0] - STANDOFF - 0.01, C['x'][0]), 'x'), T(0, y, z)) for (y, z) in C['vesa']]
+    piv_out = PIVOT_Y - SS * ARM_TP
+    back = box(bx0, C['x'][0] - STANDOFF, *LIP(HORN_Y, piv_out), C['z'][0], C['z'][1])
+    offs = [xf(along(cyl(4.5, C['x'][0] - STANDOFF - 0.01, C['x'][0]), 'x'), T(0, y, z)) for (y, z) in C['holes']]
     arms = []
-    for sy in (-1, 1):
-        y0, y1 = (C['y'][1] + ARM_GAP, C['y'][1] + ARM_GAP + ARM_TP) if sy > 0 else (C['y'][0] - ARM_GAP - ARM_T, C['y'][0] - ARM_GAP)
-        plate = box(bx0, C['axis_x'], y0, y1, C['z'][0], C['z'][1])
-        hub = xf(along(cyl(13.0, y0, y1), 'y'), T(C['axis_x'], 0, 0))
-        arms += [plate, hub]
-    s = union([back] + offs + arms)
+    for y0, y1 in (LIP(SS * (HALF_Y + ARM_GAP), HORN_Y), LIP(PIVOT_Y, piv_out)):
+        arms += [box(bx0, C['axis_x'], y0, y1, C['z'][0], C['z'][1]), xf(along(cyl(13.0, y0, y1), 'y'), T(C['axis_x'], 0, 0))]
+    parts = [back] + offs + arms
     cut = []
-    for (y, z) in C['vesa']:                  # M4 into the camera's back holes
+    hl = BACK_T + STANDOFF + C['hole_depth'] - 1.0                  # screw: through plate + standoff, 1 mm short of the max depth
+    hl_std = max(L_ for L_ in (6, 8, 10, 12, 16) if L_ <= hl)
+    for (y, z) in C['holes']:                  # into the camera's back threads
         p = (bx0, y, z)
-        cut.append(screw_cut(p, (1, 0, 0), 'M4', BACK_T + STANDOFF, cb=0.0)); r.add('SHCS', 'M4', p, (1, 0, 0), 12, 'camera back M4 (VESA 75); about 5 mm into the camera')
-    # horn side (-y): 4 x M3 into the output horn + centre-screw recess; idler side (+y): M5 insert for the pivot bolt
-    ya = C['y'][0] - ARM_GAP - ARM_T                                  # the arm's outer face = the horn face
-    for (a, b) in HORN_HOLES:                                         # horn plane: servo (x, y) -> C (z = x_s, x = -y_s)
-        p = (C['axis_x'] - b, ya + ARM_T + 0.01, a)
-        cut.append(screw_cut(p, (0, -1, 0), 'M3', ARM_T, cb=0.0)); r.add('SHCS', 'M3', p, (0, -1, 0), 8, 'cradle to the servo horn')
-    cut.append(xf(along(cyl(CTR_D / 2, ya - 0.1, ya + (OUT_CTR - OUT_FACE)), 'y'), T(C['axis_x'], 0, 0)))
-    cut.append(insert_cut((C['axis_x'], C['y'][1] + ARM_GAP + ARM_TP, 0.0), (0, -1, 0), 'M5', length=6)); r.add('insert', 'M5', (C['axis_x'], C['y'][1], 0), (0, -1, 0), 6, 'pivot bolt')
+        cut.append(screw_cut(p, (1, 0, 0), C['hole'], BACK_T + STANDOFF, cb=0.0))
+        r.add('SHCS', C['hole'], p, (1, 0, 0), hl_std, f"camera back {C['hole']} ({hl_std - BACK_T - STANDOFF:.0f} mm into the camera, max {C['hole_depth']:.0f})")
+    if C['usb']['kind'] == 'end':              # cable: through a slot in the back plate, then down the back, held by a tie bridge
+        yc, w = _cable_y(), CABLE['d'] / 2 + 1.0
+        cut.append(box(bx0 - 1, C['x'][0] - STANDOFF + 1, yc - w, yc + w, -w, w))
+        tb = dict(x=(bx0 - 4.0, bx0 + 0.01), z=(C['z'][0] - 14.0, C['z'][0] + 2.0))     # bridge on the back face, below the slot
+        parts.append(box(*tb['x'], yc - 9.0, yc + 9.0, *tb['z']))
+        zt = C['z'][0] - 6.0
+        cut.append(box(tb['x'][0] + 1.4, tb['x'][1] + 0.1, yc - 10.0, yc + 10.0, zt - CABLE['tie']['w'] / 2, zt + CABLE['tie']['w'] / 2))
+        r.add('cable tie', '2.5 x 100', (bx0 - 4.0, yc, zt), (0, 1, 0), 100, 'USB cable to the cradle (bridge on the back)')
+    s = union(parts)
+    # horn side: 4 x M3 into the output horn + centre-screw recess; idler side: M5 insert for the pivot bolt
+    for (a, b) in HORN_HOLES:                                         # horn plane: servo (x, y) -> C (z = x_s, x = -SS * y_s)
+        p = (C['axis_x'] + SS * b, HORN_Y - SS * (ARM_T + 0.01), a)
+        cut.append(screw_cut(p, (0, SS, 0), 'M3', ARM_T, cb=0.0)); r.add('SHCS', 'M3', p, (0, SS, 0), 8, 'cradle to the servo horn')
+    cut.append(xf(along(cyl(CTR_D / 2, *LIP(HORN_Y + SS * 0.1, HORN_Y - SS * (OUT_CTR - OUT_FACE))), 'y'), T(C['axis_x'], 0, 0)))
+    cut.append(insert_cut((C['axis_x'], piv_out, 0.0), (0, SS, 0), 'M5', length=6)); r.add('insert', 'M5', (C['axis_x'], piv_out, 0), (0, SS, 0), 6, 'pivot bolt')
     s = s - union(cut)
     G = head_frame(zh) @ T(-C['axis_x'], 0, 0)                        # C -> column-top frame at pitch 0
     CONTEXT['C_to_top'] = G
-    add('camera_cradle', xf(s, G), (0.20, 0.55, 0.62), r, 'holds the OAK-D Pro by its 2 back M4 (standoffs: the fins stay open), horn arm + pivot arm; prints back plate down')
+    add('camera_cradle', xf(s, G), (0.20, 0.55, 0.62), r,
+        f"holds the {C['name']} by its 2 back {C['hole']} (standoffs: the fins stay open), horn arm + pivot arm"
+        + ('; the USB cable turns back through the back plate and is tied to it' if C['usb']['kind'] == 'end' else '')
+        + '; prints back plate down')
     CONTEXT['cradle_C'] = s
 
 
 def camera_envelope():
-    C = CAM
-    body = box(C['x'][0], C['x'][1], C['y'][0], C['y'][1], C['z'][0], C['z'][1])
-    plug = box(C['usb']['x'] - 3.5, C['usb']['x'] + 3.5, C['usb']['y'] - 6.5, C['usb']['y'] + 6.5, C['z'][0] - 28.0, C['z'][0] + 0.01)   # USB-C plug + strain relief
+    """(body, plug + cable) in the camera frame C."""
+    C = CAM; x0, x1 = C['x'][0], C['front']
+    if C['r_end']:                             # rounded ends (Gemini 2): a stadium seen from the front
+        re = C['r_end']
+        body = M.hull(union([xf(along(cyl(re, x0, x1), 'x'), T(0, sy * (HALF_Y - re), 0)) for sy in (-1, 1)]))
+    else:
+        body = box(x0, x1, C['y'][0], C['y'][1], C['z'][0], C['z'][1])
+    u = C['usb']
+    if u['kind'] == 'bottom':
+        plug = box(u['x'] - 3.5, u['x'] + 3.5, u['y'] - 6.5, u['y'] + 6.5, C['z'][0] - 28.0, C['z'][0] + 0.01)   # USB-C plug + strain relief
+    else:                                      # plug out of the end, the cable turning back, through the cradle, down its back
+        px, pz, pl = u['plug']; sd = u['side']; yc = _cable_y(); rc = CABLE['d'] / 2
+        bx0 = x0 - STANDOFF - BACK_T
+        plug = union([box(u['x'] - px / 2, u['x'] + px / 2, *LIP(sd * (HALF_Y - 0.5), sd * (HALF_Y + pl)), -pz / 2, pz / 2),
+                      box(bx0 - 4.0 - CABLE['d'], u['x'] + rc, *LIP(sd * (HALF_Y + pl - 0.5), yc + sd * rc), -rc, rc),
+                      box(bx0 - 4.0 - CABLE['d'], bx0 - 4.0, yc - rc, yc + rc, C['z'][0] - 16.0, rc)])   # to below the tie (flexible beyond)
     return body, plug
 
 
@@ -235,10 +300,30 @@ def cbeam_top(length=150.0):
 
 
 def camera_mesh_C():
-    """The Luxonis enclosure mesh in the camera frame C (mm): enclosure (xe, ye, ze) -> (ze + 1.48, xe - 44.5, ye + 11.8)."""
+    """The camera's enclosure mesh in the camera frame C (mm). OAK-D (Luxonis STEP): enclosure (xe, ye, ze) ->
+    (ze + 1.48, xe - 44.5, ye + 11.8); Gemini 2 (Orbbec STEP, gemini2/: written in C already)."""
+    if CAMERA == 'gemini2':
+        return _tris(gemini2_model())
     from stlio import read_stl
-    E = read_stl(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'oakd', 'oakd_pro_enclosure.stl')).astype(float)
+    E = read_stl(os.path.join(os.path.dirname(os.path.abspath(__file__)), *CAM['mesh'])).astype(float)
     return np.stack([E[..., 2] + 1.48, E[..., 0] - 44.5, E[..., 1] + 11.8], axis=-1)
+
+
+def _tris(sol):
+    m = sol.to_mesh(); return np.asarray(m.vert_properties)[:, :3][np.asarray(m.tri_verts)]
+
+
+def gemini2_model():
+    """A light visual model of the Gemini 2 from Orbbec's drawing (20241107): stadium body 89.46 x 25, 30 deep (back 10 mm
+    finned), the front glass with the IR pair (+-25, dia 14), colour (+11, dia 9), projector (0, dia 7) windows."""
+    re, hy = 12.5, HALF_Y
+    stad = lambda x0, x1, r, h: M.hull(union([xf(along(cyl(r, x0, x1), 'x'), T(0, sy * (h - r), 0)) for sy in (-1, 1)]))
+    body = stad(-5.0, CAM['x'][1], re, hy)
+    core = stad(-15.1, -4.9, re - 2.6, hy - 6.0)                         # finned back block
+    fins = union([box(-15.1, -5.0, y - 0.6, y + 0.6, -12.0, 12.0) for y in np.arange(-34.0, 34.1, 3.4)]) ^ stad(-15.2, -4.9, re, hy - 5.0)
+    glass = stad(CAM['x'][1] - 0.6, CAM['x'][1] + 0.01, re - 2.2, hy - 2.2)
+    wins = union([xf(along(cyl(d / 2, CAM['x'][1] - 0.3, CAM['x'][1] + 0.4), 'x'), T(0, y, 0)) for y, d in ((25, 14), (-25, 14), (11, 9), (0, 7))])
+    return union([body - glass, core, fins, glass - wins, wins.translate((-0.25, 0, 0))])
 
 
 def build_all(layout='prototype'):
@@ -341,7 +426,7 @@ def check(layout):
     free = [(d, (pitched(turning, d, zh) ^ still).volume()) for d in range(-40, 121, 5)]
     lo = min(d for d, v in free if all(vv <= 0.5 for dd, vv in free if d <= dd <= 0))
     hi = max(d for d, v in free if all(vv <= 0.5 for dd, vv in free if 0 <= dd <= d))
-    info.append(f'pitch clear from {lo} to {hi} deg (camera, cradle and USB plug against the head, servo and mast); limits {PITCH}')
+    info.append(f'pitch clear from {lo} to {hi} deg (camera, cradle, USB plug + cable against the head, servo and mast); limits {PITCH}')
     if lo > PITCH[0] or hi < PITCH[1]: res.append(f'pitch range {PITCH} not clear (clear {lo}..{hi})')
     lens = head_frame(zh) @ T(-CAM['axis_x'], 0, 0) @ np.array([*CAM['lens'], 1.0])
     info.append(f'lens at pitch 0: {lens[2]:.1f} mm over the carriage origin, {lens[0]:.1f} mm in front of the column axis')
@@ -387,9 +472,9 @@ def export(out):
         for it in p['reg'].items:
             fast[(it['kind'], it['size'], it['length'], it['note'])] += 1
     fast[('servo', 'Feetech STS3215 7.4 V', '', 'camera pitch')] = 1
-    fast[('camera', 'Luxonis OAK-D Pro W (OV9782)', '', 'scene camera (+ its USB-C Y-adapter for the IR projector / LED)')] = 1
+    fast[('camera', CAM['name'], '', 'scene camera (+ its USB-C cable)')] = 1
     _write(os.path.join(out, 'assembly_stl', 'context', 'pitch_servo_STS3215.stl'), CONTEXT['servo'])
-    _write(os.path.join(out, 'assembly_stl', 'context', 'oakd_pro_envelope.stl'), pitched(union([CONTEXT['cam_body_C'], CONTEXT['cam_plug_C']]), 0, CONTEXT['zh']))
+    _write(os.path.join(out, 'assembly_stl', 'context', f'{CAMERA}_envelope.stl'), pitched(union([CONTEXT['cam_body_C'], CONTEXT['cam_plug_C']]), 0, CONTEXT['zh']))
     with open(os.path.join(out, 'printed_parts.csv'), 'w', newline='') as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0])); w.writeheader(); w.writerows(rows)
     with open(os.path.join(out, 'fasteners.csv'), 'w', newline='') as f:

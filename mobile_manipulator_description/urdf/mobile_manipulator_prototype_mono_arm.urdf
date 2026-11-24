@@ -604,7 +604,7 @@
   </link>
   <joint name="estop_fixed" type="fixed"><parent link="top_beam"/><child link="estop"/><origin xyz="-0.005 0 0.022" rpy="0 0 0"/></joint>
   <link name="carriage">
-    <inertial><origin xyz="-0.0438435 -0.0154904 0.0152923" rpy="0 0 0"/><mass value="0.701838"/><inertia ixx="0.00582786" ixy="-0.000123073" ixz="0.00117507" iyy="0.00561628" iyz="0.00113005" izz="0.00225303"/></inertial>
+    <inertial><origin xyz="-0.0441106 -0.0185916 0.0140644" rpy="0 0 0"/><mass value="0.695766"/><inertia ixx="0.00586789" ixy="-0.0003338" ixz="0.00120099" iyy="0.00557255" iyz="0.00143447" izz="0.00249236"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/visual/cbeam_carriage.stl"/></geometry><material name="mat_32"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/visual/mholder_holder.stl"/></geometry><material name="mat_01"/></visual>
     <collision><origin xyz="-0.0245 0 -0.0425" rpy="0 0 0"/><geometry><box size="0.006 0.125 0.125"/></geometry></collision>
@@ -671,37 +671,32 @@
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mholder_holder_c60.stl"/></geometry></collision>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mholder_holder_c61.stl"/></geometry></collision>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mholder_holder_c62.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mholder_holder_c63.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mholder_holder_c64.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mholder_holder_c65.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mholder_holder_c66.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/mholder_holder_c67.stl"/></geometry></collision>
     <collision><origin xyz="-0.00775 0.05 -0.0425" rpy="0 0 0"/><geometry><box size="0.0165 0.0239954 0.125"/></geometry></collision>
     <collision><origin xyz="-0.00775 -0.05 -0.0425" rpy="0 0 0"/><geometry><box size="0.0165 0.0239954 0.125"/></geometry></collision>
   </link>
   <joint name="lift" type="prismatic"><parent link="base_link"/><child link="carriage"/><origin xyz="0.155 -0.122 0.42" rpy="0 0 -1.5708"/><axis xyz="0 0 1"/><limit lower="0" upper="0.871" effort="300" velocity="0.1"/><dynamics damping="50" friction="5"/></joint>
   <link name="scene_mast">
-    <inertial><origin xyz="0.0549809 -0.028941 0.275495" rpy="0 0 0"/><mass value="0.199418"/><inertia ixx="0.000742644" ixy="4.77689e-05" ixz="-6.48373e-05" iyy="0.000355577" iyz="0.000163057" izz="0.000479621"/></inertial>
-    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/visual/scene_mast_98.stl"/></geometry><material name="mat_01"/></visual>
+    <inertial><origin xyz="0.0548027 0.0176787 0.279416" rpy="0 0 0"/><mass value="0.214582"/><inertia ixx="0.000971922" ixy="-4.40393e-05" ixz="-6.77354e-05" iyy="0.000384649" iyz="-0.000148332" izz="0.000687031"/></inertial>
+    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/visual/scene_mast_103.stl"/></geometry><material name="mat_01"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/visual/scene_head.stl"/></geometry><material name="mat_02"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/visual/scene_servo_strap.stl"/></geometry><material name="mat_02"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/visual/scene_pitch_STS3215.stl"/></geometry><material name="mat_03"/></visual>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_98_c00.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_98_c01.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_98_c02.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_98_c03.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_98_c04.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_98_c05.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_98_c06.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_98_c07.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_98_c08.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_98_c09.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_98_c10.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_98_c11.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_98_c12.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_98_c13.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_98_c14.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_98_c15.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_103_c00.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_103_c01.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_103_c02.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_103_c03.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_103_c04.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_103_c05.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_103_c06.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_103_c07.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_103_c08.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_103_c09.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_103_c10.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_103_c11.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_103_c12.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_103_c13.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_103_c14.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_mast_103_c15.stl"/></geometry></collision>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_head_c00.stl"/></geometry></collision>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_head_c01.stl"/></geometry></collision>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_head_c02.stl"/></geometry></collision>
@@ -732,25 +727,32 @@
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_servo_strap_c00.stl"/></geometry></collision>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_servo_strap_c01.stl"/></geometry></collision>
   </link>
-  <joint name="scene_mast_fixed" type="fixed"><parent link="carriage"/><child link="scene_mast"/><origin xyz="-0.122 -0.065 0" rpy="0 -0 1.5708"/></joint>
+  <joint name="scene_mast_fixed" type="fixed"><parent link="carriage"/><child link="scene_mast"/><origin xyz="-0.137 -0.125 0" rpy="0 -0 1.5708"/></joint>
   <link name="scene_camera">
-    <inertial><origin xyz="0.00109642 0.000672631 -9.26487e-07" rpy="0 0 0"/><mass value="0.108195"/><inertia ixx="0.000108848" ixy="2.7791e-07" ixz="-8.43718e-10" iyy="1.50532e-05" iyz="-6.74254e-11" izz="0.000108106"/></inertial>
+    <inertial><origin xyz="0.000677842 -0.00430001 -0.000118776" rpy="0 0 0"/><mass value="0.115731"/><inertia ixx="0.000127416" ixy="-5.5712e-06" ixz="-2.84898e-07" iyy="1.78447e-05" iyz="-9.85371e-07" izz="0.000133337"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/visual/scene_camera_cradle.stl"/></geometry><material name="mat_01"/></visual>
-    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/visual/scene_oakd_pro.stl"/></geometry><material name="mat_04"/></visual>
+    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/visual/scene_camera_body.stl"/></geometry><material name="mat_04"/></visual>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_camera_cradle_c00.stl"/></geometry></collision>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_camera_cradle_c01.stl"/></geometry></collision>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_camera_cradle_c02.stl"/></geometry></collision>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_camera_cradle_c03.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_oakd_pro_c00.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_oakd_pro_c01.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_oakd_pro_c02.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_oakd_pro_c03.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_camera_cradle_c04.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_camera_cradle_c05.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_camera_cradle_c06.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_camera_cradle_c07.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_camera_cradle_c08.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_camera_cradle_c09.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_camera_cradle_c10.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_camera_cradle_c11.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_camera_body_c00.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_camera_body_c01.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/collision/scene_camera_body_c02.stl"/></geometry></collision>
   </link>
-  <joint name="scene_camera_pitch" type="revolute"><parent link="scene_mast"/><child link="scene_camera"/><origin xyz="0.065 0 0.325" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-0.174533" upper="1.39626" effort="1.9" velocity="4.7"/><dynamics damping="0.05" friction="0.02"/></joint>
+  <joint name="scene_camera_pitch" type="revolute"><parent link="scene_mast"/><child link="scene_camera"/><origin xyz="0.065 0 0.33" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-0.174533" upper="1.39626" effort="1.9" velocity="4.7"/><dynamics damping="0.05" friction="0.02"/></joint>
   <link name="scene_camera_optical">
     <inertial><origin xyz="0 0 0" rpy="0 0 0"/><mass value="0.001"/><inertia ixx="1e-08" ixy="0" ixz="0" iyy="1e-08" iyz="0" izz="1e-08"/></inertial>
   </link>
-  <joint name="scene_camera_optical_fixed" type="fixed"><parent link="scene_camera"/><child link="scene_camera_optical"/><origin xyz="0.0147 0 0.0048" rpy="-1.5708 0 -1.5708"/></joint>
+  <joint name="scene_camera_optical_fixed" type="fixed"><parent link="scene_camera"/><child link="scene_camera_optical"/><origin xyz="0.0181 0.011 0" rpy="-1.5708 0 -1.5708"/></joint>
   <link name="left_base">
     <inertial><origin xyz="-0.0220981 -2.40799e-05 -0.000912393" rpy="0 0 0"/><mass value="0.380478"/><inertia ixx="0.00027411" ixy="-5.57011e-07" ixz="-6.95259e-05" iyy="0.000606691" iyz="-1.47293e-07" izz="0.000528324"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="../meshes/visual/arm_base_top.stl"/></geometry><material name="mat_05"/></visual>

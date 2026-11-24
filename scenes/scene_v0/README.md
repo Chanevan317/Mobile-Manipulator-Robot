@@ -186,7 +186,7 @@ Scripts, in `../../scripts/scenes/scene_v0/`:
 | `fetch_assets.py` | downloads the assets |
 | `check_scene_mono.py` | reach + scene checks with the robot; viewing window |
 | `save_scene.py` | writes `scene_v0.usda` |
-| `pick_to_tote_mono.py` | a panel in the Isaac window: choose a product (the 16 that can be picked), the robot drives to its station, picks it (side grasp or from above) and puts it in the tote; the scene camera (Pro W by default, `--tilt 40`) and the wrist camera show side by side. Moves are checked offline against the furniture and the products (`scripts/common/collide.py`; plans cached in `~/.cache/mobile_manipulator`) |
+| `pick_to_tote_mono.py` | a panel in the Isaac window: choose a product (the 16 that can be picked), the robot drives to its station, picks it (side grasp or from above) and puts it in the tote; the scene camera (Orbbec Gemini 2 by default, `--tilt 40`) and the wrist camera show side by side. Moves are checked offline against the furniture and the products (`scripts/common/collide.py`; plans cached in `~/.cache/mobile_manipulator`) |
 | `station_menu_mono.py` | opens the scene with a "Robot stations" panel: pick a product and / or a location, Go drives the robot to the station that serves it (Home, Stop too) |
 | `store_db.py` | checks the product database, writes `locations.json`, looks up products and locations (no simulator) |
 | `stations_mono.py` | works out the robot stations and routes -> `stations.json` (no simulator) |

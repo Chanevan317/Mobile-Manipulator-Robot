@@ -251,7 +251,7 @@ forward and the camera put over the arm on 2026-11-24; base 0.45 × 0.45 m and t
 | Arm | the prototype's own arm (shoulder ±115°, elbow ±125°, wrist pan ±122°, 130 + 130 mm links), its shoulder on the robot's centreline at x 0.155; zero pose points **left**, so the blind sector faces the column |
 | Tote | on the **base**, as in the original design (the lift lowers the hand into it); **L-shaped over the whole deck**: behind the arm (x −0.218 … 0.065, full width) plus the free left side up to the front edge (x 0.065 … 0.218, y 0.06 … 0.218), walls 0.12 m. The floor is **flat where the hand reaches** (plus 50 mm of room for the hand) and **rises at 30°** from there to the walls, so a product that slides into a corner or the back strip comes back down to where the arm gets it. Shape: `../CAD/mono_holder/tote/` |
 | Lift travel | 0–0.871 m (nothing stands over the beam) |
-| Scene camera | OAK-D Pro W on a pitch servo, on a 98 mm mast on the holder's bar: **straight above the shoulder**, 10 mm over the arm's highest point, lens 0.33 m over the carriage, looking forward; nothing sticks out in front of the carriage |
+| Scene camera | Orbbec Gemini 2 (colour 86° × 55°, depth 91° × 66°) on a pitch servo, on a 103 mm mast on the holder's bar, its tilt axis **60 mm behind and 15 mm left of the shoulder** (further back sees more of the work), lens 0.33 m over the carriage, looking forward; mounted upright, its USB cable turned back through the cradle and tied to it |
 
 ![one-arm robot](preview_prototype_mono.png)
 

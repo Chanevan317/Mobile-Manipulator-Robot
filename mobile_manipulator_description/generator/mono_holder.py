@@ -49,6 +49,10 @@ BAR = (145.0, 167.0)              # bar z: 10 mm over the arm's highest point (z
 POST = dict(x=(-44.0, -10.0), y=(-75.0, -46.0), z=(21.0, BAR[1]))   # from 1 mm over the gantry plate / wheel tops (z 20)
 BAR1 = dict(x=(-148.0, -10.0), y=(-75.0, -46.0))           # from the post toward the shoulder line, behind it
 ARM_DY = 0.0                      # shoulder axis this far in FRONT of the column axis (carriage +y), mm
+CAM_BACK = 60.0                   # scene camera tilt axis this far BEHIND the shoulder (2026-11-24, user: "camera mount slightly
+                                  # at the back to get more fov"; was 0, right over the shoulder), mm
+CAM_SIDE = 15.0                   # ... and this far to the robot's LEFT of it (carriage -x): the Gemini 2's USB end + pivot arm
+                                  # face the column; this keeps them outside the top end mount's footprint at full lift, mm
 import scene_cam as SC
 CAM_Z = BAR[1] - 2.0              # mast mount face (the pocket floor) = scene_cam.MOUNT['prototype_mono_arm']['z']
 
@@ -58,11 +62,12 @@ def _derive():
     own frame (flange centre at x MX, camera along +x, tilt axis 23 mm in front): turned +90 deg, flange centre at
     (-ARM_DX, MAST_Y), so the tilt axis is right over the shoulder."""
     global BAR2, MAST_Y, MAST_T, POCKET, CAM_INSERTS
-    MAST_Y = ARM_DY - (SC.AX - SC.MX)
-    MAST_T = T(-ARM_DX, MAST_Y, 0.0) @ Rz(90.0) @ T(-SC.MX, 0.0, 0.0)
-    POCKET = dict(x=(-ARM_DX - 22.2, -ARM_DX + 22.2), y=(MAST_Y - 20.2, MAST_Y + 20.2))   # the flange is 44 (carriage x) x 40 (y)
+    MAST_Y = ARM_DY - CAM_BACK - (SC.AX - SC.MX)
+    mx = -ARM_DX - CAM_SIDE                            # mast centre, carriage x
+    MAST_T = T(mx, MAST_Y, 0.0) @ Rz(90.0) @ T(-SC.MX, 0.0, 0.0)
+    POCKET = dict(x=(mx - 22.2, mx + 22.2), y=(MAST_Y - 20.2, MAST_Y + 20.2))   # the flange is 44 (carriage x) x 40 (y)
     CAM_INSERTS = [tuple((MAST_T @ np.array([SC.MX + sx * SC.FL['bx'], sy * SC.FL['by'], 0.0, 1.0]))[:2]) for sx in (-1, 1) for sy in (-1, 1)]
-    BAR2 = dict(x=(-148.0, -96.0), y=(-75.0, MAST_Y + 25.0))   # forward over the shoulder, under the mast flange
+    BAR2 = dict(x=(mx - 26.0, mx + 26.0), y=(min(-75.0, MAST_Y - 25.0), max(-46.0, MAST_Y + 25.0)))   # under the mast flange
 
 
 _derive()

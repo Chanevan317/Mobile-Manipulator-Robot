@@ -20,7 +20,7 @@ one arm on it, the tote on the base behind the arm):
 | `CAD/SCARA_arm/` | the follower arm: print files, STEP, assembly, fastener lists |
 | `CAD/mono_holder/` | one-arm robot: printed holder for the arm base and the scene camera mast on the C-Beam carriage |
 | `CAD/dual_holder/` | two-arm robot: printed holder for both arm bases on the C-Beam carriage (and the scene camera mast) |
-| `CAD/scene_cam/` | scene camera: OAK-D Pro W on a pitch servo, on a swappable printed mast on the carriage |
+| `CAD/scene_cam/` | scene camera: Orbbec Gemini 2 on a pitch servo, on a swappable printed mast on the carriage |
 | `CAD/mono_ring/` | PARKED (replaced by the mono holder on 2026-11-23): the shoulder ring around the lift column |
 | `CAD/leader_arm/` | the leader arm for teleoperation |
 | `CAD/lift_stick/` | one-hand controller for the lift: thumbstick, dead-man and stored-position buttons |

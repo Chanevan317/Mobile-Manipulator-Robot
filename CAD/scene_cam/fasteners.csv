@@ -1,13 +1,14 @@
 kind,size,length_mm,qty,where
+cable tie,2.5 x 100,100,1,USB cable to the cradle (bridge on the back)
 servo,Feetech STS3215 7.4 V,,1,camera pitch
-camera,Luxonis OAK-D Pro W (OV9782),,1,scene camera (+ its USB-C Y-adapter for the IR projector / LED)
 SHCS,M2,6,2,strap to cradle
 insert,M2,4,2,strap
 selftap,M2,6,2,servo case (idler face)
 SHCS,M3,10,4,"mast to its mount (from above, beside the box; ball-end key)"
 SHCS,M3,14,4,head to the mast (into its inserts)
+SHCS,M3,8,2,"camera back M3 (2 mm into the camera, max 3)"
 SHCS,M3,8,4,cradle to the servo horn
 insert,M3,8,4,mast top (head)
-SHCS,M4,12,2,camera back M4 (VESA 75); about 5 mm into the camera
 SHCS,M5,16,1,pivot bolt (into the cradle arm insert; turns in the upright: washer)
 insert,M5,6,1,pivot bolt
+camera,Orbbec Gemini 2,,1,scene camera (+ its USB-C cable)

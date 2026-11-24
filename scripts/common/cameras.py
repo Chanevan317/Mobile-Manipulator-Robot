@@ -11,8 +11,10 @@ the OAK colour sensor's full 12 MP mode, scaled down on the device; user 2026-11
 too narrow). Light enough to render fast. The prims sit on the URDF's optical frames (ROS convention: z forward, x right,
 y down); a USD camera looks along -Z with +Y up, so each is turned 180 deg about x under its frame.
 
-SCENE: Luxonis OAK-D Pro W, OV9782 (user 2026-11-19; SCENE_PRO_W below: 127 x 80 deg fisheye, 640 x 400). The previous
-    choice, kept as MM_SCENE_CAM=pro_af: OAK-D Pro, auto-focus version (docs.luxonis.com, OAK-D Pro page, 'Variant: Auto Focus'):
+SCENE: Orbbec Gemini 2 since 2026-11-24 (user: the OAK-D Pro W was sold out in India; the Gemini 2 ordered for the reBot
+    arm is reused; SCENE_GEMINI2 below: colour 86 x 55 deg, a normal (rectilinear) lens, 640 x 360 from its 16:9 modes;
+    depth aligned to colour (its D2C), active stereo, 0.15 .. 10 m). Earlier, kept selectable with MM_SCENE_CAM:
+    pro_w = Luxonis OAK-D Pro W, OV9782 (2026-11-19, 127 x 80 deg fisheye, 640 x 400); pro_af = OAK-D Pro, auto-focus version: OAK-D Pro, auto-focus version (docs.luxonis.com, OAK-D Pro page, 'Variant: Auto Focus'):
     colour IMX378 1/2.3", 78 / 66 / 54 deg D / H / V over the full 4056 x 3040 sensor -> f = 2028 / tan 33 deg = 3123 px.
     Used: the full sensor (4:3), 66 deg H; square pixels give 51.9 deg V (Luxonis rounds to 54). Its 16:9 modes
     (1080p / 4K) crop to 3840 x 2160 -> 63.1 x 38.2 deg. Depth = Isaac's distance to the image plane from
@@ -35,7 +37,7 @@ SCENE_PRO_AF = dict(link='scene_camera_optical', res=(640, 480), assumed=False,
              depth=(0.2, 12.0), forward=0.0,
              model='Luxonis OAK-D Pro AF: IMX378 colour (full 4:3 sensor) + depth aligned to it')
 
-# Luxonis OAK-D Pro W, OV9782 version: THE SCENE CAMERA (user 2026-11-19, in the BOM; the AF's 66 deg was too narrow): colour OV9782 1 MP 1280 x 800,
+# Luxonis OAK-D Pro W, OV9782 version: the scene camera 2026-11-19 .. 11-24 (user, in the BOM; the AF's 66 deg was too narrow): colour OV9782 1 MP 1280 x 800,
 # global shutter, fixed focus, listed 150 / 127 / 80 deg D / H / V (Luxonis spec sheet 150 / 128 / 80); stereo OV9282 with the
 # same wide view. An equidistant fisheye (r = f * theta) with f = 640 / 63.5 deg = 577 px at 1280 x 800 gives exactly
 # 127 / 79.4 / 149.7 deg, so k1..k4 = 0 matches the listed numbers (replace with the unit's factory calibration).
@@ -44,8 +46,13 @@ _F_W = 320.0 / math.radians(63.5)
 SCENE_PRO_W = dict(link='scene_camera_optical', res=(640, 400), assumed=False, hfov=127.0,
                    fx=_F_W, fy=_F_W, cx=320.0, cy=200.0, k=[0.0, 0.0, 0.0, 0.0], depth=(0.2, 12.0), forward=0.0,
                    model='Luxonis OAK-D Pro W (OV9782 colour, global shutter, 127 x 80 deg fisheye) + depth aligned to it')
-SCENE_MODELS = {'pro_af': SCENE_PRO_AF, 'pro_w': SCENE_PRO_W}
-SCENE_MODEL = __import__('os').environ.get('MM_SCENE_CAM', 'pro_w')      # the robot's camera (user 2026-11-19); MM_SCENE_CAM=pro_af = the old AF
+# Orbbec Gemini 2 (G20155, datasheet v1.1 + drawing 20241107): colour 1920 x 1080 16:9 = 86 x 55 deg (rolling shutter;
+# its 4:3 modes crop to 63 x 50), a normal lens -> pinhole here (replace with the unit's factory intrinsics, Orbbec SDK);
+# depth 91 x 66 deg, active stereo IR, 0.15 .. 10 m (optimal 0.2 .. 5), D2C-aligned to colour. Rendered 640 x 360.
+SCENE_GEMINI2 = dict(link='scene_camera_optical', res=(640, 360), assumed=False, hfov=86.0, depth=(0.15, 10.0), forward=0.0,
+                     model='Orbbec Gemini 2 (colour 86 x 55 deg, 16:9) + depth aligned to it')
+SCENE_MODELS = {'gemini2': SCENE_GEMINI2, 'pro_af': SCENE_PRO_AF, 'pro_w': SCENE_PRO_W}
+SCENE_MODEL = __import__('os').environ.get('MM_SCENE_CAM', 'gemini2')    # the robot's camera (user 2026-11-24); pro_w / pro_af = the OAK-Ds
 SCENE = SCENE_MODELS[SCENE_MODEL]
 
 _HFOV_WRIST = 120.0                                              # ASSUMED (lens not listed)

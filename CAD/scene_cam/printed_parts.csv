@@ -1,7 +1,7 @@
 file,part,material,size_mm,volume_cm3,note
-C01_mast_240.stl,mast_240,PETG,240.0 x 44.0 x 40.0,117.5,"240 mm flange to flange, 36 x 26 box (wall 3), hollow for the cables (window at the top front, exit at the bottom); prints LYING on its front face (no supports)"
-C02_mast_98_mono.stl,mast_98_mono,PETG,98.0 x 44.0 x 40.0,55.7,"98 mm flange to flange, 36 x 26 box (wall 3), hollow for the cables (window at the top front, exit at the bottom); prints LYING on its front face (no supports)"
-C03_mast_173_mono_ring_parked.stl,mast_173_mono_ring_parked,PETG,173.0 x 44.0 x 40.0,88.3,"173 mm flange to flange, 36 x 26 box (wall 3), hollow for the cables (window at the top front, exit at the bottom); prints LYING on its front face (no supports)"
-C04_head.stl,head,PETG,57.8 x 160.7 x 76.0,123.6,flange + crossbar + STS3215 cradle (output toward the camera) + pivot upright; prints flange down
+C01_mast_244.stl,mast_244,PETG,244.0 x 44.0 x 40.0,119.2,"244 mm flange to flange, 36 x 26 box (wall 3), hollow for the cables (window at the top front, exit at the bottom); prints LYING on its front face (no supports)"
+C02_mast_103_mono.stl,mast_103_mono,PETG,103.0 x 44.0 x 40.0,57.9,"103 mm flange to flange, 36 x 26 box (wall 3), hollow for the cables (window at the top front, exit at the bottom); prints LYING on its front face (no supports)"
+C03_mast_178_mono_ring_parked.stl,mast_178_mono_ring_parked,PETG,178.0 x 44.0 x 40.0,90.5,"178 mm flange to flange, 36 x 26 box (wall 3), hollow for the cables (window at the top front, exit at the bottom); prints LYING on its front face (no supports)"
+C04_head.stl,head,PETG,57.8 x 193.1 x 76.0,140.4,flange + crossbar + STS3215 cradle (output toward the camera) + pivot upright; prints flange down
 C05_servo_strap.stl,servo_strap,PETG,42.0 x 10.0 x 3.0,1.2,holds the pitch servo in the head; prints flat
-C06_camera_cradle.stl,camera_cradle,PETG,29.7 x 113.1 x 28.7,21.5,"holds the OAK-D Pro by its 2 back M4 (standoffs: the fins stay open), horn arm + pivot arm; prints back plate down"
+C06_camera_cradle.stl,camera_cradle,PETG,39.5 x 145.5 x 35.1,23.4,"holds the Orbbec Gemini 2 by its 2 back M3 (standoffs: the fins stay open), horn arm + pivot arm; the USB cable turns back through the back plate and is tied to it; prints back plate down"

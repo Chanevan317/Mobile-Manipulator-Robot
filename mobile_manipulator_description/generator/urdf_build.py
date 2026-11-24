@@ -612,7 +612,7 @@ _tote_links()
 
 
 def _scene_cam_xml(layout, mast_T=None):
-    """Scene camera (scene_cam.py): OAK-D Pro on an STS3215 pitch servo, on a mast on the carriage (two-arm: the dual
+    """Scene camera (scene_cam.py: SC.CAMERA, the Orbbec Gemini 2 since 2026-11-24) on an STS3215 pitch servo, on a mast on the carriage (two-arm: the dual
     holder's front bridge; one-arm: the ring clamp's pedestal); it moves with the lift. scene_mast (fixed to the
     carriage) -> scene_camera_pitch (revolute about y, + = tilt down, -10 .. +80 deg) -> scene_camera (origin on the
     tilt axis, x forward) -> scene_camera_optical (the RGB lens)."""
@@ -633,11 +633,11 @@ def _scene_cam_xml(layout, mast_T=None):
     put(cam, 'scene_camera_cradle', xf(SC.CONTEXT['cradle_C'], toax), SC.PARTS['camera_cradle']['color'], rho=RHO_PETG)
     E = SC.camera_mesh_C() + np.array([-SC.CAM['axis_x'], 0, 0])
     V = E.reshape(-1, 3); F = np.arange(len(V)).reshape(-1, 3)
-    write_stl(os.path.join(VIS, 'scene_oakd_pro.stl'), V * MM, F); cam['vis'].append(('scene_oakd_pro', (0.15, 0.15, 0.17)))
+    write_stl(os.path.join(VIS, 'scene_camera_body.stl'), V * MM, F); cam['vis'].append(('scene_camera_body', (0.15, 0.15, 0.17)))
     body = xf(SC.CONTEXT['cam_body_C'], toax)
-    Vb, Fb = mesh_arrays(body); cam['props'].append(mass_props(Vb, Fb, mass=0.091))
+    Vb, Fb = mesh_arrays(body); cam['props'].append(mass_props(Vb, Fb, mass=SC.CAM['mass']))
     for k, h in enumerate(convex_pieces(body)):
-        Vc, Fc = mesh_arrays(h); fn = f'scene_oakd_pro_c{k:02d}'
+        Vc, Fc = mesh_arrays(h); fn = f'scene_camera_body_c{k:02d}'
         write_stl(os.path.join(COL, fn + '.stl'), Vc * MM, Fc); cam['col'].append(fn)
     def link(name, L):
         return (f'  <link name="{name}">\n' + inertial(*combine(L['props'])) + ''.join(vis_mesh(f, c) for f, c in L['vis']) +

@@ -35,7 +35,7 @@ JOINT_NAMES = [n for n, _ in JOINTS]
 
 # LeRobot image key -> camera name in scripts/common/cameras.py
 CAMERAS = {
-    'observation.images.scene': 'scene',          # OAK-D Pro W colour, 640 x 400, on the carriage mast
+    'observation.images.scene': 'scene',          # Orbbec Gemini 2 colour, 640 x 360, on the carriage mast
     'observation.images.wrist': 'left_wrist',     # OV2710 wrist camera, 640 x 360
 }
 

@@ -3,7 +3,7 @@
     OMNI_KIT_ACCEPT_EULA=YES conda run --no-capture-output -n env_isaaclab python scripts/scenes/scene_v0/pick_to_tote_mono.py
     ... --station shelf_b1_milk_b01   any station of stations.json (default: the milk carton on the grey shelf)
     ... --tilt 40                      scene camera pitch in deg (+ = down; its servo allows -10 .. 80)
-    ... --scene_cam pro_w              scene camera model: pro_w (OAK-D Pro W, 127 deg) or pro_af (OAK-D Pro AF, 66 deg)
+    ... --scene_cam gemini2            scene camera model: gemini2 (Orbbec Gemini 2, 86 deg, the robot's), pro_w (OAK-D Pro W, 127 deg) or pro_af (OAK-D Pro AF, 66 deg)
     ... --headless --out DIR           no window: saves the two camera views side by side at each stage instead
     ... --headless --all | --stations a,b   try several stations in one session (products put back between), PASS / FAIL
     ... --all_stations                 window: list every station, not only the 16 that pass
@@ -26,7 +26,7 @@ sys.path.insert(0, os.path.join(here, '..', '..', 'common')); import repo_paths 
 ap = argparse.ArgumentParser()
 ap.add_argument('--station', default='shelf_b1_milk_b01')
 ap.add_argument('--tilt', type=float, default=40.0, help='scene camera pitch, deg (+ = down)')
-ap.add_argument('--scene_cam', default='pro_w', choices=('pro_w', 'pro_af'))
+ap.add_argument('--scene_cam', default='gemini2', choices=('gemini2', 'pro_w', 'pro_af'))
 ap.add_argument('--headless', action='store_true')
 ap.add_argument('--out', default='pick_to_tote')
 ap.add_argument('--all', action='store_true', help='headless: try every station in one session, print PASS / FAIL')

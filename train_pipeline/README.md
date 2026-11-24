@@ -140,7 +140,7 @@ Each frame (30 per second):
 |---|---|
 | `observation.state` | 7 measured values, see below |
 | `action` | the 7 values **commanded** at that moment (not the measured ones: the policy learns to command, and the gripper squeezes) |
-| `observation.images.scene` | OAK-D Pro W colour image, 640 × 400 (JPEG in the raw file, AV1 video after converting) |
+| `observation.images.scene` | Orbbec Gemini 2 colour image, 640 × 360 (JPEG in the raw file, AV1 video after converting) |
 | `observation.images.wrist` | wrist camera, 640 × 360 |
 | `observation.depth.scene` | only with `--depth`: depth in mm, for point-cloud policies later (not converted yet) |
 
