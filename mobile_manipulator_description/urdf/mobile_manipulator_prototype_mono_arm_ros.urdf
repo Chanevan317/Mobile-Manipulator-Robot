@@ -604,7 +604,7 @@
   </link>
   <joint name="estop_fixed" type="fixed"><parent link="top_beam"/><child link="estop"/><origin xyz="-0.005 0 0.022" rpy="0 0 0"/></joint>
   <link name="carriage">
-    <inertial><origin xyz="-0.0441106 -0.0185916 0.0140644" rpy="0 0 0"/><mass value="0.695766"/><inertia ixx="0.00586789" ixy="-0.0003338" ixz="0.00120099" iyy="0.00557255" iyz="0.00143447" izz="0.00249236"/></inertial>
+    <inertial><origin xyz="-0.043777 -0.0171093 0.0102891" rpy="0 0 0"/><mass value="0.756047"/><inertia ixx="0.00608681" ixy="-0.000338116" ixz="0.00121996" iyy="0.00574679" iyz="0.00148331" izz="0.0025545"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/cbeam_carriage.stl"/></geometry><material name="mat_32"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/mholder_holder.stl"/></geometry><material name="mat_01"/></visual>
     <collision><origin xyz="-0.0245 0 -0.0425" rpy="0 0 0"/><geometry><box size="0.006 0.125 0.125"/></geometry></collision>
@@ -671,6 +671,15 @@
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/mholder_holder_c60.stl"/></geometry></collision>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/mholder_holder_c61.stl"/></geometry></collision>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/mholder_holder_c62.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/mholder_holder_c63.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/mholder_holder_c64.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/mholder_holder_c65.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/mholder_holder_c66.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/mholder_holder_c67.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/mholder_holder_c68.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/mholder_holder_c69.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/mholder_holder_c70.stl"/></geometry></collision>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/mholder_holder_c71.stl"/></geometry></collision>
     <collision><origin xyz="-0.00775 0.05 -0.0425" rpy="0 0 0"/><geometry><box size="0.0165 0.0239954 0.125"/></geometry></collision>
     <collision><origin xyz="-0.00775 -0.05 -0.0425" rpy="0 0 0"/><geometry><box size="0.0165 0.0239954 0.125"/></geometry></collision>
   </link>

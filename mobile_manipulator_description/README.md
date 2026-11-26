@@ -33,6 +33,7 @@ robot itself. Run them from the repository root, for example `python scripts/rob
 | `../scripts/common/smooth_path.py` | Ring-robot tasks: blends the planned moves into smooth, time-optimal motions (TOPP-RA; `pip install toppra`). On by default in the stationary and shelf tasks (`--no_smooth` turns it off); off in the table task since 2026-11-13 (`--smooth` turns it on). |
 | `../scripts/robot_tests/isaac_dual_load_test.py` | Two-arm robot: the forces and torques both arm bases put on the dual-arm holder (for `generator/dual_holder_strength.py`). |
 | `../scripts/robot_tests/isaac_mono_load_test.py` | Mono arm: the forces and torques through the ring while the arm works with a payload (for `generator/mono_ring_strength.py`). |
+| `generator/mono_holder_strength.py`, `generator/mono_holder_fea.py` | One-arm robot: strength of the printed mono holder without a simulator. The first applies beam formulas on its cross-sections for 1210 arm poses; the second is a 3D FEA (`generator/voxel_fea.py`, numpy / scipy; `pip install pyamg` for the fast solver). Results in `../CAD/mono_holder/README.md` |
 | `../scripts/common/proto_task.py`, `../scripts/tasks/dual/lib/proto_poses.py` | Prototype task helpers (time-synchronised moves, IK lines, reporting) and the planned poses and routes. |
 | `../scripts/common/scara_ik.py` | Inverse kinematics for one arm plus the lift (gripper position, heading and tilt to joint angles). |
 | `../scripts/common/self_collision.py` | Turns on self-collision (`--self_collision` in the other scripts). |
@@ -49,17 +50,18 @@ The scripts still accept `--layout prototype` (the only choice).
 
 | | `prototype` |
 |---|---|---|
-| Lift column | 0.18 m in front of the base centre, on the **working face** (the robot's front, +x) |
-| Arms | right beside the column at y = ±0.15; zero pose 45° toward the rear tote (±135°) |
+| Base | **0.45 × 0.45 m** mecanum since 2026-11-25 (was 0.50, as the one-arm robot); everything moved back with the front edge, so the reach past the front edge is unchanged |
+| Lift column | 0.155 m in front of the base centre (0.18 on the 0.50 base), on the **working face** (the robot's front, +x) |
+| Arms | right beside the column at y = ±0.15; zero pose straight out to each side (±90°; ±135° until 2026-11-25) |
 | Lift | OpenBuilds C-Beam XLarge kit, 1000 mm beam (80 mm open face to the rear), NEMA 23 at the bottom, **0–0.871 m** |
 | Carriage | the kit's XLarge gantry plate (125 × 125 × 6 mm, 1.5 mm behind the beam) with its 4 V-wheels + the printed **dual-arm holder** (`../CAD/dual_holder/`, PETG, two halves around the beam) carrying both arm bases and the scene camera mast |
-| Tote | behind the column, 0.35 × 0.48 m |
+| Tote | behind the column, flat floor, inside 0.29 × 0.44 m (was 0.34 × 0.47 on the 0.50 base; `dual_holder.dual_tote()`). Products are dropped in its middle, x −0.07 m. A funnel floor like the one-arm robot's was tried and dropped: the dropped boxes lie about 20 cm long, their ends reached the slope and one rolled onto its side |
 | Scene camera | Luxonis OAK-D Pro on an STS3215 pitch servo, on a printed mast on the carriage in front of the column (`../CAD/scene_cam/`), moves with the lift: lens 0.33 m over the carriage origin, 80 mm in front of the column; joint `scene_camera_pitch` −10° … +80° (+ = down) |
 | Lift moment, arms parked / both reaching with 0.25 kg | **0.1 / 14.2 N·m** |
 | Tote floor reached, either arm / both | 0.094 / 0.049 m² |
 | Arms colliding when each works its own half of the tote | **8 %** of target pairs |
 | Reach past the front bumper, hand level / hand down | 0.41 m / 0.22 m |
-| Stow pose inside the 50 × 50 cm base | left (30°, 105°, −120°, hand level), right mirrored; clear at any lift |
+| Stow pose | left (30°, 105°, −120°, hand level), right mirrored; clear at any lift; 5 mm past each side of the 0.45 m base (at 0.57 m up, above the bumper) |
 
 The moment, tote and collision numbers come from the layout study of 2026-11-06 (180 / 150 links); the reach and stow rows are for the 130 / 130 links.
 
@@ -178,24 +180,29 @@ How the moves were made safe:
 - **Lift travel:** with 0.885 m of travel a hand-down pick works on tables up to about 1.0 m (0.12 m approach on
   0.75 m), and a level grasp reaches shelf boards from about 0.38 to 1.27 m.
 
-### Reach test (`reach_test.py`, prototype, 2026-11-09: links 130 / 130, lift 0.885 m)
+### Reach test (`reach_test.py`, prototype, 2026-11-25: mounts ±90°, links 130 / 130)
 
-Table edge 0.30 m and shelf edge 0.55 m in front of the base centre; 3 cm grid; the other arm parked.
+Table edge 0.30 m and shelf edge 0.55 m in front of the base centre; 3 cm grid; the other arm parked. In brackets: the
+old ±135° mounts. On the 0.45 m base (2026-11-25) the robot stops 25 mm closer (edges 0.275 / 0.525) and the table and
+shelf numbers are the same; the smaller tote: 39 % of its floor (0.053 m²), both arms 0.010 m².
 
-| Surface | Reachable (either arm) | Deepest past the edge | Width at 0.10 m past the edge |
-|---|---|---|---|
-| Table 0.45 / 0.60 / 0.75 / 0.90 m, hand down | 0.095 m² each | 0.18 m | 0.54 m |
-| Shelf boards 0.70 and 1.10 m, hand level | 0.058 m² | 0.12 m | 0.36 m |
+| Surface | Reachable (either arm) | Both arms | Deepest past the edge | Width at 0.10 m past the edge |
+|---|---|---|---|---|
+| Table 0.45 / 0.60 / 0.75 / 0.90 m, hand down | 0.120 m² (0.095) | 0.015 m² (0) | 0.18 m | 0.69 m (0.54) |
+| Shelf boards 0.70 and 1.10 m, hand level | 0.087 m² (0.058) | 0.003 m² (0) | 0.15 m (0.12) | 0.54 m (0.36) |
+| Tote, hand down | 44 % of the floor (47 %) | 0.013 m² (0.022) | | |
 | Shelf boards 0.30 m and 1.40 m | none (lift travel) | | |
 
 With the old 180 / 150 links: tables 0.159 m², 0.24 m deep; shelf 0.099 m², 0.18 m deep (and no 0.90 m table or
 1.10 m shelf, with the 0.70 m lift).
 
-**Each arm reaches only its own half in front** (left arm y ≈ 0.05…0.48, right arm mirrored); no spot in front is
-reachable by both arms, and a strip about 10 cm wide in the middle by neither. The shoulder's ±115° range around
-its 135° mount heading leaves its blind sector pointing forward and inward, toward the column. Two-arm work in
-front (hand-overs, holding one item with both hands) would need a different mount angle; over the tote both arms
-overlap.
+**Mounts turned from ±135° to ±90° (2026-11-25).** At ±135° each arm's blind sector (outside the shoulder's ±115°)
+pointed forward and inward: each arm reached only its own half in front, and a strip about 10 cm wide in the middle
+was reachable by neither. At ±90° the blind sector points at the column, where nothing is reachable anyway: the two
+halves now meet, and on tables they overlap in the middle. A layout study (mount angle 45 to 135°, arm spacing 0.12 to
+0.18 m, one arm 10 or 18 cm higher, the column set back) found ±90° at ±0.15 m the best overall; closer arms would put
+the arm base's pillar into the column, a height offset costs reach (the higher hand must pitch down), angles below 90°
+lose the tote. Still mostly a two-picks-at-once robot: two-hand work on one item has a small shared area.
 
 Add `--self_collision` to any of them (and to `isaac_import_and_test.py`) to make the robot's own parts collide.
 The grasp test has it on by default (`--no_self_collision` turns it off).
@@ -247,7 +254,7 @@ forward and the camera put over the arm on 2026-11-24; base 0.45 × 0.45 m and t
 |---|---|
 | Base | **0.45 × 0.45 m** mecanum (was 0.50; the other layouts keep 0.50), wheels at (±0.145, ±0.197) |
 | Lift column | **0.155 m in front** of the base centre (7 cm behind the deck's front edge) and **0.122 m to the right** of the centreline, turned so the gantry plate (the carriage) **faces the centre**; the carriage's front ends at the bumper |
-| Carriage | the kit's gantry plate + the printed **mono holder** (`../CAD/mono_holder/`): the arm base (01 + 02) on a pad, a post behind the beam and a bar over the arm for the scene camera |
+| Carriage | the kit's gantry plate + the printed **mono holder** (`../CAD/mono_holder/`): the arm base (01 + 02) on a pad (with a rib and a web down to the legs), a post behind the beam and a bar over the arm for the scene camera. Strength-checked with an FEA: safety factor ≥ 3.5 with 0.5 kg in the gripper |
 | Arm | the prototype's own arm (shoulder ±115°, elbow ±125°, wrist pan ±122°, 130 + 130 mm links), its shoulder on the robot's centreline at x 0.155; zero pose points **left**, so the blind sector faces the column |
 | Tote | on the **base**, as in the original design (the lift lowers the hand into it); **L-shaped over the whole deck**: behind the arm (x −0.218 … 0.065, full width) plus the free left side up to the front edge (x 0.065 … 0.218, y 0.06 … 0.218), walls 0.12 m. The floor is **flat where the hand reaches** (plus 50 mm of room for the hand) and **rises at 30°** from there to the walls, so a product that slides into a corner or the back strip comes back down to where the arm gets it. Shape: `../CAD/mono_holder/tote/` |
 | Lift travel | 0–0.871 m (nothing stands over the beam) |
@@ -282,6 +289,7 @@ turns that into a roll the wrist can't undo, and a box then goes back on the she
 |---|---|
 | Joint sweep (2026-11-23) | 8/8 OK; shoulder / elbow / wrist pan reach their limits, lift 0–870.7 of 871 mm |
 | Hold, 3 poses × 30 s (2026-11-23) | 21/21 OK, no drift |
+| Store scene, Gemini 2 head + reinforced holder, camera tilt 55° (2026-11-25) | **14 / 14** pickable stations picked, dropped in the tote, picked out and put back **1–6 mm** from where each stood (turned ≤ 3°, tilted ≤ 0.4°), nothing else moved over 10 mm. Scene check: reach 15 / 15, scene 23 / 23 |
 | Store scene on the 0.45 base with the funnel tote (2026-11-24) | **14 / 14** pickable stations picked, dropped in the tote, picked out and put back **1–6 mm** from where each stood |
 | Angled entry, round products (forced test stations, ±30°) | **4 / 4**, back 1–6 mm from their spots (a bottle may end turned about its own axis) |
 | Store scene on the 0.50 base, old L tote | **14 / 14** pickable stations: picked, dropped in the tote, picked out and put back 1–14 mm from where each stood, nothing else knocked. `shelf_b2_milk_c01` is picked but not put back (the round bottle leans in the tote). Not pickable: `rack_b0_boxedFood_d01` (only a far stop at 0.64 m is free; the jaws missed it), and as on the ring robot `shelf_b1_yogurt_a01`, `shelf_b2_yogurt_c01`, `rack2_b0_cannedFood_h01` (packed run) |
@@ -410,7 +418,7 @@ arms. Only the wrist pitch lifts against gravity. With the wrist level it needs 
 with 0.25 kg in the gripper and 1.69 N·m with 0.5 kg, against 1.9 N·m available. Plan for items up to about
 0.25–0.3 kg; a 1 kg item (2.75 N·m) is more than the servo can hold with the wrist level.
 
-At zero, each arm points along its zero heading (±135°, toward the rear and past the base sides), the gripper is level, and the fingers are closed.
+At zero, each arm points along its zero heading (±90°, straight out to its side), the gripper is level, and the fingers are closed.
 
 **Fixed frames you can use:**
 - `left_/right_tcp`: between the fingertips, 12 mm in from the tip.

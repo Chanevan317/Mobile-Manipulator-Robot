@@ -262,6 +262,85 @@ class Task:
     def lift_to(self, v):
         self.joint_move2({}, {}, lift=v)
 
+    # ------------------------------------------------------------ both arms ASYNCHRONOUS (2026-11-25, user: "asynchronous,
+    # not waiting for the other arm"): each arm runs its own chain of steps on its own clock, the lift optionally moves at
+    # the same time; the call returns when everything has finished (one settle at the end, not one per step).
+    #   steps: ('joint', q)  arm joints only, time-synchronised within the arm, at 0.88 x its joint speed limits
+    #          ('cart', a, b, elbow)  straight TCP line at the CURRENT lift (a and b at one height: z moves are shared)
+    #          ('jaw', v, max_s)  open / close until the jaws stop (as jaw_mode 'stop'), at most max_s
+    #          ('wait', s)
+    def parallel(self, chains, lift=None, lift_after=0.0):
+        """chains: {'left': [steps], 'right': [steps]}; lift: target moved at the same time (after `lift_after` s)."""
+        gens = [self._g_chain(s, steps) for s, steps in chains.items() if steps]
+        if lift is not None:
+            gens.append(self._g_lift(lift, lift_after))
+        while gens:
+            for g in list(gens):
+                try:
+                    next(g)
+                except StopIteration:
+                    gens.remove(g)
+            if gens:
+                self.step_once()
+        self.settle(timeout=3.0)
+
+    def _g_chain(self, side, steps):
+        for st in steps:
+            kind = st[0]
+            if kind == 'joint': yield from self._g_joint(side, st[1])
+            elif kind == 'cart': yield from self._g_cart(side, *st[1:])
+            elif kind == 'jaw': yield from self._g_jaw(side, *st[1:])
+            elif kind == 'wait':
+                for _ in range(int(st[1] * CTRL_HZ)): yield
+            else: raise ValueError(kind)
+
+    def _g_joint(self, side, q):
+        a = self.arm_now(side); keys = [k for k in q if k in ARM_KEYS]
+        lim = {k: 0.88 * self.vmax[self.idx[f'{side}_{k}']] for k in keys}
+        T, prof = _profile(self.profile, max([abs(q[k] - a[k]) / lim[k] for k in keys] + [0.05]))
+        steps = max(2, int(T * CTRL_HZ) + 1)
+        for i in range(1, steps + 1):
+            s = prof(i, steps)
+            self.set_arm(side, {k: a[k] + (q[k] - a[k]) * s for k in keys}); yield
+
+    def _g_cart(self, side, a, b, elbow):
+        a, b = np.asarray(a, float), np.asarray(b, float)
+        d = np.abs(b - a)
+        if d[2] > 0.002:
+            raise RuntimeError(f'{side}: an asynchronous straight move must stay at one height (dz {d[2] * 1000:.0f} mm)')
+        seconds, prof = _profile(self.profile, max(float(np.linalg.norm(d[:3])) / TCP_SPEED, max(d[3], d[4]) / TCP_TURN))
+        steps = max(2, int(max(MIN_MOVE, seconds) * CTRL_HZ))
+        lift_now = float(self.q_goal[self.idx['lift']])
+        for k in range(1, steps + 1):
+            q = K.ik(side, *(a + (b - a) * prof(k, steps)), elbow=elbow)
+            if q is None:
+                raise RuntimeError(f'{side}: no IK on the straight move at {np.round(a + (b - a) * prof(k, steps), 3)}')
+            if abs(q['lift'] - lift_now) > 0.003:
+                raise RuntimeError(f'{side}: straight move needs lift {q["lift"]:.3f}, the lift is at {lift_now:.3f}')
+            self.set_arm(side, {k_: v for k_, v in q.items() if k_ != 'lift'}); yield
+
+    def _g_jaw(self, side, v, seconds=0.7):
+        self.set_jaw(side, v)
+        ii = [self.idx[f'{side}_finger_right'], self.idx[f'{side}_finger_left']]
+        n = still = 0; moved = False
+        while n < seconds * CTRL_HZ:
+            yield; n += 1
+            vel = np.abs(self.robot.get_joint_velocities()[ii])
+            moved |= bool(np.any(vel > 3 * JAW_STILL_V))
+            arrived = np.max(np.abs(self.q_cmd[ii] - self.q_goal[ii])) < 1e-6
+            still = still + 1 if np.all(vel < JAW_STILL_V) else 0
+            if n >= 0.15 * CTRL_HZ and still >= 4 and (moved or arrived):
+                break
+        self.jaw_log.append(n / CTRL_HZ)
+
+    def _g_lift(self, target, delay=0.0):
+        for _ in range(int(delay * CTRL_HZ)): yield
+        i = self.idx['lift']; l0 = float(self.q_goal[i])
+        T, prof = _profile(self.profile, max(0.05, abs(target - l0) / (0.88 * self.vmax[i])))
+        steps = max(2, int(T * CTRL_HZ) + 1)
+        for k in range(1, steps + 1):
+            self.q_goal[i] = l0 + (target - l0) * prof(k, steps); yield
+
     def cart_move2(self, aL, bL, eL, aR, bR, eR):
         """Straight TCP lines for both hands at once; the lift must agree (same heights), so z moves are shared."""
         aL, bL, aR, bR = (np.asarray(v, float) for v in (aL, bL, aR, bR))

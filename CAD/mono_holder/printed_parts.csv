@@ -1,2 +1,2 @@
 file,part,material,size_mm,volume_cm3,note
-H01_holder.stl,holder,PETG,153.0 x 247.0 x 183.0,445.0,"one piece: pad (arm base), legs + lip + rear bridge (gantry plate), post + bar over the arm (scene camera mast); prints on its back (the rear leg / post face), supports under the bar"
+H01_holder.stl,holder,PETG,153.0 x 247.0 x 183.0,520.3,"one piece: pad (arm base), legs + lip + rear bridge (gantry plate), post + bar over the arm (scene camera mast); prints on its back (the rear leg / post face), supports under the bar"

@@ -64,6 +64,7 @@ if not args.headless:
             v.viewport_api.resolution = r
         except Exception:
             pass
+    DEPTH_VIEW = CAM.depth_window(cams['scene'])   # scene camera depth (cameras.py)
 
 picks = [n for n in st if n != 'home' and 'product' in st[n]]
 if args.headless:
@@ -112,6 +113,8 @@ with win.frame:
             ui.Button('Reset robot', clicked_fn=lambda: state.update(req='reset') if not state['busy'] else None)
         status = ui.Label('choose a product and press "Pick into the tote"', word_wrap=True)
 combo.model.get_item_value_model().add_value_changed_fn(lambda m: state.update(sel=m.as_int))
+if not args.headless:                 # the camera views in a row along the bottom, the panel as a tab by Render Settings
+    LAYOUT = CAM.arrange([views[0], DEPTH_VIEW[0], views[1]], panel=win)
 
 print('pick_to_tote: use the "Pick to tote" panel in the Isaac window; close the window to exit.', flush=True)
 # tests without a person: P2T_CLICK=pick|place|both presses that button once; P2T_AUTOQUIT=S closes the window (like

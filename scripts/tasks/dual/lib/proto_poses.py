@@ -24,8 +24,12 @@ P = math.pi / 2
 PAN = ('shoulder_pan', 'elbow_pan', 'wrist_pan')
 
 
+MOUNT_SHIFT = 45.0   # deg: the mounts turned from +-135 to +-90 (2026-11-25); the poses below were planned at 135 and keep
+                     # their shape in the robot frame: shoulder + 45 (left; the right arm is the mirror)
+
+
 def _q(a, b, c, p, lift=None):
-    q = dict(shoulder_pan=D(a), elbow_pan=D(b), wrist_pan=D(c), wrist_pitch=D(p), wrist_roll=0.0)
+    q = dict(shoulder_pan=D(a + MOUNT_SHIFT), elbow_pan=D(b), wrist_pan=D(c), wrist_pitch=D(p), wrist_roll=0.0)
     if lift is not None: q['lift'] = lift
     return q
 
@@ -49,7 +53,7 @@ PARK = both(_q(45, 0, 0, 0))                     # waiting arm: straight out to 
 READY = both(_q(-45, 0, 0, 0, 0.45))             # working arm straight out to its side, hand level (shelf B retreat)
 
 # tote spot per arm (hand down), base frame; flat item (shelf task) and upright 70 mm product (table task)
-TOTE = {'left': dict(x=-0.07, y=0.13, yaw=D(180), elbow=1), 'right': dict(x=-0.07, y=-0.13, yaw=-D(180), elbow=-1)}   # = TOTE2 since 130 / 130 links
+TOTE = {'left': dict(x=-0.07, y=0.13, yaw=D(180), elbow=1), 'right': dict(x=-0.07, y=-0.13, yaw=-D(180), elbow=-1)}   # = TOTE2 since 130 / 130 links; x = the tote middle (0.45 base: -0.095 put the 21 cm cracker box against the back wall)
 # both arms at the tote at the same time: the spots above make the arms collide, these don't (two-arm check 2026-11-06)
 TOTE2 = {'left': dict(x=-0.07, y=0.13, yaw=D(180), elbow=1), 'right': dict(x=-0.07, y=-0.13, yaw=-D(180), elbow=-1)}
 # shelf task (left arm, one item): same spot as TOTE but with the shelf's elbow bend, so shelf A -> tote -> shelf B
@@ -58,7 +62,7 @@ TOTE_SHELF = {'left': dict(x=-0.07, y=0.13, yaw=D(180), elbow=-1), 'right': dict
 ZT_FLAT = 0.263 + 0.045 / 2 + 0.008              # TCP height that sets a lying 45 mm item 8 mm above the tote floor
 ZT_UPRIGHT = 0.263 + 0.035 + 0.008               # same for an upright 70 mm product
 TOTE_UP = 0.12                                   # vertical approach above the tote
-TOTE_INNER = (-0.238, 0.098, -0.233, 0.233)      # inside of the tote walls (x0, x1, y0, y1), base frame
+TOTE_INNER = (-0.218, 0.073, -0.218, 0.218)      # inside of the tote walls (x0, x1, y0, y1), base frame (dual_holder.dual_tote; 0.45 base)
 
 # table task (left arm; the right arm uses y -> -y and the opposite elbow)
 TABLE_EDGE = 0.36                                # table front edge, m in front of the base centre (0.10 m past the bumper)

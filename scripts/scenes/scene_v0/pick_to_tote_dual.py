@@ -52,12 +52,19 @@ if args.headless:
 
 import omni.ui as ui
 from omni.kit.viewport.utility import create_viewport_window
+CAM_WINS = {}
 x = 20
 for title, cam in (('Scene camera', 'scene'), ('Left wrist camera', 'left_wrist'), ('Right wrist camera', 'right_wrist')):
     if cam in task.cams:
         r = CAM.SCENE['res'] if cam == 'scene' else CAM.WRIST['res']
-        v = create_viewport_window(title, width=r[0] + 20, height=r[1] + 45, position_x=x, position_y=820, camera_path=task.cams[cam].prim_path)
+        CAM_WINS[cam] = create_viewport_window(title, width=r[0] + 20, height=r[1] + 45, position_x=x, position_y=820,
+                                               camera_path=task.cams[cam].prim_path)
         x += r[0] + 30
+        try:
+            CAM_WINS[cam].viewport_api.resolution = r
+        except Exception:
+            pass
+DEPTH_VIEW = CAM.depth_window(task.cams['scene']) if 'scene' in task.cams else None   # scene camera depth (cameras.py)
 state = {'req': None, 'sel': pairs.index(pid)}
 win = ui.Window('Dual pick', width=640, height=170, position_x=40, position_y=90)
 with win.frame:
@@ -71,6 +78,9 @@ with win.frame:
             ui.Button('Reset robot', clicked_fn=lambda: state.update(req='reset'))
         status = ui.Label('choose a pair and press "Pick both into the tote"', word_wrap=True)
 combo.model.get_item_value_model().add_value_changed_fn(lambda m: state.update(sel=m.as_int))
+# the 4 camera views in a row along the bottom, the panel as a tab next to Render Settings (cameras.arrange)
+LAYOUT = CAM.arrange([CAM_WINS.get('scene'), DEPTH_VIEW[0] if DEPTH_VIEW else None, CAM_WINS.get('left_wrist'),
+                      CAM_WINS.get('right_wrist')], panel=win)
 _quit_at = time.time() + float(os.environ['P2T_AUTOQUIT']) if os.environ.get('P2T_AUTOQUIT') else None
 if os.environ.get('P2T_CLICK'):
     state['req'] = os.environ['P2T_CLICK']

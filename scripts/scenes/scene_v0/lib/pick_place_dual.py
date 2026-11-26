@@ -32,6 +32,17 @@ TOTE_WALL = 0.376
 TOTE_FLOOR = 0.263
 SHALLOW_MAX = 0.020                       # a re-grasp may hold a product at most this much shallower than at release                        # tote floor top, base frame                         # tote wall top, base frame (URDF: tote at z 0.256, walls 0.12 high)
 SIDES = ('left', 'right')
+# ASYNC (2026-11-25, user: "as fast as mono ... asynchronous, not waiting for the other arm"): with the mounts at +-90 both
+# arms unfold / fold together (checked offline, clear at lift 0.2 / 0.45 / 0.8), the lift moves while they do, and between
+# shared vertical moves each arm runs its own chain of moves on its own clock (proto_task.Task.parallel). MM_DUAL_SYNC=1 =
+# the old lock-step sequence (one arm at a time for the fold, every move waits for both arms).
+ASYNC = os.environ.get('MM_DUAL_SYNC') != '1'
+EMPTY_UP = 0.05                           # ASYNC: empty hands rise only this much over a release / re-grasp height (TCP),
+EMPTY_CLEAR = TOTE_WALL + 0.06            # and at least this high (fingertips 12 mm below the TCP, ~5 cm over the walls)
+TRAVEL_MAX = 0.50                         # ASYNC: the fold keeps the lift where it is, at most this high for driving (STOW
+                                          # is clear at any lift; a lower centre of mass only for the high stops); the next
+                                          # pick then starts near its grip height instead of from 0.20 (2026-11-25)
+LIFT_SAFE = 0.20                          # ELBOW_OPEN touches the deck below this lift (urdf_selfcol); STOW is clear at any
 task = items = watch = st = None
 ROBOT = {'at': 'home'}
 TRACE0 = {}
@@ -53,9 +64,24 @@ def _both(fn):
     return {s: fn(s) for s in SIDES}
 
 
-def unfold():
-    task.joint_move2(PPo.ELBOW_OPEN['left'], PPo.STOW['right'])
-    task.joint_move2(PPo.ELBOW_OPEN['left'], PPo.ELBOW_OPEN['right'])
+def J(q):
+    return ('joint', q)
+
+
+def unfold(lift=None, wide=0.0):
+    """Out of the travel fold to ELBOW_OPEN, and the lift to `lift`. ASYNC: both arms at once with the lift moving too
+    (above `wide` first if the hands swing out over a low obstacle; never below LIFT_SAFE while the arms open)."""
+    if not ASYNC:
+        if lift is not None: task.lift_to(lift)
+        task.joint_move2(PPo.ELBOW_OPEN['left'], PPo.STOW['right'])
+        task.joint_move2(PPo.ELBOW_OPEN['left'], PPo.ELBOW_OPEN['right'])
+        return
+    if wide > _lift_now():
+        task.lift_to(min(lift, wide) if lift is not None else wide)
+    tgt = None if lift is None else max(lift, LIFT_SAFE)
+    task.parallel({s: [J(PPo.ELBOW_OPEN[s])] for s in SIDES}, lift=tgt)
+    if lift is not None and abs(lift - _lift_now()) > 1e-4:
+        task.lift_to(lift)
 
 
 def _lift_now():
@@ -67,12 +93,29 @@ def fold(wide_lift=0.0):
     the outline), elbow-open, fold one arm at a time, then down (the fold is clear at any lift)."""
     if wide_lift > _lift_now():
         task.lift_to(wide_lift)
+    if ASYNC:
+        _fold_async(wide_lift)
+        trace('folded', TRACE_NAMES)
+        return
     task.joint_move2(PPo.ELBOW_OPEN['left'], PPo.ELBOW_OPEN['right'])
     trace('fold: elbow open', TRACE_NAMES)
     task.joint_move2(PPo.ELBOW_OPEN['left'], PPo.STOW['right'])
     task.joint_move2(PPo.STOW['left'], PPo.STOW['right'])
     task.lift_to(PPo.STOW['left']['lift'])
     trace('folded', TRACE_NAMES)
+
+
+def _fold_async(wide_lift):
+    """ELBOW_OPEN then STOW, each arm on its own clock; the lift goes down to the fold height meanwhile (once both hands are
+    at ELBOW_OPEN when they swing out over a low obstacle, i.e. wide_lift > 0; never below LIFT_SAFE before they are in)."""
+    down = min(max(_lift_now(), LIFT_SAFE), TRAVEL_MAX)
+    if wide_lift > 0:
+        task.parallel({s: [J(PPo.ELBOW_OPEN[s])] for s in SIDES})
+        task.parallel({s: [J(PPo.STOW[s])] for s in SIDES}, lift=max(down, LIFT_SAFE))
+    else:
+        task.parallel({s: [J(PPo.ELBOW_OPEN[s]), J(PPo.STOW[s])] for s in SIDES}, lift=max(down, LIFT_SAFE))
+    if abs(down - _lift_now()) > 1e-4:
+        task.lift_to(down)
 
 
 def trace(label, names):
@@ -168,22 +211,27 @@ def pick_pair(pid):
     q_ready = {s: task.ik(s, ready[s], el[s]) for s in SIDES}
     tcp_off = gz - q_ready['left']['lift']                                # TCP height over the lift, hand level
     wide_lift = max(0.0, S.get('side_min_z', 0.0) - tcp_off)
-    task.lift_to(max(q_ready['left']['lift'], wide_lift))                 # folded: clear at any lift
-    unfold()
+    unfold(lift=max(q_ready['left']['lift'], wide_lift), wide=wide_lift)  # folded: clear at any lift
     trace('unfolded', names)
     task.joint_move2({**q_ready['left'], 'lift': _lift_now()}, {**q_ready['right'], 'lift': _lift_now()})   # both hands in front
     task.lift_to(q_ready['left']['lift'])
     trace('in front of products', names)
-    if any(ready[s] is not poses[s][0] for s in SIDES):
-        task.cart_move2(ready['left'], poses['left'][0], el['left'], ready['right'], poses['right'][0], el['right'])
-    task.set_jaw('right', jopen['right'])
-    task.jaw('left', jopen['left'], 1.2); task.jaw('right', jopen['right'], 1.2)   # until both are open (0.8 s for 90 mm)
-    task.cart_move2(poses['left'][0], poses['left'][1], el['left'], poses['right'][0], poses['right'][1], el['right'])
-    task.jaw2(0.0, 1.0)
+    if ASYNC:                             # each arm: (to the approach start), jaws fully open, straight in, close on it
+        task.parallel({s: ([('cart', ready[s], poses[s][0], el[s])] if ready[s] is not poses[s][0] else []) +
+                          [('jaw', jopen[s], 1.2), ('cart', poses[s][0], poses[s][1], el[s]), ('jaw', 0.0, 1.0)]
+                       for s in SIDES})
+    else:
+        if any(ready[s] is not poses[s][0] for s in SIDES):
+            task.cart_move2(ready['left'], poses['left'][0], el['left'], ready['right'], poses['right'][0], el['right'])
+        task.set_jaw('right', jopen['right'])
+        task.jaw('left', jopen['left'], 1.2); task.jaw('right', jopen['right'], 1.2)   # until both are open (0.8 s for 90 mm)
+        task.cart_move2(poses['left'][0], poses['left'][1], el['left'], poses['right'][0], poses['right'][1], el['right'])
+        task.jaw2(0.0, 1.0)
     trace('closed', names)
     z0 = {s: R.positions(watch)[names[s]][2] for s in SIDES}
     task.cart_move2(poses['left'][1], poses['left'][2], el['left'], poses['right'][1], poses['right'][2], el['right'])
-    task.cart_move2(poses['left'][2], out['left'], el['left'], poses['right'][2], out['right'], el['right'])
+    if not ASYNC:
+        task.cart_move2(poses['left'][2], out['left'], el['left'], poses['right'][2], out['right'], el['right'])
     trace('out of the shelf', names)
     pz = R.positions(watch)
     for s in SIDES:
@@ -200,7 +248,14 @@ def pick_pair(pid):
     # the TCP: the hand is out when that tip is 30 mm in front of the board
     front = min(c[s][0] - dims[s][1] / 2 - 0.04 for s in SIDES)
     wq = {s: back_out(s, out[s], el[s], front - (dims[s][1] - 0.03) - 0.03) for s in SIDES}
-    task.joint_move2(wq['left'], wq['right'])
+    chained = ASYNC and wide_lift <= 0
+    if ASYNC and not chained:
+        task.parallel({s: [('cart', poses[s][2], out[s], el[s]), J(wq[s])] for s in SIDES})
+    elif chained:                         # out of the shelf, back out, elbow open, hands down: each arm on its own
+        task.parallel({s: [('cart', poses[s][2], out[s], el[s]), J(wq[s]), J(PPo.ELBOW_OPEN[s]),
+                           J({**PPo.ELBOW_OPEN[s], 'wrist_pitch': P})] for s in SIDES})
+    else:
+        task.joint_move2(wq['left'], wq['right'])
     trace('backed out', names)
     # holding the products, the hands swing out beside the robot and then pitch down there (the box turns from upright to
     # lying, its far end sweeping up to its full length below the TCP; pitching down also drops the TCP by HAND_DROP):
@@ -210,9 +265,10 @@ def pick_pair(pid):
         wide_held = min(K.LIFT_MAX[LAYOUT], wide_lift + reach + HAND_DROP)
         if wide_held > _lift_now():
             task.lift_to(wide_held)
-    task.joint_move2(PPo.ELBOW_OPEN['left'], PPo.ELBOW_OPEN['right'])
-    trace('elbow open', names)
-    task.joint_move2({**PPo.ELBOW_OPEN['left'], 'wrist_pitch': P}, {**PPo.ELBOW_OPEN['right'], 'wrist_pitch': P})
+    if not chained:
+        task.joint_move2(PPo.ELBOW_OPEN['left'], PPo.ELBOW_OPEN['right'])
+        trace('elbow open', names)
+        task.joint_move2({**PPo.ELBOW_OPEN['left'], 'wrist_pitch': P}, {**PPo.ELBOW_OPEN['right'], 'wrist_pitch': P})
     trace('hands down', names)
     T = PPo.TOTE2
     zt = {s: 0.263 + (dims[s][1] - 0.03) + TOTE_DZ for s in SIDES}           # lying: the approach depth is now vertical
@@ -232,10 +288,18 @@ def pick_pair(pid):
     task.cart_move2(hi['left'], lo['left'], T['left']['elbow'], hi['right'], lo['right'], T['right']['elbow'])
     trace('lowered', names)
     held = {s: PM.pose_b(items[names[s]]['bodies'][0]) for s in SIDES}       # product pose in the hand, just before release
-    task.jaw2(0.04, 0.8)
+    if ASYNC:
+        task.parallel({s: [('jaw', 0.04, 0.8)] for s in SIDES})
+    else:
+        task.jaw2(0.04, 0.8)
     trace('released', names)
     task.wait(0.3)
-    task.cart_move2(lo['left'], hi['left'], T['left']['elbow'], lo['right'], hi['right'], T['right']['elbow'])
+    if ASYNC:                             # empty hands: up just clear of the product and the walls (not back to the carry
+        ze = min(max(z + EMPTY_UP, EMPTY_CLEAR), hi['left'][2])          # height the boxes needed going in)
+        up_ = {s: (lo[s][0], lo[s][1], ze, lo[s][3], lo[s][4]) for s in SIDES}
+        task.cart_move2(lo['left'], up_['left'], T['left']['elbow'], lo['right'], up_['right'], T['right']['elbow'])
+    else:
+        task.cart_move2(lo['left'], hi['left'], T['left']['elbow'], lo['right'], hi['right'], T['right']['elbow'])
     task.jaw2(0.0, 0.5)
     x0, x1, y0, y1 = PPo.TOTE_INNER
     for s in SIDES:
@@ -319,17 +383,31 @@ def place_pair():
     hi2 = {s: (lo2[s][0], lo2[s][1], C['hi'][s][2], lo2[s][3], P) for s in SIDES}
     el_t = {s: T[s]['elbow'] for s in SIDES}
     q_hi2 = {s: task.ik(s, hi2[s], el_t[s]) for s in SIDES}
+    if ASYNC:                             # empty hands go in just over the walls, not at the carry height
+        # over BOTH products' tops: each rests at its own height (the shared grip zc is the lower one); a held product's
+        # top sits ~2 cm above the TCP and the fingertips 12 mm below it (at zc + 5 cm the right hand swept the cracker
+        # box, which rested 20 mm higher, out of its place)
+        ze = min(max(max(ideal.values()) + 0.02 + 0.012 + EMPTY_UP, EMPTY_CLEAR), hi2['left'][2])
+        in2 = {s: (lo2[s][0], lo2[s][1], ze, lo2[s][3], P) for s in SIDES}
+        q_in2 = {s: task.ik(s, in2[s], el_t[s]) for s in SIDES}
+    else:
+        in2, q_in2 = hi2, q_hi2
 
     # out of the fold and over the tote (the pick's way back, forwards): up, elbow-open, hands down beside the robot, in
-    task.lift_to(max(C['fold_lift'], C['lift_hi']))
-    unfold()
-    task.joint_move2({**PPo.ELBOW_OPEN['left'], 'wrist_pitch': P}, {**PPo.ELBOW_OPEN['right'], 'wrist_pitch': P})
+    unfold(lift=max(C['fold_lift'], q_in2['left']['lift']), wide=C['wide_lift'])
     task.set_jaw('left', 0.04); task.set_jaw('right', 0.04)
-    task.joint_move2(q_hi2['left'], q_hi2['right'])
-    task.lift_to(q_hi2['left']['lift'])
+    if ASYNC:
+        task.parallel({s: [J({**PPo.ELBOW_OPEN[s], 'wrist_pitch': P}), J(q_in2[s])] for s in SIDES})
+    else:
+        task.joint_move2({**PPo.ELBOW_OPEN['left'], 'wrist_pitch': P}, {**PPo.ELBOW_OPEN['right'], 'wrist_pitch': P})
+        task.joint_move2(q_hi2['left'], q_hi2['right'])
+    task.lift_to(q_in2['left']['lift'])
     trace('over the tote', names)
-    task.cart_move2(hi2['left'], lo2['left'], el_t['left'], hi2['right'], lo2['right'], el_t['right'])
-    task.jaw2(0.0, 1.0)
+    task.cart_move2(in2['left'], lo2['left'], el_t['left'], in2['right'], lo2['right'], el_t['right'])
+    if ASYNC:
+        task.parallel({s: [('jaw', 0.0, 1.0)] for s in SIDES})
+    else:
+        task.jaw2(0.0, 1.0)
     z0 = {s: R.positions(watch)[names[s]][2] for s in SIDES}
     task.cart_move2(lo2['left'], hi2['left'], el_t['left'], lo2['right'], hi2['right'], el_t['right'])
     pz = R.positions(watch); q = task.robot.get_joint_positions()
@@ -342,10 +420,16 @@ def place_pair():
 
     # back to the shelf: up, out beside the robot (hands down), hands level, back-out waypoint, down, in, set down
     task.lift_to(C['lift_hi'])
-    task.joint_move2({**PPo.ELBOW_OPEN['left'], 'wrist_pitch': P}, {**PPo.ELBOW_OPEN['right'], 'wrist_pitch': P})
-    task.joint_move2(PPo.ELBOW_OPEN['left'], PPo.ELBOW_OPEN['right'])
-    trace('beside the robot', names)
-    task.joint_move2(C['wq']['left'], C['wq']['right'])
+    if ASYNC:
+        task.parallel({s: [J({**PPo.ELBOW_OPEN[s], 'wrist_pitch': P}), J(PPo.ELBOW_OPEN[s])] +
+                          ([J(C['wq'][s])] if C['wide_lift'] <= 0 else []) for s in SIDES})
+        if C['wide_lift'] > 0:
+            task.parallel({s: [J(C['wq'][s])] for s in SIDES})
+    else:
+        task.joint_move2({**PPo.ELBOW_OPEN['left'], 'wrist_pitch': P}, {**PPo.ELBOW_OPEN['right'], 'wrist_pitch': P})
+        task.joint_move2(PPo.ELBOW_OPEN['left'], PPo.ELBOW_OPEN['right'])
+        trace('beside the robot', names)
+        task.joint_move2(C['wq']['left'], C['wq']['right'])
     task.lift_to(C['wq']['left']['lift'])
     q_out = {s: task.ik(s, C['out'][s], C['el'][s]) for s in SIDES}
     task.joint_move2(q_out['left'], q_out['right'])
@@ -354,16 +438,28 @@ def place_pair():
     up = {s: (po[s][2][0] + deeper[s], po[s][2][1], po[s][2][2], 0.0, 0.0) for s in SIDES}
     down = {s: (po[s][1][0] + deeper[s], po[s][1][1], po[s][1][2] + 0.005, 0.0, 0.0) for s in SIDES}
     task.report('re-grasp offsets', ', '.join(f'{s} {deeper[s] * 1000:+.0f} mm (+ = deeper in the hand)' for s in SIDES))
-    task.cart_move2(C['out']['left'], up['left'], el['left'], C['out']['right'], up['right'], el['right'])
+    if ASYNC:
+        task.parallel({s: [('cart', C['out'][s], up[s], el[s])] for s in SIDES})
+    else:
+        task.cart_move2(C['out']['left'], up['left'], el['left'], C['out']['right'], up['right'], el['right'])
     task.cart_move2(up['left'], down['left'], el['left'], up['right'], down['right'], el['right'])
-    task.set_jaw('right', C['jopen']['right'])
-    task.jaw('left', C['jopen']['left'], 1.0); task.jaw('right', C['jopen']['right'], 1.0)   # until both jaws are open
-    trace('set down', names)
-    task.cart_move2(down['left'], po['left'][0], el['left'], down['right'], po['right'][0], el['right'])
-    if any(C['ready'][s] is not po[s][0] for s in SIDES):
-        task.cart_move2(po['left'][0], C['ready']['left'], el['left'], po['right'][0], C['ready']['right'], el['right'])
-    task.jaw2(0.0, 0.5)
-    task.wait(0.5)
+    if ASYNC:                             # each arm: open on the shelf; the 5 mm set-down margin back (shared lift); then
+        task.parallel({s: [('jaw', C['jopen'][s], 1.0)] for s in SIDES})      # each arm straight out, (ready), close
+        d0 = {s: (down[s][0], down[s][1], po[s][0][2], 0.0, 0.0) for s in SIDES}
+        task.cart_move2(down['left'], d0['left'], el['left'], down['right'], d0['right'], el['right'])
+        task.parallel({s: [('cart', d0[s], po[s][0], el[s])] +
+                          ([('cart', po[s][0], C['ready'][s], el[s])] if C['ready'][s] is not po[s][0] else []) +
+                          [('jaw', 0.0, 0.5)] for s in SIDES})
+        task.wait(0.3)
+    else:
+        task.set_jaw('right', C['jopen']['right'])
+        task.jaw('left', C['jopen']['left'], 1.0); task.jaw('right', C['jopen']['right'], 1.0)   # until both jaws are open
+        trace('set down', names)
+        task.cart_move2(down['left'], po['left'][0], el['left'], down['right'], po['right'][0], el['right'])
+        if any(C['ready'][s] is not po[s][0] for s in SIDES):
+            task.cart_move2(po['left'][0], C['ready']['left'], el['left'], po['right'][0], C['ready']['right'], el['right'])
+        task.jaw2(0.0, 0.5)
+        task.wait(0.5)
     for s in SIDES:
         n = names[s]
         pf, Rf = PM.pose_b(items[n]['bodies'][0])
@@ -375,10 +471,13 @@ def place_pair():
                     ok=dxy < 20 and tl < 5)
     if C['wide_lift'] > _lift_now():
         task.lift_to(C['wide_lift'])                                       # hands in front of the shelf: up, then fold
-    task.joint_move2(PPo.ELBOW_OPEN['left'], PPo.ELBOW_OPEN['right'])
-    task.joint_move2(PPo.ELBOW_OPEN['left'], PPo.STOW['right'])
-    task.joint_move2(PPo.STOW['left'], PPo.STOW['right'])
-    task.lift_to(PPo.STOW['left']['lift'])
+    if ASYNC:
+        _fold_async(C['wide_lift'])
+    else:
+        task.joint_move2(PPo.ELBOW_OPEN['left'], PPo.ELBOW_OPEN['right'])
+        task.joint_move2(PPo.ELBOW_OPEN['left'], PPo.STOW['right'])
+        task.joint_move2(PPo.STOW['left'], PPo.STOW['right'])
+        task.lift_to(PPo.STOW['left']['lift'])
     trace('folded', names)
     moved = {n: d for n, d in R.knocked(watch, p0).items() if n not in names.values()}
     task.report('nothing else moved', ', '.join(f'{n} {d*1000:.0f} mm' for n, d in moved.items()) or 'none over 10 mm', ok=not moved)

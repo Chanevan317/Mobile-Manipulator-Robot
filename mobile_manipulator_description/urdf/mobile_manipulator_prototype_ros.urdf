@@ -44,25 +44,25 @@
     <inertial><origin xyz="0 0 0" rpy="0 0 0"/><mass value="0.001"/><inertia ixx="1e-08" ixy="0" ixz="0" iyy="1e-08" iyz="0" izz="1e-08"/></inertial>
   </link>
   <link name="base_body">
-    <inertial><origin xyz="0 0 0.113947" rpy="0 0 0"/><mass value="19"/><inertia ixx="0.355529" ixy="0" ixz="0" iyy="0.469746" iyz="0" izz="0.6726"/></inertial>
-    <visual><origin xyz="0 0 0.22" rpy="0 0 0"/><geometry><box size="0.5 0.5 0.04"/></geometry><material name="mat_26"/></visual>
-    <visual><origin xyz="0 0 0.243" rpy="0 0 0"/><geometry><box size="0.49 0.49 0.006"/></geometry><material name="mat_27"/></visual>
-    <visual><origin xyz="0 0 0.08" rpy="0 0 0"/><geometry><box size="0.5 0.39 0.1"/></geometry><material name="mat_26"/></visual>
-    <visual><origin xyz="0 0.2225 0.08" rpy="0 0 0"/><geometry><box size="0.24 0.055 0.1"/></geometry><material name="mat_26"/></visual>
-    <visual><origin xyz="0 -0.2225 0.08" rpy="0 0 0"/><geometry><box size="0.24 0.055 0.1"/></geometry><material name="mat_26"/></visual>
-    <visual><origin xyz="0.235 0.235 0.165" rpy="0 0 0"/><geometry><box size="0.015 0.015 0.07"/></geometry><material name="mat_00"/></visual>
-    <visual><origin xyz="0.235 -0.235 0.165" rpy="0 0 0"/><geometry><box size="0.015 0.015 0.07"/></geometry><material name="mat_00"/></visual>
-    <visual><origin xyz="-0.235 0.235 0.165" rpy="0 0 0"/><geometry><box size="0.015 0.015 0.07"/></geometry><material name="mat_00"/></visual>
-    <visual><origin xyz="-0.235 -0.235 0.165" rpy="0 0 0"/><geometry><box size="0.015 0.015 0.07"/></geometry><material name="mat_00"/></visual>
-    <visual><origin xyz="-0.225 0.035 0.165" rpy="0 0 0"/><geometry><box size="0.015 0.015 0.07"/></geometry><material name="mat_00"/></visual>
-    <visual><origin xyz="-0.225 -0.035 0.165" rpy="0 0 0"/><geometry><box size="0.015 0.015 0.07"/></geometry><material name="mat_00"/></visual>
-    <visual><origin xyz="0.253 0 0.07" rpy="0 0 0"/><geometry><box size="0.012 0.48 0.035"/></geometry><material name="mat_28"/></visual>
-    <visual><origin xyz="-0.253 0 0.07" rpy="0 0 0"/><geometry><box size="0.012 0.48 0.035"/></geometry><material name="mat_28"/></visual>
-    <visual><origin xyz="0.248 0 0.205" rpy="0 0 0"/><geometry><box size="0.006 0.3 0.008"/></geometry><material name="mat_29"/></visual>
-    <collision><origin xyz="0 0 0.22" rpy="0 0 0"/><geometry><box size="0.5 0.5 0.04"/></geometry></collision>
-    <collision><origin xyz="0 0 0.08" rpy="0 0 0"/><geometry><box size="0.5 0.39 0.1"/></geometry></collision>
-    <collision><origin xyz="0 0.2225 0.08" rpy="0 0 0"/><geometry><box size="0.24 0.055 0.1"/></geometry></collision>
-    <collision><origin xyz="0 -0.2225 0.08" rpy="0 0 0"/><geometry><box size="0.24 0.055 0.1"/></geometry></collision>
+    <inertial><origin xyz="0 0 0.113947" rpy="0 0 0"/><mass value="19"/><inertia ixx="0.293404" ixy="0" ixz="0" iyy="0.394787" iyz="0" izz="0.535517"/></inertial>
+    <visual><origin xyz="0 0 0.22" rpy="0 0 0"/><geometry><box size="0.45 0.45 0.04"/></geometry><material name="mat_26"/></visual>
+    <visual><origin xyz="0 0 0.243" rpy="0 0 0"/><geometry><box size="0.44 0.44 0.006"/></geometry><material name="mat_27"/></visual>
+    <visual><origin xyz="0 0 0.08" rpy="0 0 0"/><geometry><box size="0.45 0.34 0.1"/></geometry><material name="mat_26"/></visual>
+    <visual><origin xyz="0 0.1975 0.08" rpy="0 0 0"/><geometry><box size="0.19 0.055 0.1"/></geometry><material name="mat_26"/></visual>
+    <visual><origin xyz="0 -0.1975 0.08" rpy="0 0 0"/><geometry><box size="0.19 0.055 0.1"/></geometry><material name="mat_26"/></visual>
+    <visual><origin xyz="0.21 0.21 0.165" rpy="0 0 0"/><geometry><box size="0.015 0.015 0.07"/></geometry><material name="mat_00"/></visual>
+    <visual><origin xyz="0.21 -0.21 0.165" rpy="0 0 0"/><geometry><box size="0.015 0.015 0.07"/></geometry><material name="mat_00"/></visual>
+    <visual><origin xyz="-0.21 0.21 0.165" rpy="0 0 0"/><geometry><box size="0.015 0.015 0.07"/></geometry><material name="mat_00"/></visual>
+    <visual><origin xyz="-0.21 -0.21 0.165" rpy="0 0 0"/><geometry><box size="0.015 0.015 0.07"/></geometry><material name="mat_00"/></visual>
+    <visual><origin xyz="-0.2 0.035 0.165" rpy="0 0 0"/><geometry><box size="0.015 0.015 0.07"/></geometry><material name="mat_00"/></visual>
+    <visual><origin xyz="-0.2 -0.035 0.165" rpy="0 0 0"/><geometry><box size="0.015 0.015 0.07"/></geometry><material name="mat_00"/></visual>
+    <visual><origin xyz="0.228 0 0.07" rpy="0 0 0"/><geometry><box size="0.012 0.43 0.035"/></geometry><material name="mat_28"/></visual>
+    <visual><origin xyz="-0.228 0 0.07" rpy="0 0 0"/><geometry><box size="0.012 0.43 0.035"/></geometry><material name="mat_28"/></visual>
+    <visual><origin xyz="0.223 0 0.205" rpy="0 0 0"/><geometry><box size="0.006 0.3 0.008"/></geometry><material name="mat_29"/></visual>
+    <collision><origin xyz="0 0 0.22" rpy="0 0 0"/><geometry><box size="0.45 0.45 0.04"/></geometry></collision>
+    <collision><origin xyz="0 0 0.08" rpy="0 0 0"/><geometry><box size="0.45 0.34 0.1"/></geometry></collision>
+    <collision><origin xyz="0 0.1975 0.08" rpy="0 0 0"/><geometry><box size="0.19 0.055 0.1"/></geometry></collision>
+    <collision><origin xyz="0 -0.1975 0.08" rpy="0 0 0"/><geometry><box size="0.19 0.055 0.1"/></geometry></collision>
   </link>
   <joint name="base_body_fixed" type="fixed"><parent link="base_link"/><child link="base_body"/><origin xyz="0 0 0" rpy="0 0 0"/></joint>
   <link name="wheel_fl">
@@ -70,7 +70,7 @@
     <visual><origin xyz="0 0 0" rpy="1.5708 0 0"/><geometry><cylinder radius="0.03" length="0.051"/></geometry><material name="mat_30"/></visual>
     <collision><origin xyz="0 0 0" rpy="1.5708 0 0"/><geometry><cylinder radius="0.028" length="0.045"/></geometry></collision>
   </link>
-  <joint name="wheel_fl_joint" type="continuous"><parent link="base_link"/><child link="wheel_fl"/><origin xyz="0.17 0.222 0.05" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-1e+09" upper="1e+09" effort="6" velocity="25"/><dynamics damping="0.1" friction="0.05"/></joint>
+  <joint name="wheel_fl_joint" type="continuous"><parent link="base_link"/><child link="wheel_fl"/><origin xyz="0.145 0.197 0.05" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-1e+09" upper="1e+09" effort="6" velocity="25"/><dynamics damping="0.1" friction="0.05"/></joint>
   <link name="wheel_fl_roller_0">
     <inertial><origin xyz="0 0 0" rpy="0 0 0"/><mass value="0.012"/><inertia ixx="1.963e-06" ixy="0" ixz="0" iyy="1.963e-06" iyz="0" izz="7.26e-07"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><cylinder radius="0.011" length="0.04"/></geometry><material name="mat_31"/></visual>
@@ -148,7 +148,7 @@
     <visual><origin xyz="0 0 0" rpy="1.5708 0 0"/><geometry><cylinder radius="0.03" length="0.051"/></geometry><material name="mat_30"/></visual>
     <collision><origin xyz="0 0 0" rpy="1.5708 0 0"/><geometry><cylinder radius="0.028" length="0.045"/></geometry></collision>
   </link>
-  <joint name="wheel_fr_joint" type="continuous"><parent link="base_link"/><child link="wheel_fr"/><origin xyz="0.17 -0.222 0.05" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-1e+09" upper="1e+09" effort="6" velocity="25"/><dynamics damping="0.1" friction="0.05"/></joint>
+  <joint name="wheel_fr_joint" type="continuous"><parent link="base_link"/><child link="wheel_fr"/><origin xyz="0.145 -0.197 0.05" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-1e+09" upper="1e+09" effort="6" velocity="25"/><dynamics damping="0.1" friction="0.05"/></joint>
   <link name="wheel_fr_roller_0">
     <inertial><origin xyz="0 0 0" rpy="0 0 0"/><mass value="0.012"/><inertia ixx="1.963e-06" ixy="0" ixz="0" iyy="1.963e-06" iyz="0" izz="7.26e-07"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><cylinder radius="0.011" length="0.04"/></geometry><material name="mat_31"/></visual>
@@ -226,7 +226,7 @@
     <visual><origin xyz="0 0 0" rpy="1.5708 0 0"/><geometry><cylinder radius="0.03" length="0.051"/></geometry><material name="mat_30"/></visual>
     <collision><origin xyz="0 0 0" rpy="1.5708 0 0"/><geometry><cylinder radius="0.028" length="0.045"/></geometry></collision>
   </link>
-  <joint name="wheel_rl_joint" type="continuous"><parent link="base_link"/><child link="wheel_rl"/><origin xyz="-0.17 0.222 0.05" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-1e+09" upper="1e+09" effort="6" velocity="25"/><dynamics damping="0.1" friction="0.05"/></joint>
+  <joint name="wheel_rl_joint" type="continuous"><parent link="base_link"/><child link="wheel_rl"/><origin xyz="-0.145 0.197 0.05" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-1e+09" upper="1e+09" effort="6" velocity="25"/><dynamics damping="0.1" friction="0.05"/></joint>
   <link name="wheel_rl_roller_0">
     <inertial><origin xyz="0 0 0" rpy="0 0 0"/><mass value="0.012"/><inertia ixx="1.963e-06" ixy="0" ixz="0" iyy="1.963e-06" iyz="0" izz="7.26e-07"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><cylinder radius="0.011" length="0.04"/></geometry><material name="mat_31"/></visual>
@@ -304,7 +304,7 @@
     <visual><origin xyz="0 0 0" rpy="1.5708 0 0"/><geometry><cylinder radius="0.03" length="0.051"/></geometry><material name="mat_30"/></visual>
     <collision><origin xyz="0 0 0" rpy="1.5708 0 0"/><geometry><cylinder radius="0.028" length="0.045"/></geometry></collision>
   </link>
-  <joint name="wheel_rr_joint" type="continuous"><parent link="base_link"/><child link="wheel_rr"/><origin xyz="-0.17 -0.222 0.05" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-1e+09" upper="1e+09" effort="6" velocity="25"/><dynamics damping="0.1" friction="0.05"/></joint>
+  <joint name="wheel_rr_joint" type="continuous"><parent link="base_link"/><child link="wheel_rr"/><origin xyz="-0.145 -0.197 0.05" rpy="0 0 0"/><axis xyz="0 1 0"/><limit lower="-1e+09" upper="1e+09" effort="6" velocity="25"/><dynamics damping="0.1" friction="0.05"/></joint>
   <link name="wheel_rr_roller_0">
     <inertial><origin xyz="0 0 0" rpy="0 0 0"/><mass value="0.012"/><inertia ixx="1.963e-06" ixy="0" ixz="0" iyy="1.963e-06" iyz="0" izz="7.26e-07"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><cylinder radius="0.011" length="0.04"/></geometry><material name="mat_31"/></visual>
@@ -383,19 +383,19 @@
   </link>
   <joint name="lidar_fixed" type="fixed"><parent link="base_link"/><child link="lidar_link"/><origin xyz="0.04 0 0.165" rpy="0 0 0"/></joint>
   <link name="tote">
-    <inertial><origin xyz="0 0 0.04" rpy="0 0 0"/><mass value="1.05"/><inertia ixx="0.02142" ixy="0" ixz="0" iyy="0.0119788" iyz="0" izz="0.0308787"/></inertial>
-    <visual><origin xyz="0 0 0.0035" rpy="0 0 0"/><geometry><box size="0.35 0.48 0.007"/></geometry><material name="mat_29"/></visual>
-    <visual><origin xyz="0.17149999999999999 0 0.06" rpy="0 0 0"/><geometry><box size="0.007 0.48 0.12"/></geometry><material name="mat_29"/></visual>
-    <visual><origin xyz="-0.17149999999999999 0 0.06" rpy="0 0 0"/><geometry><box size="0.007 0.48 0.12"/></geometry><material name="mat_29"/></visual>
-    <visual><origin xyz="0 0.2365 0.06" rpy="0 0 0"/><geometry><box size="0.336 0.007 0.12"/></geometry><material name="mat_29"/></visual>
-    <visual><origin xyz="0 -0.2365 0.06" rpy="0 0 0"/><geometry><box size="0.336 0.007 0.12"/></geometry><material name="mat_29"/></visual>
-    <collision><origin xyz="0 0 0.0035" rpy="0 0 0"/><geometry><box size="0.35 0.48 0.007"/></geometry></collision>
-    <collision><origin xyz="0.17149999999999999 0 0.06" rpy="0 0 0"/><geometry><box size="0.007 0.48 0.12"/></geometry></collision>
-    <collision><origin xyz="-0.17149999999999999 0 0.06" rpy="0 0 0"/><geometry><box size="0.007 0.48 0.12"/></geometry></collision>
-    <collision><origin xyz="0 0.2365 0.06" rpy="0 0 0"/><geometry><box size="0.336 0.007 0.12"/></geometry></collision>
-    <collision><origin xyz="0 -0.2365 0.06" rpy="0 0 0"/><geometry><box size="0.336 0.007 0.12"/></geometry></collision>
+    <inertial><origin xyz="0 0 0.04" rpy="0 0 0"/><mass value="0.915"/><inertia ixx="0.0165386" ixy="0" ixz="0" iyy="0.00819116" iyz="0" izz="0.0225338"/></inertial>
+    <visual><origin xyz="0 0 0.0035" rpy="0 0 0"/><geometry><box size="0.305 0.45 0.007"/></geometry><material name="mat_29"/></visual>
+    <visual><origin xyz="0.149 0 0.06" rpy="0 0 0"/><geometry><box size="0.007 0.45 0.12"/></geometry><material name="mat_29"/></visual>
+    <visual><origin xyz="-0.149 0 0.06" rpy="0 0 0"/><geometry><box size="0.007 0.45 0.12"/></geometry><material name="mat_29"/></visual>
+    <visual><origin xyz="0 0.2215 0.06" rpy="0 0 0"/><geometry><box size="0.291 0.007 0.12"/></geometry><material name="mat_29"/></visual>
+    <visual><origin xyz="0 -0.2215 0.06" rpy="0 0 0"/><geometry><box size="0.291 0.007 0.12"/></geometry><material name="mat_29"/></visual>
+    <collision><origin xyz="0 0 0.0035" rpy="0 0 0"/><geometry><box size="0.305 0.45 0.007"/></geometry></collision>
+    <collision><origin xyz="0.149 0 0.06" rpy="0 0 0"/><geometry><box size="0.007 0.45 0.12"/></geometry></collision>
+    <collision><origin xyz="-0.149 0 0.06" rpy="0 0 0"/><geometry><box size="0.007 0.45 0.12"/></geometry></collision>
+    <collision><origin xyz="0 0.2215 0.06" rpy="0 0 0"/><geometry><box size="0.291 0.007 0.12"/></geometry></collision>
+    <collision><origin xyz="0 -0.2215 0.06" rpy="0 0 0"/><geometry><box size="0.291 0.007 0.12"/></geometry></collision>
   </link>
-  <joint name="tote_fixed" type="fixed"><parent link="base_link"/><child link="tote"/><origin xyz="-0.07 0 0.256" rpy="0 0 0"/></joint>
+  <joint name="tote_fixed" type="fixed"><parent link="base_link"/><child link="tote"/><origin xyz="-0.0725 0 0.256" rpy="0 0 0"/></joint>
   <link name="column">
     <inertial><origin xyz="-0.000837434 3.71592e-06 0.315898" rpy="0 0 0"/><mass value="3.6588"/><inertia ixx="0.453763" ixy="1.74717e-07" ixz="-0.00278795" iyy="0.452628" iyz="4.70253e-06" izz="0.00276951"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/cbeam_beam.stl"/></geometry><material name="mat_32"/></visual>
@@ -407,13 +407,13 @@
     <collision><origin xyz="-0.010335 0 -0.054" rpy="0 0 0"/><geometry><box size="0.06067 0.08 0.108"/></geometry></collision>
     <collision><origin xyz="0.023 0 -0.007" rpy="0 0 0"/><geometry><box size="0.006 0.08 0.12"/></geometry></collision>
   </link>
-  <joint name="column_fixed" type="fixed"><parent link="base_link"/><child link="column"/><origin xyz="0.18 0 0.313" rpy="0 0 0"/></joint>
+  <joint name="column_fixed" type="fixed"><parent link="base_link"/><child link="column"/><origin xyz="0.155 0 0.313" rpy="0 0 0"/></joint>
   <link name="top_beam">
     <inertial><origin xyz="-0.00486948 1.81726e-06 0.00558039" rpy="0 0 0"/><mass value="0.1456"/><inertia ixx="8.06856e-05" ixy="3.30126e-09" ixz="-7.25664e-08" iyy="3.23254e-05" iyz="5.88752e-10" izz="0.000108533"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/cbeam_top.stl"/></geometry><material name="mat_00"/></visual>
     <collision><origin xyz="-0.005 0 0.006" rpy="0 0 0"/><geometry><box size="0.05 0.08 0.012"/></geometry></collision>
   </link>
-  <joint name="top_beam_fixed" type="fixed"><parent link="base_link"/><child link="top_beam"/><origin xyz="0.18 0 1.313" rpy="0 0 0"/></joint>
+  <joint name="top_beam_fixed" type="fixed"><parent link="base_link"/><child link="top_beam"/><origin xyz="0.155 0 1.313" rpy="0 0 0"/></joint>
   <link name="estop">
     <inertial><origin xyz="0 0 0" rpy="0 0 0"/><mass value="0.03"/><inertia ixx="4.63e-06" ixy="0" ixz="0" iyy="4.63e-06" iyz="0" izz="7.26e-06"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><cylinder radius="0.022" length="0.02"/></geometry><material name="mat_33"/></visual>
@@ -514,7 +514,7 @@
   </link>
   <joint name="scene_camera_optical_fixed" type="fixed"><parent link="scene_camera"/><child link="scene_camera_optical"/><origin xyz="0.0181 0.011 0" rpy="-1.5708 0 -1.5708"/></joint>
   <link name="carriage">
-    <inertial><origin xyz="-0.00167879 0.000126064 -0.0158087" rpy="0 0 0"/><mass value="0.792772"/><inertia ixx="0.00560704" ixy="2.1115e-06" ixz="-0.000429907" iyy="0.00187291" iyz="2.77527e-06" izz="0.00515229"/></inertial>
+    <inertial><origin xyz="-0.00431837 0.000126519 -0.0159344" rpy="0 0 0"/><mass value="0.789921"/><inertia ixx="0.00540352" ixy="1.8477e-06" ixz="-0.000356013" iyy="0.00177207" iyz="2.76271e-06" izz="0.00485494"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/cbeam_carriage.stl"/></geometry><material name="mat_32"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/dual_holder_left.stl"/></geometry><material name="mat_01"/></visual>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/dual_holder_right.stl"/></geometry><material name="mat_34"/></visual>
@@ -631,10 +631,8 @@
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/dual_holder_right_c52.stl"/></geometry></collision>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/dual_holder_right_c53.stl"/></geometry></collision>
     <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/dual_holder_right_c54.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/dual_holder_right_c55.stl"/></geometry></collision>
-    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/collision/dual_holder_right_c56.stl"/></geometry></collision>
   </link>
-  <joint name="lift" type="prismatic"><parent link="base_link"/><child link="carriage"/><origin xyz="0.18 0 0.42" rpy="0 0 0"/><axis xyz="0 0 1"/><limit lower="0" upper="0.871" effort="300" velocity="0.1"/><dynamics damping="50" friction="5"/></joint>
+  <joint name="lift" type="prismatic"><parent link="base_link"/><child link="carriage"/><origin xyz="0.155 0 0.42" rpy="0 0 0"/><axis xyz="0 0 1"/><limit lower="0" upper="0.871" effort="300" velocity="0.1"/><dynamics damping="50" friction="5"/></joint>
   <link name="left_base">
     <inertial><origin xyz="-0.0220981 -2.40799e-05 -0.000912393" rpy="0 0 0"/><mass value="0.380478"/><inertia ixx="0.00027411" ixy="-5.57011e-07" ixz="-6.95259e-05" iyy="0.000606691" iyz="-1.47293e-07" izz="0.000528324"/></inertial>
     <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><mesh filename="package://mobile_manipulator_description/meshes/visual/arm_base_top.stl"/></geometry><material name="mat_05"/></visual>
@@ -1493,6 +1491,6 @@
     <inertial><origin xyz="0 0 0" rpy="0 0 0"/><mass value="0.001"/><inertia ixx="1e-08" ixy="0" ixz="0" iyy="1e-08" iyz="0" izz="1e-08"/></inertial>
   </link>
   <joint name="right_tcp_fixed" type="fixed"><parent link="right_hand"/><child link="right_tcp"/><origin xyz="0.13 0 0" rpy="0 0 0"/></joint>
-  <joint name="left_arm_mount" type="fixed"><parent link="carriage"/><child link="left_base"/><origin xyz="0 0.15 0.0655" rpy="0 0 2.35619"/></joint>
-  <joint name="right_arm_mount" type="fixed"><parent link="carriage"/><child link="right_base"/><origin xyz="0 -0.15 0.0655" rpy="0 0 -2.35619"/></joint>
+  <joint name="left_arm_mount" type="fixed"><parent link="carriage"/><child link="left_base"/><origin xyz="0 0.15 0.0655" rpy="0 0 1.5708"/></joint>
+  <joint name="right_arm_mount" type="fixed"><parent link="carriage"/><child link="right_base"/><origin xyz="0 -0.15 0.0655" rpy="0 0 -1.5708"/></joint>
 </robot>

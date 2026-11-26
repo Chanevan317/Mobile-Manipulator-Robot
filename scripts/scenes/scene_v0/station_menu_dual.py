@@ -41,17 +41,19 @@ import pick_place_dual as PD
 PD.init(task, items, watch, st_mono, st)
 
 # ---------------------------------------------------------------- camera views
+CAM_WINS = {}
 x = 20
 for title, cam in (('Scene camera', 'scene'), ('Left wrist camera', 'left_wrist'), ('Right wrist camera', 'right_wrist')):
     if cam in task.cams:
         r = CAM.SCENE['res'] if cam == 'scene' else CAM.WRIST['res']
-        v = create_viewport_window(title, width=r[0] + 20, height=r[1] + 45, position_x=x, position_y=820,
-                                   camera_path=task.cams[cam].prim_path)
+        v = CAM_WINS[cam] = create_viewport_window(title, width=r[0] + 20, height=r[1] + 45, position_x=x, position_y=820,
+                                                   camera_path=task.cams[cam].prim_path)
+        x += r[0] + 30
         try:
             v.viewport_api.resolution = r
         except Exception:
             pass
-        x += r[0] + 30
+DEPTH_VIEW = CAM.depth_window(task.cams['scene']) if 'scene' in task.cams else None   # scene camera depth (cameras.py)
 
 # ---------------------------------------------------------------- lift on the arrow keys (arms folded only)
 LIFT_RANGE = (0.0, K.LIFT_MAX['prototype'])
@@ -111,6 +113,9 @@ with win.frame:
         status = ui.Label('choose a pair and press Go (or "Pick both into the tote": it drives there first)', word_wrap=True)
         lift_lbl = ui.Label('')
 combo.model.get_item_value_model().add_value_changed_fn(lambda m: state.update(sel=m.as_int))
+# the 4 camera views in a row along the bottom, the panel as a tab next to Render Settings (cameras.arrange)
+LAYOUT = CAM.arrange([CAM_WINS.get('scene'), DEPTH_VIEW[0] if DEPTH_VIEW else None, CAM_WINS.get('left_wrist'),
+                      CAM_WINS.get('right_wrist')], panel=win)
 
 
 def drive(target):

@@ -45,6 +45,16 @@ PAD = DH.PAD                      # (13.5, 25.5)
 ARM_YAW = 180.0                   # arm frame: zero pose along carriage -x (robot left), pillar toward the column
                                   # (robot heading of the zero pose = ARM_YAW - 90)
 LEG, LIP, REAR = DH.LEG, DH.LIP, DH.REAR
+# strength (mono_holder_strength.py, 2026-11-25): the pad's whole load reached the legs only through the rear bridge
+# (9 x 25.5 mm, across the print layers, twisted by the arm's tipping moment): SF 0.7. Now the bridge goes down to the
+# legs' bottom between them (WEB, 9 x 105 mm) and a rib under the pad on the centreline (RIB, in the layer plane) stiffens
+# the pad; RELIEF slots in the bridge / web let the two inner arm-base screws (x -42) seat and be driven from below
+WEB = dict(x=REAR['x'], y=LEG['y'][0], z=(LEG['z'][0], REAR['z'][0] + 0.01))
+RIB = dict(y=3.0, x=(-100.0, REAR['x'][0] + 0.01), z=-60.0)          # triangle: z -60 at the web -> pad bottom at x -100
+FAN = dict(x=-56.0, y=42.0)       # corner gussets in plan where the pad meets the bridge: |y| 24.5 at x -56 -> 42 at the bridge
+                                  # (FEA 2026-11-25: the narrow pad pushed the load into the bridge at two corners). Wider (to
+                                  # the legs' outer faces) blocked the folded arm's hand / fingers at pad height (|y| 32..75)
+RELIEF_R = 5.0                                                       # M5 head 8.5 + 0.75 per side (driver / key from below)
 BAR = (145.0, 167.0)              # bar z: 10 mm over the arm's highest point (z 134.7, any pose)
 POST = dict(x=(-44.0, -10.0), y=(-75.0, -46.0), z=(21.0, BAR[1]))   # from 1 mm over the gantry plate / wheel tops (z 20)
 BAR1 = dict(x=(-148.0, -10.0), y=(-75.0, -46.0))           # from the post toward the shoulder line, behind it
@@ -164,10 +174,20 @@ def holder():
     p, cut = pad(r)
     parts = [p, box(*REAR['x'], -REAR['y'], REAR['y'], *REAR['z']),
              box(*POST['x'], *POST['y'], *POST['z']), box(*BAR1['x'], *BAR1['y'], *BAR), box(*BAR2['x'], *BAR2['y'], *BAR)]
+    parts.append(box(*WEB['x'], -WEB['y'], WEB['y'], *WEB['z']))
+    if FAN:
+        x0 = REAR['x'][0] + 0.01
+        parts.append(CS([[(FAN['x'], -24.5), (x0, -FAN['y']), (x0, FAN['y']), (FAN['x'], 24.5)]]).extrude(PAD[1] - PAD[0]).translate((0, 0, PAD[0])))
+    tri = CS([[(RIB['x'][0], PAD[0] + 0.01), (RIB['x'][1], RIB['z']), (RIB['x'][1], PAD[0] + 0.01)]])   # (x, z), CCW
+    parts.append(xf(tri.extrude(2 * RIB['y']).translate((0, 0, -RIB['y'])), np.array([[1, 0, 0, 0], [0, 0, -1, 0], [0, 1, 0, 0], [0, 0, 0, 1.0]])))
     for sy in (-1, 1):
         y0, y1 = sorted((sy * LEG['y'][0], sy * LEG['y'][1])); parts.append(box(*LEG['x'], y0, y1, *LEG['z']))
         y0, y1 = sorted((sy * LIP['y'][0], sy * LIP['y'][1])); parts.append(box(*LIP['x'], y0, y1, *LIP['z']))
     s = union(parts)
+    for (x, y) in BASE_M5:                                             # inner screws: head + driver room through the bridge / web
+        q = arm_frame() @ np.array([x, y, PAD[0] - AZ, 1.0])
+        if q[0] + RELIEF_R > REAR['x'][0]:
+            cut.append(cyl(RELIEF_R, LEG['z'][0] - 1.0, PAD[0], hole=True).translate((q[0], q[1], 0.0)))
     cut.append(box(*POCKET['x'], *POCKET['y'], CAM_Z, BAR[1] + 1.0))                             # mast flange pocket
     for (x, y) in CAM_INSERTS:
         cut.append(insert_cut((x, y, CAM_Z), (0, 0, -1), 'M3', length=8))

@@ -20,7 +20,8 @@ for d in (VIS, COL, os.path.join(OUT, 'urdf')):
 MM = 0.001
 RHO_PRINT = 0.80e-3 * (1.24 / 1.27)  # PLA 1.24 vs PETG 1.27 g/cm^3, same effective fill
 # prototype layout (see the docstring): column x, arm mount y, arm zero-pose yaw (left; right is mirrored)
-PROTO_CX, PROTO_ARM_Y, PROTO_YAW = 0.18, 0.15, math.radians(135.0)
+PROTO_CX, PROTO_ARM_Y, PROTO_YAW = 0.18, 0.15, math.radians(90.0)   # mount yaw +-90 since 2026-11-25 (was 135: each arm's
+# blind sector pointed forward-inward, nothing in the centre strip was reachable; dual layout study)
 # SIDE layout test (user, 2026-11-18: "side tote, side lift"): the one-arm robot with the column in the middle of the
 # right side edge and the tote turned lengthwise along the left side. The arm works over the front edge with a ~90 deg
 # swing to the tote (front layout: ~180), and the scene camera sits 0.18 m further back from what it looks at.
@@ -32,6 +33,7 @@ SIDE_TOTE = (0.0, 0.075, math.pi / 2)       # tote centre x, y and yaw (0.48 alo
 # centreline, zero pose to the LEFT; the tote on the BASE behind the arm, as in the original design (MH.BASE_TOTE). Layout name 'prototype_mono_arm' (the ring layouts are parked as
 # 'prototype_mono_ring' / 'prototype_mono_ring_side').
 import mono_holder as MH
+import dual_holder as DH
 SINGLE_CX, SINGLE_CY = MH.ROBOT_X, -MH.ARM_DX * 0.001   # column axis in base_link: ROBOT_X forward, 0.122 right (shoulder at (ROBOT_X + ARM_DY, 0))
 SINGLE_YAW = -math.pi / 2                   # column / carriage yaw: carriage +y = robot front, carriage -x = robot left
 # lift speed limit (m/s): 0.10 since 2026-11-06 (user decision; 8 mm-lead C-Beam + closed-loop NEMA 23 at ~750 rpm).
@@ -410,7 +412,8 @@ MONO_LIFT_MAX = 0.81                                  # mono ring (layout B): it
 
 def base_xml(mono=False, side=False, single=False):
     o = frame_link('base_link')
-    B = MH.BASE if single else 0.50          # one-arm robot: 0.45 since 2026-11-24 (mono_holder.BASE); the rest keep 0.50
+    B = MH.BASE if single else (DH.BASE if not (mono or side) else 0.50)   # one-arm robot 0.45 since 2026-11-24, the dual
+    # robot DH.BASE (0.45 since 2026-11-25); the parked ring robots keep 0.50
     r4 = lambda v_: round(v_, 4)
     h, sb, pc, pr, bm = r4(B / 2), r4(B / 2 - 0.0275), r4(B / 2 - 0.015), r4(B / 2 - 0.025), r4(B / 2 + 0.003)
     v = vprim('0 0 0.22', bx(B, B, 0.04), SHELL) + vprim('0 0 0.243', bx(B - 0.01, B - 0.01, 0.006), TRIM)
@@ -479,14 +482,19 @@ def lift_prototype(mono=False, side=False):
     """Prototype: column 0.18 m toward the front (working face), arms right beside it, tote behind it,
     scene camera on a carriage bracket in front of the column. Compact carriage: gantry plate on the column's rear face + two 8 mm arm brackets."""
     o = ''
-    CX, CY = (SIDE_CX, SIDE_CY) if side else (PROTO_CX, 0)
+    CX, CY = (SIDE_CX, SIDE_CY) if side else ((PROTO_CX, 0) if mono else (DH.ROBOT_X, 0))   # dual: column with the base
     # tote behind the column (x -0.245 .. 0.105), full width
     L, Wt, H, t = 0.35, 0.48, 0.12, 0.007; TX = -0.07
-    o += tote_link(L, Wt, H, t)
+    if not mono and not side:     # the dual robot: the box sized to its base (dual_holder.dual_tote, 0.45 since 2026-11-25)
+        T_ = DH.dual_tote(); L, Wt = T_['x'][1] - T_['x'][0] + 2 * t, 2 * T_['y'][1] + 2 * t; TX = (T_['x'][0] + T_['x'][1]) / 2
+        o += tote_link(L, Wt, H, t)
+        o += joint('tote_fixed', 'fixed', 'base_link', 'tote', f'{TX:.6g} 0 0.256')
+    else:
+        o += tote_link(L, Wt, H, t)
     if side:                      # turned lengthwise along the left side, beside the column
         o += joint('tote_fixed', 'fixed', 'base_link', 'tote', f'{SIDE_TOTE[0]} {SIDE_TOTE[1]} 0.256', f'0 0 {SIDE_TOTE[2]:.6g}')
-    else:
-        o += joint('tote_fixed', 'fixed', 'base_link', 'tote', f'{TX} 0 0.256')
+    elif mono:
+        o += joint('tote_fixed', 'fixed', 'base_link', 'tote', f'{TX} 0 0.256')   # the ring robots: the old flat box
     # Lift (user's hardware): OpenBuilds C-Beam XLarge actuator, 1000 mm, from the kit's STEP (cbeam_import.py ->
     # cbeam/*.stl, every part as in the kit; the 500 mm beam and lead screw stretched to 1000). NEMA 23 at the BOTTOM,
     # on 40 mm spacers under the bottom end mount: it goes through a hole in the deck (motor bottom at base z 0.205).
@@ -554,24 +562,26 @@ SHOLDER = {k: dict(vis=[], col=[], props=[]) for k in ('holder',)}
 TOTE1 = dict(vis=[], col=[])
 
 
-def _tote_links():
+def _tote_links(prefix='mtote_'):
     """The one-arm robot's tote (mono_holder.tote_solid, robot frame): visual mesh; collision = floor + slopes and the
     walls as separate convex pieces (a hull over a floor + wall corner would fill the corner)."""
+    t = MH.BASE_TOTE; store = TOTE1
     for f in os.listdir(VIS) + os.listdir(COL):
-        if f.startswith('mtote_'):
+        if f.startswith(prefix):
             for d in (VIS, COL):
                 if os.path.exists(os.path.join(d, f)): os.remove(os.path.join(d, f))
-    t = MH.BASE_TOTE; ts = MH.tote_solid(t); z0, w = t['z'][0] * 1000, t['wall'] * 1000
+    ts = MH.tote_solid(t); z0, w = t['z'][0] * 1000, t['wall'] * 1000
+    TOTE1_ = store
     inner = union([box(r[0] * 1000, r[1] * 1000, r[2] * 1000, r[3] * 1000, z0 - 1, z0 + 1000) for r in t['rects']])
     floor = ts ^ inner; wall = ts - inner
-    V, F = mesh_m(ts); write_stl(os.path.join(VIS, 'mtote_tote.stl'), V, F); TOTE1['vis'].append(('mtote_tote', BLUE[:3]))
+    V, F = mesh_m(ts); write_stl(os.path.join(VIS, prefix + 'tote.stl'), V, F); TOTE1_['vis'].append((prefix + 'tote', BLUE[:3]))
     k = 0
     for part, cell in ((floor, 45.0), (wall, 45.0)):
         for hh in convex_pieces(part, cell=cell):
-            Vc, Fc = mesh_arrays(hh); fn = f'mtote_c{k:02d}'; k += 1
-            write_stl(os.path.join(COL, fn + '.stl'), Vc * MM, Fc); TOTE1['col'].append(fn)
+            Vc, Fc = mesh_arrays(hh); fn = f'{prefix}c{k:02d}'; k += 1
+            write_stl(os.path.join(COL, fn + '.stl'), Vc * MM, Fc); TOTE1_['col'].append(fn)
     area = sum((r[1] - r[0]) * (r[3] - r[2]) for r in t['rects'])
-    TOTE1['inertial'] = mass_props(V / MM, F, mass=round(1.05 * area / (0.35 * 0.48) * 1.3, 3))   # sheet + the slope inserts
+    TOTE1_['inertial'] = mass_props(V / MM, F, mass=round(1.05 * area / (0.35 * 0.48) * 1.3, 3))   # sheet + the slope inserts
 
 
 def _single_holder_links():

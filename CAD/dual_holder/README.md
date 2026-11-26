@@ -13,7 +13,7 @@ Made by `mobile_manipulator_description/generator/dual_holder.py` (shape, checks
 
 | Part of the frame | Where | What it does |
 |---|---|---|
-| **2 pads** | under each arm base, from 6.5 mm below to 5.5 mm above the plate top (12 mm thick) | each base bolts down with 4 × M5 × 20 from below into its own M5 × 8 inserts; the bases sit exactly where they were (150 mm each side, turned ±135°) |
+| **2 pads** | under each arm base, from 6.5 mm below to 5.5 mm above the plate top (12 mm thick) | each base bolts down with 4 × M5 × 20 from below into its own M5 × 8 inserts; the bases sit 150 mm each side, turned ±90° (±135° until 2026-11-25); each pad's inner end (under the base's pillar, which points at the column) is a 5 mm skin, 0.5 mm over the gantry plate and V-wheel tops |
 | **front bridge** | in front of the beam (1 mm clear), 24 mm deep | joins the two pads; carries the **scene camera mast** (`../scene_cam/`) in a 2 mm pocket across its top, on 4 × M3 × 8 inserts in the pocket floor |
 | **cheeks** | beside the gantry plate and its wheels | join pads, bridges and legs |
 | **legs** | behind the gantry plate | bolt through 4 of the plate's own 5.2 mm holes (50 mm each side of the centre, 12.5 and 72.5 mm below its top), nylocs on the plate's front face; a lip rests on the plate's top edge |
@@ -50,22 +50,24 @@ place plus `context/` (the arm bases, the camera mast stand-in, the kit's plate 
 - No contact with the kit's gantry plate, V-wheels, the beam (1 mm clear) or the column foot at the lowest lift; nothing
   inside the top end mount's footprint above the plate top.
 - The arm bases sit on the pads without overlap; each half is one solid and the halves don't overlap.
-- Arm sweep (left arm, 396 poses; the holder is symmetric): the arm touches the holder or the camera mast only in
-  poses that were already blocked before (by the old brackets, the old camera post or the beam): the forearm or hand
-  folded back toward the column. The holder blocks no pose that was free.
+- Arm sweep (left arm, 396 poses; the holder is symmetric; mounts ±90°): 77 poses touch the holder or the camera post.
+  50 of them also hit the beam, gantry plate, V-wheels, top end mount or the other arm base (impossible anyway). The
+  other 27 are the hand level and curled back under its own arm into the pad under its base: the pad turns with the
+  base, so these are the same arm poses as at ±135°, and no plan uses them. The holder blocks no usable pose.
 
 **Strength** (`generator/dual_holder_strength.py`, loads from `isaac_dual_load_test.py` with 0.25 / 0.5 kg in each
 gripper: both arms stretched out sideways, to the front limit, back over the tote and back-inward; both shoulders
 swinging at full speed then stopping hard; the lift going up and down; worst per arm base: tipping 8.3 N·m, down 32 N).
-Printed strengths as for the ring (PETG 30 MPa, already reduced for walls / infill); target safety factor 3:
+Printed strengths as for the ring (PETG 30 MPa, already reduced for walls / infill); target safety factor 3.
+Recomputed 2026-11-25 on the ±90° holder with the 0.5 kg loads (measured at ±135°; the force sizes barely depend on the mount angle):
 
 | Part | What | Stress / force | Safety factor |
 |---|---|---|---|
-| holder (PETG) | pad + bridge leaving the cheek (936 mm² section, worst: the lift stopping at the bottom) | 2.8 MPa | 10.6 |
-| legs | M5 bolt through the gantry plate | 132 N | 38 |
-| legs (PETG) | bolt head pulling through a 12 mm leg | 0.4 MPa | 44 |
-| lap joint | M5 shear, one arm loaded and the other not | 542 N | 5.5 |
-| lap joint (PETG) | bolt bearing on an 11 mm lap layer | 9.9 MPa | 3.0 |
+| holder (PETG) | pad + bridge leaving the cheek (1519 mm² section, worst: the lift stopping at the bottom) | 1.8 MPa | 16.9 |
+| legs | M5 bolt through the gantry plate | 65 N | 76 |
+| legs (PETG) | bolt head pulling through a 12 mm leg | 0.2 MPa | 88 |
+| lap joint | M5 shear, one arm loaded and the other not | 439 N | 6.8 |
+| lap joint (PETG) | bolt bearing on an 11 mm lap layer | 8.0 MPa | 3.8 |
 | arm base | its own M5 × 8 inserts | 22 N | 54 |
 
 The lap joint was the weak spot with an 8 mm layer (safety factor 2.6), so the front bridge is 24 mm deep. The mast

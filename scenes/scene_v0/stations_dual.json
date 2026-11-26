@@ -15,11 +15,11 @@
   },
   "pair_rack_b0_boxedCereal_l01__box_cracker_a01": {
    "x": -1.218,
-   "y": 0.506,
+   "y": 0.526,
    "yaw": 90.0,
    "grasp": "side",
    "grip_z": 0.881,
-   "reach": 0.71,
+   "reach": 0.69,
    "side_min_z": 0.0,
    "board": "rack_b0",
    "surface": 0.761,
@@ -44,16 +44,16 @@
    },
    "approach": [
     -1.218,
-    0.506
+    0.526
    ]
   },
   "pair_rack_b0_box_cracker_a01__boxedFood_b01": {
    "x": -0.806,
-   "y": 0.503,
+   "y": 0.523,
    "yaw": 90.0,
    "grasp": "side",
    "grip_z": 0.839,
-   "reach": 0.71,
+   "reach": 0.69,
    "side_min_z": 0.0,
    "board": "rack_b0",
    "surface": 0.761,
@@ -78,16 +78,16 @@
    },
    "approach": [
     -0.806,
-    0.503
+    0.523
    ]
   },
   "pair_rack_b0_boxedFood_b01__boxedFood_c01": {
    "x": -0.394,
-   "y": 0.506,
+   "y": 0.526,
    "yaw": 90.0,
    "grasp": "side",
    "grip_z": 0.839,
-   "reach": 0.7,
+   "reach": 0.68,
    "side_min_z": 0.0,
    "board": "rack_b0",
    "surface": 0.761,
@@ -112,16 +112,16 @@
    },
    "approach": [
     -0.394,
-    0.506
+    0.526
    ]
   },
   "pair_rack_b0_boxedFood_c01__boxedFood_d01": {
    "x": 0.018,
-   "y": 0.5,
+   "y": 0.53,
    "yaw": 90.0,
    "grasp": "side",
    "grip_z": 0.875,
-   "reach": 0.7,
+   "reach": 0.67,
    "side_min_z": 1.03,
    "board": "rack_b0",
    "surface": 0.761,
@@ -145,8 +145,8 @@
     "elbow": 1
    },
    "approach": [
-    -0.182,
-    0.5
+    -0.082,
+    0.53
    ]
   },
   "pair_shelf2_b1_ketchup_c01__ketchup_i01": {
@@ -180,7 +180,7 @@
    },
    "approach": [
     -2.15,
-    -0.682
+    -0.782
    ]
   }
  }

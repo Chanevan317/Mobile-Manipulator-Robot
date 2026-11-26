@@ -7,7 +7,7 @@ Why pairs on one board: both arms ride on ONE carriage, so the two grasps must b
 arm reaches only its own half in front (scara_ik 'prototype': 0.10 .. 0.35 m from the centre line, 0.55 .. 0.65 m ahead
 with the hand level), so the two products must be 0.2 .. 0.7 m apart. Side grasps at a COMMON grip height (the lower of
 the two products' usual ones). The mono stations (stations_mono.py) give the task products' positions; this file uses
-their footprint check, approach points and route (the dual base is the same 0.50 x 0.50).
+their footprint check, approach points and route (the dual base is the same 0.45 x 0.45 since 2026-11-25; it was 0.50 with this 0.45 check).
 Checked: kinematics (both arms, approach / grasp / lift poses, joint limits) and the footprint. NOT checked yet: the arms
 against the furniture, the products and each other (the dual pick script's job).
 """
@@ -24,10 +24,10 @@ import scara_ik as K
 
 LAYOUT = 'prototype'
 OUT = os.path.join(RP.scene_dir('scene_v0'), 'stations_dual.json')
-GAP = (0.20, 0.75)                          # m between the two products' centres
+GAP = (0.12, 0.75)                          # m between the two products' centres (0.20 until the mounts turned to +-90, 2026-11-25)
 DZ = 0.02                                   # lift after grasping (as the mono stations)
 HUB = SM.HUB
-SIDE_ENV = (-0.05, 0.25, 0.25, 0.47)        # base frame (x0, x1, |y| from, |y| to): where a hand goes in the elbow-open pose
+SIDE_ENV = (-0.075, 0.225, 0.25, 0.47)        # base frame (x0, x1, |y| from, |y| to): where a hand goes in the elbow-open pose
 SIDE_CLEAR = 0.06                           # wide moves keep the TCP this far above a low obstacle there (the hand's bottom)                                # the aisle middle (scene_robot.leg labels it)
 
 

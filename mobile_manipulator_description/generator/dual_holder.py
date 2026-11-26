@@ -3,7 +3,7 @@
 aluminium brackets of the URDF.
 
 Units mm, CARRIAGE frame: origin on the column axis, x forward (working face), z = carriage z (gantry plate top z 20).
-The arm bases stay where they were: shoulder axes at (0, +-150), mount yaw +-135 deg, base underside z 25.5.
+The arm bases stay where they were: shoulder axes at (0, +-150), mount yaw +-90 deg (+-135 until 2026-11-25), base underside z 25.5.
 
     pads        12 mm under each arm base (its footprint + 4 mm), z 13.5..25.5; 4 x M5 x 20 from below into the
                 base's own M5 x 8 inserts
@@ -25,9 +25,23 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from lib import M, CS, box, cyl, union, xf, T, Rx, Ry, Rz, print_mesh
 from hw import screw_cut, insert_cut, Reg
 
-ARM_Y, YAW, AZ = 150.0, 135.0, 65.5          # urdf_build PROTO_ARM_Y, PROTO_YAW, ARM_Z
+ARM_Y, YAW, AZ = 150.0, 90.0, 65.5           # urdf_build PROTO_ARM_Y, PROTO_YAW, ARM_Z (yaw 135 until 2026-11-25)
 BASE_Z = AZ - 40.0                            # base underside (its mount face is 40 mm under the servo mid-plane)
 PAD = (BASE_Z - 12.0, BASE_Z)                 # pad z
+# the dual robot's base (2026-11-25, user: try the mono's 0.45): square mecanum base, side BASE; the column (and the arms
+# beside it) ROBOT_X forward of the base centre, 0.07 behind the front edge as on the 0.50 base (column 0.18) and the mono
+BASE = 0.45
+ROBOT_X = round(BASE / 2 - 0.07, 3)
+# the dual robot's tote on the base (robot frame, m): a FLAT box behind the column, inner faces 7 mm inside the deck's back /
+# side edges, front face 0.082 behind the column axis, floor top 0.263, walls 0.12. A funnel floor as the mono's was tried
+# (2026-11-25): the arms reach all but a ~10 cm back strip, and the dropped boxes (lying, ~20 cm long) rest their ends on
+# any slope there: food box b rolled 10 cm onto its side in Isaac. Flat it is.
+def dual_tote():
+    e = round(BASE / 2 - 0.007, 3); x1 = round(ROBOT_X - 0.082, 3)
+    return dict(x=(-e, x1), y=(-e, e), z=(0.256, 0.376), wall=0.007)
+
+
+GANTRY_CLEAR = dict(x=(-28.5, 1.5), y=63.5, z=20.5)   # pads stay above the gantry plate + V-wheel tops (z 20) here
 BASE_M5 = [(-80.0, 13.5), (-80.0, -13.5), (-54.0, 13.5), (-54.0, -13.5)]
 FRONT = dict(x=(21.0, 60.0), y=95.0, z=(1.5, BASE_Z), zm=12.5)   # 24 mm deep; lap face 12.5 (2026-11-16, was 13.5): 11 mm layers under the mast pocket (strength check: 10 mm gave SF 2.8, 8 mm 2.6 in bolt bearing)
 REAR = dict(x=(-40.0, -31.0), y=75.0, z=(0.0, BASE_Z), zm=12.75)
@@ -85,7 +99,12 @@ def holder():
     r = Reg(); cut = []
     parts = []
     for sy in (-1, 1):
-        p, c = pad(sy, r); parts.append(p); cut += c
+        p, c = pad(sy, r); cut += c
+        # since the mounts turned to +-90 (2026-11-25) each base's pillar points at the column: its pad's inner end lies over
+        # the gantry plate and the V-wheels (tops z 20). Keep the pad 0.5 mm above them there (a 5 mm skin; no screws there:
+        # the base's M5s are at |y| 70 / 96)
+        p = p - box(GANTRY_CLEAR['x'][0], GANTRY_CLEAR['x'][1], -GANTRY_CLEAR['y'], GANTRY_CLEAR['y'], PAD[0] - 1.0, GANTRY_CLEAR['z'])
+        parts.append(p)
         y0, y1 = sorted((sy * CHEEK['y'][0], sy * CHEEK['y'][1]))
         parts.append(box(*CHEEK['x'], y0, y1, *CHEEK['z']))
         y0, y1 = sorted((sy * LEG['y'][0], sy * LEG['y'][1]))

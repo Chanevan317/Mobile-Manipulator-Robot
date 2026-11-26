@@ -2,7 +2,7 @@
 
 The arm: shoulder, elbow and wrist pan about vertical axes (link lengths 0.13 and 0.13 m), then wrist pitch
 (+ = tip down) and wrist roll. The lift moves the whole carriage up. Two robot layouts (generator/urdf_build.py):
-    prototype  shoulder axis base_link (0.18, ±0.15), arm zero pose at ±135 deg (45 deg toward the rear tote)
+    prototype  shoulder axis base_link (0.155, ±0.15) (0.18 on the 0.50 base until 2026-11-25), arm zero pose at ±90 deg (straight out to its side; ±135 until 2026-11-25)
 The only layout is 'prototype' (v0 was deleted on 2026-11-09); use('prototype') is kept for the existing callers.
 Geometry (metres):
     shoulder z         0.4855 + lift (both layouts)
@@ -21,7 +21,7 @@ TOOL = 0.215              # pitch axis -> TCP
 Z0 = 0.4109               # TCP height at lift 0, pitch 0
 D = math.radians
 # per layout: side -> (shoulder x, shoulder y, arm zero-pose yaw); must match generator/urdf_build.py
-LAYOUTS = {'prototype': {'left': (0.18, 0.15, D(135)), 'right': (0.18, -0.15, -D(135))},
+LAYOUTS = {'prototype': {'left': (0.155, 0.15, D(90)), 'right': (0.155, -0.15, -D(90))},   # x 0.18 on the 0.50 base (until 2026-11-25)
            # THE one-arm prototype since 2026-11-23 (mono holder): the prototype's own arm, shoulder on the robot's
            # centreline 0.18 m forward (0.12 until 2026-11-24), zero pose pointing LEFT (+y); the column 0.122 m to its
            # right, the tote on the base behind the arm (as the original design); keep equal to mono_holder.ROBOT_X
@@ -37,8 +37,8 @@ ARM_GEOM = {'prototype': (0.13, 0.4109), 'prototype_mono_arm': (0.13, 0.4109), '
             'prototype_mono_ring_side': (0.161, 0.4109 + 0.0185)}
 LAYOUT = 'prototype'
 ARM_Y = 0.15              # arm mount y (ARM_Y / SHOULDER / MOUNT_YAW are set by use(); see the end of this file)
-SHOULDER = {'left': (0.18, ARM_Y), 'right': (0.18, -ARM_Y)}
-MOUNT_YAW = {'left': D(135), 'right': -D(135)}
+SHOULDER = {'left': (0.155, ARM_Y), 'right': (0.155, -ARM_Y)}
+MOUNT_YAW = {'left': D(90), 'right': -D(90)}
 
 
 def use(layout):

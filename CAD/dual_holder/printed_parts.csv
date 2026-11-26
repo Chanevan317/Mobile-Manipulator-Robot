@@ -1,3 +1,3 @@
 file,part,material,size_mm,volume_cm3,note
-D01_holder_left.stl,holder_left,PETG,120.3 x 105.5 x 210.0,282.7,"left half (y >= 0): pad, cheek, leg, upper layer of both laps, scene camera mast inserts; prints on its outer side face (cheek down)"
-D02_holder_right.stl,holder_right,PETG,120.3 x 105.5 x 210.0,283.5,"right half (y <= 0): pad, cheek, leg, lower layer of both laps; prints on its outer side face (cheek down)"
+D01_holder_left.stl,holder_left,PETG,100.0 x 105.5 x 210.0,280.9,"left half (y >= 0): pad, cheek, leg, upper layer of both laps, scene camera mast inserts; prints on its outer side face (cheek down)"
+D02_holder_right.stl,holder_right,PETG,100.0 x 105.5 x 210.0,281.7,"right half (y <= 0): pad, cheek, leg, lower layer of both laps; prints on its outer side face (cheek down)"

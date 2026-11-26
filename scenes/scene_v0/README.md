@@ -103,7 +103,7 @@ on two different products**: the left arm takes one, the right arm the one besid
 
 ```bash
 python scripts/scenes/scene_v0/stations_dual.py                     # pair stations -> stations_dual.json (no simulator)
-python scripts/scenes/scene_v0/pick_to_tote_dual.py                  # window: "Dual pick" panel + scene and both wrist cameras
+python scripts/scenes/scene_v0/pick_to_tote_dual.py                  # window: "Dual pick" panel + scene and both wrist cameras + scene depth
 python scripts/scenes/scene_v0/pick_to_tote_dual.py --headless --all --place   # every pair: pick both, put both back
 python scripts/scenes/scene_v0/station_menu_dual.py                  # window: drive to pair stations, pick / place both
 python scripts/scenes/scene_v0/drive_stations_dual.py --route home,shelf_b1_milk_b01,home   # driving only
@@ -111,22 +111,34 @@ python scripts/scenes/scene_v0/random_drive_dual.py
 python scripts/scenes/scene_v0/check_scene_dual.py --headless       # pair reach + scene check with the dual robot
 ```
 
-- **Pair stations** (`stations_dual.py`): two task products on one board, 0.20-0.75 m apart. Each arm reaches only its
-  own half in front (0.10-0.35 m from the middle, 0.55-0.65 m ahead with the hand level), and both arms share **one
-  lift**, so both products are gripped from the side at **one height** (the lower of their usual grip heights).
+- **Pair stations** (`stations_dual.py`): two task products on one board, 0.12-0.75 m apart (0.20 before the arm mounts
+  turned to ±90° on 2026-11-25: the two arms' reach now meets in the middle), and both arms share **one lift**, so both products are gripped from the side at **one height** (the lower of their usual grip heights).
   5 pairs: four on blue rack 1's bottom board and the two ketchups on grey shelf 2. The table's products are only
-  0.12 m apart: too close for two hands. The driving scripts still use the mono stations (`stations_mono.py`).
-- **The pick** (`lib/pick_place_dual.py`): drive there folded; lift; unfold one arm at a time; both hands in front of
+  0.12 m apart: no base pose fits both arms beside the table. The driving scripts still use the mono stations (`stations_mono.py`).
+- **The pick** (`lib/pick_place_dual.py`): drive there folded; unfold both arms while the lift rises; both hands in front of
   their products; both jaws open (fully, before going in); both straight in; both close; both lift 2 cm and back out
   of the shelf to a point from which the swing can't slide a held box along the board; elbow-open beside the robot;
   hands down beside the robot (the boxes turn to lying); over the two tote spots, high enough to clear the tote walls
-  in any orientation; down; release; fold.
+  in any orientation; down; release; up just clear of the products; fold both arms. The lift stays where it is for the
+  drive (at most 0.50 m), so the next pick starts near its grip height instead of from 0.20 m.
+- **Asynchronous arms (2026-11-25):** between the shared lift moves each arm runs its own chain of moves (in, jaws, out,
+  back out, elbow-open, hands down; on the way back the same) on its own clock, without waiting for the other
+  (`proto_task.Task.parallel`); each jaw stops when it closes on its product. A pair takes 18-23 s to pick and 19-20 s
+  to put back (was 29-32 s), all 5 pairs PASS (also on the 0.45 m base). `MM_DUAL_SYNC=1` = the old lock-step sequence.
+  The pair beside the tall unit (rack 1's last pair) takes ~44 s: its hands must go high before they swing out.
 - **The lift moves only while both hands are inside the robot's outline** (folded, over the tote) or straight in front
   of the shelf. Next to the table (rack 1's last pair) the hands swing out above the table and the crate on it
   (`side_min_z` in `stations_dual.json`), and the held boxes' length is added while they hang.
 - **Place back:** the same path backwards. Each hand re-grips its product where it lies now (it slides and drops a little
   after release). Both hands are at one height, so the two boxes may be held a little deeper or shallower than when
   they were dropped. Each hand then goes that much further in or less far into the shelf, so the box lands on its spot.
+- **Scene camera depth window** (in `pick_to_tote_mono.py`, `pick_to_tote_dual.py`, `station_menu_dual.py`; `cameras.depth_window()`):
+  the scene camera's depth image, live, also while a pick runs: red = 0.2 m, through yellow and green, to blue = 2 m and
+  beyond; black = no depth (outside the camera's range, as the real Gemini 2 reports). The line under it gives the nearest
+  and median distance. `MM_DEPTH_SNAP=file.png` saves one frame.
+- **Window layout** (`cameras.arrange()`, the same three scripts): the camera windows (scene, scene depth, wrist cameras)
+  float in one even row along the bottom, under the main viewport, and the script's menu is a tab next to Render
+  Settings on the right. Drag them anywhere after; `MM_UI_SNAP=file.png` saves a picture of the whole app window.
 - `DUAL_DEBUG=1` prints, after every step, both products, both hands, the jaw gaps, the worst joint error and anything
   else that moved.
 - Not yet: collision planning for two arms (mono uses `collide.py`'s planner; the dual moves are fixed patterns, checked

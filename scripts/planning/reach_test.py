@@ -35,6 +35,8 @@ ap.add_argument('--width', type=float, default=0.45, help='test y from -width to
 ap.add_argument('--step', type=float, default=0.03, help='grid step (m)')
 ap.add_argument('--jobs', type=int, default=max(1, (os.cpu_count() or 2) - 2))
 ap.add_argument('--no_tote', action='store_true', help='skip the tote')
+ap.add_argument('--open_deck', action='store_true', help='tote design: test hand-down reach over the WHOLE deck at the tote '
+                'floor height with the tote itself removed (no walls)')
 ap.add_argument('--shelf_angle', type=float, default=0.0, help='shelves: the hand may enter up to +- this many deg off straight in (5 deg steps)')
 ap.add_argument('--out', default=None, help='output prefix (default: <package>/reach_test_<layout>)')
 args = ap.parse_args()
@@ -46,12 +48,15 @@ import scara_ik as K                              # noqa: E402
 
 K.use(args.layout)
 SIDES = list(K.SHOULDER)                          # ['left', 'right'], or ['left'] for the mono-arm experiment
-TOTE = dict(x=(-0.238, 0.098), y=0.233, floor=0.263)   # tote interior / floor top in base_link (urdf_build lift_prototype)
+TOTE = dict(x=(-0.218, 0.073), y=0.218, floor=0.263)   # dual tote interior / floor top in base_link (dual_holder.dual_tote)
 if args.layout == 'prototype_mono_arm':          # mono holder: its own L-shaped base tote, mono_holder.base_tote()
     import mono_holder as _MH
     _t = _MH.base_tote(); _w = _t['wall']              # rects = the walls' inner faces; floor = its flat part
     TOTE = dict(x=(_t['x'][0], _t['x'][1]), y=max(abs(_t['y'][0]), _t['y'][1]), floor=_t['z'][0] + _w,
                 inside=lambda x, y: _MH.in_tote(_t, x, y))
+if args.open_deck:                                # the whole deck (base_xml: square base, half side B / 2), tote link removed
+    _B = 0.45
+    TOTE = dict(x=(-_B / 2 + 0.007, _B / 2 - 0.007), y=_B / 2 - 0.007, floor=TOTE['floor'])
 D = math.radians
 ARM = ['upper_arm', 'forearm', 'wrist', 'tilt', 'hand', 'finger_right', 'finger_left']
 PARK = dict(shoulder_pan=D(45), elbow_pan=0.0, wrist_pan=0.0, wrist_pitch=0.0, wrist_roll=0.0)
@@ -74,7 +79,8 @@ def init():
         return False
     global EXTRA
     EXTRA = [n for n in LS if not n.startswith(('left_', 'right_')) and on_arm(n)]
-    STATIC_NAMES = [n for n in LS if not n.startswith(('left_', 'right_')) and 'roller' not in n and not n.startswith('wheel') and n not in EXTRA]
+    STATIC_NAMES = [n for n in LS if not n.startswith(('left_', 'right_')) and 'roller' not in n and not n.startswith('wheel') and n not in EXTRA
+                    and not (args.open_deck and n == 'tote')]
 
 
 def solids(q, names):

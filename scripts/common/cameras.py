@@ -268,3 +268,133 @@ def capture(task, cams, renders=3, max_renders=60, settle=90):
                 d[~np.isfinite(d) | (d < lo) | (d > hi)] = 0.0
             out[n.replace('scene', 'scene_depth') if n != 'scene' else 'scene_depth'] = d
     return out
+
+
+def _turbo_lut():
+    """256 x 3 uint8 colour map, near = red ... far = blue (Google's Turbo, polynomial fit; no matplotlib needed)."""
+    t = np.linspace(0.0, 1.0, 256)[:, None]
+    c = np.array([[0.13572138, 4.61539260, -42.66032258, 132.13108234, -152.94239396, 59.28637943],
+                  [0.09140261, 2.19418839, 4.84296658, -14.18503333, 4.27729857, 2.82956604],
+                  [0.10667330, 12.64194608, -60.58204836, 110.36276771, -89.90310912, 27.34824973]])
+    rgb = sum(c[:, k] * t ** k for k in range(6))
+    return (np.clip(rgb, 0, 1)[::-1] * 255).astype(np.uint8)       # reversed: near = warm
+
+
+def depth_window(cam, title='Scene camera depth', near=0.2, far=2.0, every=4, position=None):
+    """A window that shows `cam`'s depth (Isaac Camera with a depth annotator, e.g. task.cams['scene']) live, coloured from
+    `near` (red) to `far` (blue) metres; black = no depth (outside the device's range, SCENE['depth'], as the real camera
+    reports). Updated every `every` app frames from the annotator's latest data (no extra render), also while a pick runs.
+    Keep the returned (window, subscription) alive."""
+    import omni.ui as ui, omni.kit.app
+    lo_dev, hi_dev = SCENE['depth']
+    w, h = SCENE['res']
+    if position is None:                      # just above the camera row the scripts open at y 820
+        position = (20, 820 - (h + 70) - 10)
+    lut = _turbo_lut()
+    prov = ui.ByteImageProvider()
+    win = ui.Window(title, width=w + 20, height=h + 70, position_x=position[0], position_y=position[1])
+    with win.frame:
+        with ui.VStack(spacing=4):
+            ui.ImageWithProvider(prov, fill_policy=ui.IwpFillPolicy.IWP_PRESERVE_ASPECT_FIT)   # fits a docked window
+            label = ui.Label(f'red {near:.1f} m ... blue {far:.1f} m (and beyond), black = no depth '
+                             f'(device range {lo_dev:g} .. {hi_dev:g} m)', height=16)
+    n = {'k': 0}
+
+    def _update(_e):
+        n['k'] += 1
+        if n['k'] % every:
+            return
+        try:
+            d = cam.get_depth()
+        except Exception:
+            return
+        if d is None or np.asarray(d).ndim != 2:
+            return
+        d = np.asarray(d, np.float32)
+        bad = ~np.isfinite(d) | (d < lo_dev) | (d > hi_dev)
+        idx = np.clip((d - near) / (far - near) * 225.0, 0, 225)   # Turbo's last ~10 % is near-black: stop at blue
+        idx[bad] = 0
+        rgb = lut[idx.astype(np.uint8)]
+        rgb[bad] = 0
+        rgba = np.concatenate([rgb, np.full(rgb.shape[:2] + (1,), 255, np.uint8)], axis=2)
+        hh, ww = rgba.shape[:2]
+        try:
+            prov.set_data_array(np.ascontiguousarray(rgba), [ww, hh])
+        except Exception:
+            prov.set_bytes_data(rgba.flatten().tolist(), [ww, hh])
+        snap = __import__('os').environ.get('MM_DEPTH_SNAP')          # debug: save one coloured frame (after ~10 s of data)
+        if snap and n['k'] > 600 and not n.get('saved'):
+            from PIL import Image
+            Image.fromarray(rgb).save(snap); n['saved'] = True; print('depth window: saved', snap, flush=True)
+        ok = d[~bad]
+        if ok.size:
+            label.text = (f'red {near:.1f} m ... blue {far:.1f} m, black = no depth   |   nearest {ok.min():.2f} m, '
+                          f'median {np.median(ok):.2f} m, {100 * ok.size / d.size:.0f} % of pixels with depth')
+
+    sub = omni.kit.app.get_app().get_update_event_stream().create_subscription_to_pop(_update, name='depth_window')
+    return win, sub
+
+
+
+def arrange(cam_windows, panel=None, gap=6, panel_next_to=('Render Settings', 'Property', 'Stage')):
+    """Camera windows FLOATING in one even row along the bottom of the app window, under the main 'Viewport' (over the
+    bottom panel, not the viewport), keeping the camera picture's shape; the script's panel docked as a TAB next to Render
+    Settings on the right (2026-11-25, user: "make those 4 align at the bottom and the menu as a tab next to render
+    settings"; floating, not docked into the bottom panel). Runs on the app's update events a few frames later (the
+    workspace must be laid out first; an asyncio task never ran in these standalone scripts); keep the returned
+    subscription alive. MM_UI_SNAP=file.png also saves a picture of the whole app window."""
+    import os, traceback, omni.ui as ui, omni.kit.app
+    wins = [w for w in cam_windows if w is not None]
+    st = {'k': 0, 'docked_to': None}
+    snap = os.environ.get('MM_UI_SNAP')
+
+    def _dock_panel():
+        for name in panel_next_to:
+            tgt = ui.Workspace.get_window(name)
+            if tgt is not None and tgt.visible:
+                panel.dock_in(tgt, ui.DockPosition.SAME)
+                st['docked_to'] = name
+                return
+
+    def _place():
+        W_main, H_main = ui.Workspace.get_main_window_width(), ui.Workspace.get_main_window_height()
+        vp = ui.Workspace.get_window('Viewport')
+        if vp is not None and vp.width > 100:
+            x0, width, bottom = vp.position_x, vp.width, vp.position_y + vp.height
+        else:
+            x0, width, bottom = 0.0, W_main * 0.78, H_main * 0.70
+        n = max(1, len(wins))
+        w = (width - (n + 1) * gap) / n
+        h = w * SCENE['res'][1] / SCENE['res'][0] + 52                 # picture + title bar (+ the depth line)
+        room = H_main - bottom - 2 * gap
+        if room > 150:
+            h = min(h, room)                                          # fit under the viewport when there is room
+        y = H_main - h - gap
+        for k, win in enumerate(wins):
+            win.position_x, win.position_y = x0 + gap + k * (w + gap), y
+            win.width, win.height = w, h
+        print(f'arrange: {n} camera windows {w:.0f} x {h:.0f} at y {y:.0f} (viewport x {x0:.0f}..{x0 + width:.0f}, bottom '
+              f'{bottom:.0f}; app {W_main} x {H_main}); panel tab next to {st["docked_to"]}', flush=True)
+
+    def _update(_e):
+        st['k'] += 1
+        k = st['k']
+        try:
+            if k == 10 and panel is not None:
+                _dock_panel()
+            elif k == 15:
+                _place()
+            elif k == 20 and panel is not None and st['docked_to']:
+                panel.focus()                                   # show the menu tab, not Render Settings
+            elif snap and k == 150:
+                import omni.renderer_capture
+                omni.renderer_capture.acquire_renderer_capture_interface().capture_next_frame_swapchain(snap)
+            elif snap and k == 160:
+                print('arrange: saved', snap, flush=True)
+        except Exception:
+            traceback.print_exc()
+        if k >= 160:
+            st.pop('sub', None)                                 # done: drop the subscription
+
+    st['sub'] = omni.kit.app.get_app().get_update_event_stream().create_subscription_to_pop(_update, name='arrange')
+    return st

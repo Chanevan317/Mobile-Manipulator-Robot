@@ -31,6 +31,9 @@ Made by `mobile_manipulator_description/generator/mono_holder.py` (shape, checks
 |---|---|---|
 | **pad** | under the arm base, 6.5 mm below to 5.5 mm above the plate top (12 mm thick) | the base bolts down with 4 × M5 × 20 from below into its own M5 × 8 inserts |
 | **legs, lip, rear bridge** | behind the gantry plate, as on the dual holder | bolt through 4 of the plate's own 5.2 mm holes (50 mm each side of the centre, 12.5 and 72.5 mm below its top), nylocs on the plate's front face; the lip rests on the plate's top edge |
+| **web** | the rear bridge carried down between the legs to their bottom (9 mm thick, 105 mm tall) | carries the arm's tipping moment from the pad to the legs (the bridge alone was too weak, see Strength); two round slots let the inner arm-base screws seat and be driven from below |
+| **rib** | under the pad on the centreline, 6 mm thick, from 73 mm deep at the web to nothing 60 mm out | stiffens the pad (and carries a third of the load) |
+| **corner gussets** | where the pad meets the bridge, the pad widens in plan from ±24.5 mm (16 mm out) to ±42 mm | spread the load into the whole bridge instead of two corners; any wider and the folded arm's hand hits them |
 | **post** | on the rear leg, behind the beam and its wheels, from 1 mm over the plate / wheel tops up to the bar (34 × 29 mm) | carries the bar; it stands where the shoulder's ±115° never takes the arm |
 | **bar** | 145–167 mm over the plate top (the arm never rises above 135 mm), from the post along behind the arm, then forward over the shoulder | a 2 mm pocket for the camera mast's flange, 4 × M3 × 8 inserts in its floor |
 
@@ -38,7 +41,7 @@ Made by `mobile_manipulator_description/generator/mono_holder.py` (shape, checks
 
 | # | File | What | Material | Print |
 |---|---|---|---|---|
-| H01 | `H01_holder.stl` | the whole holder, 152 × 247 × 150 mm, 453 cm³ | **PETG** | on its back (the rear leg and post face on the bed); supports under the bar and the pad |
+| H01 | `H01_holder.stl` | the whole holder, 520 cm³ | **PETG** | on its back (the rear leg and post face on the bed); supports under the bar and the pad |
 
 The camera mast for this robot is `../scene_cam/C02_mast_98_mono.stl` (98 mm; the head and cradle are the same as the
 two-arm robot's). `printed_parts.csv` has the size and volume; `fasteners.csv` every screw. `assembly_stl/` has the
@@ -55,7 +58,8 @@ holder in place plus `context/` (the arm base, the camera mast, the kit's plate 
 ## Assembly
 
 1. Press the 4 M3 inserts into the bar's pocket floor.
-2. Bolt the arm base onto the pad: 4 × M5 × 20 from below.
+2. Bolt the arm base onto the pad: 4 × M5 × 20 from below (the two screws next to the bridge go in through the round
+   slots in the web).
 3. Hang the holder on the gantry plate (lip on the plate's top edge) and bolt the legs through the plate: 4 × M5 × 25,
    nylocs on the plate's front face.
 4. Set the camera mast's flange in the bar's pocket and screw it down (see `../scene_cam/`).
@@ -64,11 +68,59 @@ holder in place plus `context/` (the arm base, the camera mast, the kit's plate 
 
 - No clashes with the kit (gantry plate, V-wheels, beam with 1 mm clearance, top end mount, column foot), the arm base,
   the camera mast or the camera's pitch sweep; one piece.
-- The mast flange sits on 1683 of its 1760 mm² on the pocket floor.
+- The web, rib and corner gussets don't block any arm pose. A 3025-pose sweep (URDF meshes, 3 mm margin) flagged a few
+  poses near them; the exact CAD check shows those either already hit the old holder, gantry plate or beam, or don't
+  touch the new parts at all.
+- The mast flange sits on 1413 of its 1760 mm² on the pocket floor.
 - The base tote is clear of the holder at the lowest lift (holder bottom 340 mm above the floor; the tote ends 15 mm
   before the rear legs, and its left leg is on the other side of the arm from the column).
+- Isaac, 2026-11-25 (after the strength changes): all 14 pickable store products picked into the tote and put back
+  1–6 mm from where they stood, nothing else knocked.
 - In the robot model: the URDF checks are clean, the travel fold is clear from lift 0 to 0.871 m (numbers and Isaac
   results in `mobile_manipulator_description/README.md`).
 
-Not checked: strength and stiffness. The bar holds the mast, head, pitch servo and camera about 100 mm out from the post;
-if the camera image shakes when the lift stops, a second post or a gusset under the bar is the fix.
+## Strength
+
+Two checks, no simulator. The arm's masses come from the URDF, with 0.5 kg in the gripper. Every case is run with gravity
+alone, and with a dynamic case: gravity × 1.3 (the lift starting or stopping), 3 m/s² sideways (hard braking) and the
+shoulder servo's full stall torque, all at once. PETG is taken as 30 MPa along the layers and 15 MPa across them (the
+holder prints on its back, so the bridge and web are loaded across the layers). Target safety factor: 3.
+
+**FEA** (`python3 mobile_manipulator_description/generator/mono_holder_fea.py`; needs `pyamg` for the fast solver):
+- **Model:** the real holder cut into 2 mm cubes (270k unknowns), with the arm base as a stiff plate bolted on top. The
+  legs are held where they bolt onto the gantry plate: the M5 preload is far above what the loads pull with.
+- **Load cases:** the arm stretched straight out, to the front and to the back.
+- **Output:** a stress map, `fea_mono_holder.png`.
+
+Where the load goes: from the arm base into the pad, then down the rib (a third of it) and along the pad into the top of
+the bridge. From there it goes into the upper halves of the legs, and through them into the gantry plate. The lower web
+does little.
+
+| Worst dynamic case | First fix: web + short rib | Now: + deep rib + corner gussets |
+|---|---|---|
+| Peak stress (one sharp inner corner), SF | 1.3 (pad corner into the bridge, across layers) | 3.5 (top of the bridge at the leg) |
+| Every region at its 99th percentile, SF | ≥ 5.4 | ≥ 10 |
+| Hand drop from the holder bending (arm stretched) | 3.1 mm (gravity), 4.0 mm (dynamic) | 1.6 mm, 2.1 mm |
+
+**Beam check** (`mono_holder_strength.py`): 1210 arm poses on chosen sections.
+- Bridge + web SF 5.4, legs 4.5 and the arm base inserts 4.7.
+- The gantry bolts and the camera post / bar are above 90.
+- The pad section under the arm base reads 3.3. That number is low because the beam method ignores the stiff arm base
+  bolted on top of the pad. The FEA, which includes it, gives that area SF ≥ 10.
+
+History (2026-11-25):
+- **Original design:** the rear bridge (9 × 25.5 mm) was the only path from the pad to the legs. It had SF 1.0 with gravity
+  alone and 0.7 dynamic, and the inner arm-base screws' heads hit it.
+- **First fix:** the web, a short rib and the screw slots.
+- **Then, from the FEA:** the rib was deepened, and the corner gussets were added where the narrow pad had pushed the load
+  into the bridge at two points.
+- **Rejected:** a wider fan, out to the legs' outer faces. It was stronger, but it blocked the folded arm.
+
+1 kg in the gripper is more than the arm can hold (the wrist pitch servo gives up first). 0.5 kg is the design case.
+
+**Crash limit:** a push on the stretched hand of about 75 N starts a crack at the sharp corner, and about 200 N breaks the
+bulk of the holder. The lift's NEMA 23 and lead screw push far harder than that. If the hand lands on a shelf or the tote
+rim, the lift must stop: use the lift driver's stall or following-error alarm, or a current limit.
+
+Not checked: stiffness of the camera bar. It holds the mast, head, pitch servo and camera about 100 mm out from the post;
+the stresses are tiny, but if the camera image shakes when the lift stops, a second post or a gusset under the bar is the fix.
